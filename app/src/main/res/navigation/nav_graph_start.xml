@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_start"
+    app:startDestination="@id/splashFragment">
+
+    <fragment
+        android:id="@+id/navBottomFragment"
+        android:name="ru.feip.elisianix.common.NavBottomFragment"
+        android:label="fragment_nav_bottom"
+        tools:layout="@layout/fragment_nav_bottom" />
+    <include app:graph="@navigation/nav_graph_cart" />
+    <include app:graph="@navigation/nav_graph_catalog" />
+    <include app:graph="@navigation/nav_graph_favorite" />
+    <include app:graph="@navigation/nav_graph_profile" />
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="ru.feip.elisianix.start.SplashFragment"
+        android:label="SplashFragment" />
+</navigation>
