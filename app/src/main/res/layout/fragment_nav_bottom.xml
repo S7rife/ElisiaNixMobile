@@ -14,12 +14,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
+    <!--TODO raise labels-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemIconSize="34dp"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/main_nav_menu"
-        app:labelVisibilityMode="selected"/>
+        app:menu="@menu/main_nav_menu" />
 </androidx.constraintlayout.widget.ConstraintLayout>
