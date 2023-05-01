@@ -38,13 +38,13 @@ android {
 dependencies {
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.fragment:fragment-ktx:1.5.6'
+    implementation 'androidx.fragment:fragment-ktx:1.5.7'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    def nav_version = "2.5.3"
+    def nav_version = "2.6.0-beta01"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation 'androidx.navigation:navigation-compose:2.6.0-alpha09'
+    implementation "androidx.navigation:navigation-compose:$nav_version"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
 
@@ -64,4 +64,7 @@ dependencies {
     def okHttp_version = "4.10.0"
     implementation "com.squareup.okhttp3:okhttp:$okHttp_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okHttp_version"
+
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }

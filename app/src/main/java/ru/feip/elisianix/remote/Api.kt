@@ -10,7 +10,7 @@ interface Api {
     ////////////////////////////////////////__CATALOG__////////////////////////////////////////////
 
 
-    @GET("/categories")
+    @GET("api/categories")
     suspend fun getCategories(): List<CategoryResponse>
 
 }

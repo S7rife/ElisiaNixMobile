@@ -49,7 +49,7 @@ data class CategoryResponse(
     var image: String,
 
     @SerializedName("subCategories")
-    var subCategories: List<String>?,
+    var subCategories: List<CategoryResponse>?,
 
     @SerializedName("level")
     var level: Int,
