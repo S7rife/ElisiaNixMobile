@@ -41,3 +41,25 @@ data class Color(
     @SerializedName("value")
     var value: String,
 )
+
+data class ActualSection(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("name")
+    var name: String,
+
+    @SerializedName("products")
+    var products: List<ProductMainPreview>,
+)
+
+data class Image(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("name")
+    var name: String?,
+
+    @SerializedName("url")
+    var url: String,
+)
