@@ -3,21 +3,18 @@ package ru.feip.elisianix.remote.models
 import com.google.gson.annotations.SerializedName
 
 
-data class ProductResponse(
+data class ProductMainPreview(
     @SerializedName("id")
     var id: Int,
 
     @SerializedName("article")
     var article: String?,
 
-    @SerializedName("alias")
-    var alias: String?,
-
-    @SerializedName("description")
-    var description: String?,
+    @SerializedName("name")
+    var name: String?,
 
     @SerializedName("price")
-    var price: Int,
+    var price: Double,
 
     @SerializedName("countAvailable")
     var countAvailable: Int,
@@ -25,8 +22,8 @@ data class ProductResponse(
     @SerializedName("previewImage")
     var previewImage: String,
 
-    @SerializedName("isVisible")
-    var isVisible: Boolean,
+    @SerializedName("newProduct")
+    var newProduct: Boolean,
 
     @SerializedName("category")
     var category: ProductCategory,
@@ -35,7 +32,7 @@ data class ProductResponse(
     var brand: Brand,
 )
 
-data class CategoryResponse(
+data class CategoryMainPreview(
     @SerializedName("id")
     var id: Int,
 
@@ -46,10 +43,10 @@ data class CategoryResponse(
     var alias: String,
 
     @SerializedName("image")
-    var image: String,
+    var image: Image,
 
     @SerializedName("subCategories")
-    var subCategories: List<CategoryResponse>?,
+    var subCategories: List<CategoryMainPreview>?,
 
     @SerializedName("level")
     var level: Int,

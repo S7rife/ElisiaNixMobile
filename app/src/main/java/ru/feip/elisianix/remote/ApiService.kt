@@ -14,9 +14,17 @@ class ApiService {
     ////////////////////////////////////////__CATALOG__////////////////////////////////////////////
 
 
-    suspend fun getCategories(): Flow<Result<List<CategoryResponse>>> =
-        flow<Result<List<CategoryResponse>>> {
+    suspend fun getCategories(): Flow<Result<List<CategoryMainPreview>>> =
+        flow<Result<List<CategoryMainPreview>>> {
             emit(Result.Success(api.getCategories()))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
+    suspend fun getProducts(queryMap: Map<String, String>): Flow<Result<List<ProductMainPreview>>> =
+        flow<Result<List<ProductMainPreview>>> {
+            emit(Result.Success(api.getProducts(queryMap)))
         }
             .catch { emit(Result.Error(it)) }
             .flowOn(Dispatchers.IO)
