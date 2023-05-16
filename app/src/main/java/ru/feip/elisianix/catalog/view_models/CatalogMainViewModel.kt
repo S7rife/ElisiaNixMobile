@@ -52,7 +52,7 @@ class CatalogMainViewModel : ViewModel() {
                 .collect {
                     when (it) {
                         is Result.Success -> {
-                            _newProducts.emit(it.result)
+                            _newProducts.emit(it.result.products)
                         }
                         is Result.Error -> {}
                     }
@@ -68,7 +68,7 @@ class CatalogMainViewModel : ViewModel() {
                 .collect {
                     when (it) {
                         is Result.Success -> {
-                            _discountProducts.emit(it.result)
+                            _discountProducts.emit(it.result.products)
                         }
                         is Result.Error -> {}
                     }

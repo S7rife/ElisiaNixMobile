@@ -3,32 +3,12 @@ package ru.feip.elisianix.remote.models
 import com.google.gson.annotations.SerializedName
 
 
-data class ProductCategory(
-    @SerializedName("id")
-    var id: Int,
-
-    @SerializedName("name")
-    var name: String,
-
-    @SerializedName("alias")
-    var alias: String,
-
-    @SerializedName("image")
-    var image: String,
-
-    @SerializedName("isVisible")
-    var isVisible: Boolean,
-)
-
 data class Brand(
     @SerializedName("id")
     var id: Int,
 
     @SerializedName("name")
     var name: String,
-
-    @SerializedName("logo")
-    var logo: String?,
 )
 
 data class Color(
@@ -62,4 +42,21 @@ data class Image(
 
     @SerializedName("url")
     var url: String,
+)
+
+data class Size(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("value")
+    var value: String,
+
+    @SerializedName("available")
+    var available: Int,
+
+    @SerializedName("onFitting")
+    var onFitting: Boolean,
+
+    @SerializedName("subscribed")
+    var subscribed: Boolean,
 )

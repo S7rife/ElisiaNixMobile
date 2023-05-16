@@ -16,20 +16,26 @@ data class ProductMainPreview(
     @SerializedName("price")
     var price: Double,
 
-    @SerializedName("countAvailable")
-    var countAvailable: Int,
-
-    @SerializedName("previewImage")
-    var previewImage: String,
-
-    @SerializedName("newProduct")
-    var newProduct: Boolean,
-
-    @SerializedName("category")
-    var category: ProductCategory,
+    @SerializedName("isNew")
+    var isNew: Boolean,
 
     @SerializedName("brand")
     var brand: Brand,
+
+    @SerializedName("images")
+    var images: List<Image>,
+
+    @SerializedName("color")
+    var color: Color,
+
+    @SerializedName("discount")
+    var discount: Double?,
+
+    @SerializedName("sizes")
+    var sizes: List<Size>,
+
+    @SerializedName("createdDate")
+    var createdDate: String,
 )
 
 data class CategoryMainPreview(
@@ -38,9 +44,6 @@ data class CategoryMainPreview(
 
     @SerializedName("name")
     var name: String,
-
-    @SerializedName("alias")
-    var alias: String,
 
     @SerializedName("image")
     var image: Image,
@@ -53,4 +56,18 @@ data class CategoryMainPreview(
 
     @SerializedName("isVisible")
     var isVisible: Boolean,
+)
+
+data class ProductMainPreviews(
+    @SerializedName("productsCount")
+    var productsCount: Int,
+
+    @SerializedName("minPrice")
+    var minPrice: Double,
+
+    @SerializedName("maxPrice")
+    var maxPrice: Double,
+
+    @SerializedName("products")
+    var products: List<ProductMainPreview>
 )

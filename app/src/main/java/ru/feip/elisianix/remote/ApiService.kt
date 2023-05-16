@@ -22,8 +22,8 @@ class ApiService {
             .flowOn(Dispatchers.IO)
 
 
-    suspend fun getProducts(queryMap: Map<String, String>): Flow<Result<List<ProductMainPreview>>> =
-        flow<Result<List<ProductMainPreview>>> {
+    suspend fun getProducts(queryMap: Map<String, String>): Flow<Result<ProductMainPreviews>> =
+        flow<Result<ProductMainPreviews>> {
             emit(Result.Success(api.getProducts(queryMap)))
         }
             .catch { emit(Result.Error(it)) }

@@ -14,6 +14,6 @@ interface Api {
     suspend fun getCategories(): List<CategoryMainPreview>
 
     @GET("api/products")
-    suspend fun getProducts(@QueryMap options: Map<String, String>): List<ProductMainPreview>
+    suspend fun getProducts(@QueryMap options: Map<String, String>): ProductMainPreviews
 
 }
