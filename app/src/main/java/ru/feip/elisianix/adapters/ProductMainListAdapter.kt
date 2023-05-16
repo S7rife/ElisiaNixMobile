@@ -16,12 +16,12 @@ class ProductMainListAdapter(
 
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
-    inner class CategoryMainList(item: View) : RecyclerView.ViewHolder(item) {
+    inner class ProductMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainProductBinding.bind(item)
 
         fun bind(item: ProductMainPreview) {
             binding.apply {
-                Glide.with(itemView).load(item.previewImage)
+                Glide.with(itemView).load(item.images[0].url)
                     .error(R.drawable.ic_no_image)
                     .into(productImage)
                 val price = "${item.price} ₽"
@@ -46,12 +46,12 @@ class ProductMainListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_main_product, parent, false)
-        return CategoryMainList(view)
+        return ProductMainList(view)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is CategoryMainList -> {
+            is ProductMainList -> {
                 val item = currentList[position]
                 holder.bind(item)
             }
