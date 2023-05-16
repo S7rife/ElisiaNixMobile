@@ -8,4 +8,6 @@
     <string name="discounts">Discounts</string>
     <string name="new_">New</string>
     <string name="best_price">Best price</string>
+    <string name="search">Search</string>
+    <string name="sorting">Sorting</string>
 </resources>
