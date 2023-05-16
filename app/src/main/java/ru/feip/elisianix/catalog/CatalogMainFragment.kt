@@ -2,11 +2,13 @@ package ru.feip.elisianix.catalog
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import ru.feip.elisianix.R
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.adapters.ActualMainListAdapter
@@ -31,12 +33,16 @@ class CatalogMainFragment :
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            categoryMainAdapter = CategoryMainListAdapter()
-            actualMainAdapter = ActualMainListAdapter()
-
+            categoryMainAdapter = CategoryMainListAdapter {
+                findNavController().navigate(
+                    R.id.action_catalogMainFragment_to_catalogCategoryFragment,
+                    bundleOf("category_id" to it.id, "category_name" to it.name)
+                )
+            }
             recyclerCategoriesPreview.adapter = categoryMainAdapter
             recyclerCategoriesPreview.layoutManager = GridLayoutManager(requireContext(), 3)
 
+            actualMainAdapter = ActualMainListAdapter()
             recyclerActual.adapter = actualMainAdapter
             recyclerActual.layoutManager =
                 LinearLayoutManager(
@@ -52,8 +58,7 @@ class CatalogMainFragment :
 
         viewModel.categories
             .onEach {
-                val lst = it.toMutableList().plus(it).plus(it)
-                categoryMainAdapter.submitList(lst)
+                categoryMainAdapter.submitList(it)
             }
             .launchWhenStarted(lifecycleScope)
 
@@ -68,7 +73,7 @@ class CatalogMainFragment :
 
         viewModel.discountProducts
             .onEach {
-                val lst = actualMainAdapter.currentList.toMutableList()
+                val lst = mutableListOf(actualMainAdapter.currentList[0])
                 lst.plusAssign(ActualSection(1, getString(R.string.discounts), it))
                 actualMainAdapter.submitList(lst)
 
@@ -76,6 +81,6 @@ class CatalogMainFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.getCategories()
-//        viewModel.getNewProducts()
+        viewModel.getNewProducts()
     }
 }

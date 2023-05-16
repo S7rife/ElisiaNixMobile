@@ -13,11 +13,22 @@ import ru.feip.elisianix.remote.models.CategoryMainPreview
 
 
 class CategoryMainListAdapter(
-
+    private val clickListenerCategoryPreview: (CategoryMainPreview) -> Unit,
 ) : ListAdapter<CategoryMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class CategoryMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainCategoryBinding.bind(item)
+
+        init {
+            binding.apply {
+                categoryImage.setOnClickListener {
+                    val position = adapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerCategoryPreview.invoke(currentList[position])
+                    }
+                }
+            }
+        }
 
         fun bind(item: CategoryMainPreview) {
             binding.apply {
