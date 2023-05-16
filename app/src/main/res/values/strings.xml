@@ -4,4 +4,8 @@
     <string name="cart">Cart</string>
     <string name="favorite">Favorite</string>
     <string name="profile">Profile</string>
+    <string name="new_arrivals">New Arrivals</string>
+    <string name="discounts">Discounts</string>
+    <string name="new_">New</string>
+    <string name="best_price">Best price</string>
 </resources>
