@@ -9,18 +9,18 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualBinding
-import ru.feip.elisianix.remote.models.ActualSection
+import ru.feip.elisianix.remote.models.MainBlock
 
 
 class ActualMainListAdapter(
 
-) : ListAdapter<ActualSection, RecyclerView.ViewHolder>(ItemCallback()) {
+) : ListAdapter<MainBlock, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ActualMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainActualBinding.bind(item)
         private lateinit var productMainAdapter: ProductMainListAdapter
 
-        fun bind(item: ActualSection) {
+        fun bind(item: MainBlock) {
             binding.apply {
                 actualSectionName.text = item.name
 
@@ -38,15 +38,15 @@ class ActualMainListAdapter(
         }
     }
 
-    private class ItemCallback : DiffUtil.ItemCallback<ActualSection>() {
+    private class ItemCallback : DiffUtil.ItemCallback<MainBlock>() {
         override fun areItemsTheSame(
-            oldItem: ActualSection,
-            newItem: ActualSection
+            oldItem: MainBlock,
+            newItem: MainBlock
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: ActualSection,
-            newItem: ActualSection
+            oldItem: MainBlock,
+            newItem: MainBlock
         ): Boolean = oldItem == newItem
     }
 

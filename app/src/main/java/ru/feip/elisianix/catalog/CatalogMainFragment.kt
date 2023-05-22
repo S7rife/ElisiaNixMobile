@@ -17,7 +17,7 @@ import ru.feip.elisianix.catalog.view_models.CatalogMainViewModel
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
-import ru.feip.elisianix.remote.models.ActualSection
+import ru.feip.elisianix.remote.models.MainBlock
 
 class CatalogMainFragment :
     BaseFragment<FragmentCatalogMainBinding>(R.layout.fragment_catalog_main) {
@@ -65,7 +65,7 @@ class CatalogMainFragment :
         viewModel.newProducts
             .onEach {
                 actualMainAdapter.submitList(
-                    listOf(ActualSection(0, getString(R.string.new_arrivals), it))
+                    listOf(MainBlock(0, getString(R.string.new_arrivals), it))
                 )
                 viewModel.getDiscountProducts()
             }
@@ -74,7 +74,7 @@ class CatalogMainFragment :
         viewModel.discountProducts
             .onEach {
                 val lst = mutableListOf(actualMainAdapter.currentList[0])
-                lst.plusAssign(ActualSection(1, getString(R.string.discounts), it))
+                lst.plusAssign(MainBlock(1, getString(R.string.discounts), it))
                 actualMainAdapter.submitList(lst)
 
             }

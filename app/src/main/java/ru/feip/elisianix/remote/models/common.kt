@@ -22,7 +22,7 @@ data class Color(
     var value: String,
 )
 
-data class ActualSection(
+data class MainBlock(
     @SerializedName("id")
     var id: Int,
 
