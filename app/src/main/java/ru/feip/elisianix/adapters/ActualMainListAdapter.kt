@@ -18,14 +18,14 @@ class ActualMainListAdapter(
 
     inner class ActualMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainActualBinding.bind(item)
-        private lateinit var productMainAdapter: ProductMainListAdapter
+        private lateinit var productActualMainAdapter: ProductActualMainListAdapter
 
         fun bind(item: MainBlock) {
             binding.apply {
                 actualSectionName.text = item.name
 
-                productMainAdapter = ProductMainListAdapter()
-                recyclerProduct.adapter = productMainAdapter
+                productActualMainAdapter = ProductActualMainListAdapter()
+                recyclerProduct.adapter = productActualMainAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(
                         itemView.context,
@@ -33,7 +33,7 @@ class ActualMainListAdapter(
                         false
                     )
 
-                productMainAdapter.submitList(item.products)
+                productActualMainAdapter.submitList(item.products)
             }
         }
     }

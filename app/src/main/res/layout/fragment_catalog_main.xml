@@ -26,9 +26,9 @@
                 android:layout_below="@id/recyclerCategoriesPreview" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerCategories"
+                android:id="@+id/recyclerCategoryBlocks"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/recyclerActual"/>
         </RelativeLayout>
     </ScrollView>
