@@ -7,10 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.ApiService
-import ru.feip.elisianix.remote.models.CategoryMainPreview
-import ru.feip.elisianix.remote.models.ProductMainPreview
-import ru.feip.elisianix.remote.models.ProductsQueryMap
-import ru.feip.elisianix.remote.models.dataClassToMap
+import ru.feip.elisianix.remote.models.*
 
 class CatalogMainViewModel : ViewModel() {
 
@@ -21,11 +18,13 @@ class CatalogMainViewModel : ViewModel() {
     private val _categories = MutableSharedFlow<List<CategoryMainPreview>>(replay = 0)
     private val _newProducts = MutableSharedFlow<List<ProductMainPreview>>(replay = 0)
     private val _discountProducts = MutableSharedFlow<List<ProductMainPreview>>(replay = 0)
+    private val _categoryBlockProducts = MutableSharedFlow<MainBlock>(replay = 0)
 
     val showLoading get() = _showLoading
     val categories get() = _categories
     val newProducts get() = _newProducts
     val discountProducts get() = _discountProducts
+    val categoryBlockProducts get() = _categoryBlockProducts
 
 
     fun getCategories() {
@@ -69,6 +68,33 @@ class CatalogMainViewModel : ViewModel() {
                     when (it) {
                         is Result.Success -> {
                             _discountProducts.emit(it.result.products)
+                        }
+                        is Result.Error -> {}
+                    }
+                }
+        }
+    }
+
+    fun getCategoryBlockProducts(category_id: Int, category_name: String) {
+        viewModelScope.launch {
+            apiService.getProducts(
+                ProductsQueryMap(
+                    categoryId = category_id,
+                    limit = 10
+                ).dataClassToMap()
+            )
+                .onStart { _showLoading.value = true }
+                .onCompletion { _showLoading.value = false }
+                .collect {
+                    when (it) {
+                        is Result.Success -> {
+                            _categoryBlockProducts.emit(
+                                MainBlock(
+                                    category_id,
+                                    category_name,
+                                    it.result.products
+                                )
+                            )
                         }
                         is Result.Error -> {}
                     }

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.adapters.ActualMainListAdapter
+import ru.feip.elisianix.adapters.CategoryBlockMainListAdapter
 import ru.feip.elisianix.adapters.CategoryMainListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogMainViewModel
 import ru.feip.elisianix.common.BaseFragment
@@ -28,6 +29,7 @@ class CatalogMainFragment :
 
     private lateinit var categoryMainAdapter: CategoryMainListAdapter
     private lateinit var actualMainAdapter: ActualMainListAdapter
+    private lateinit var categoryBlockMainAdapter: CategoryBlockMainListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,6 +52,23 @@ class CatalogMainFragment :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
+
+            categoryBlockMainAdapter = CategoryBlockMainListAdapter(
+                {
+                    findNavController().navigate(
+                        R.id.action_catalogMainFragment_to_catalogCategoryFragment,
+                        bundleOf("category_id" to it.id, "category_name" to it.name)
+                    )
+                },
+                {}
+            )
+            recyclerCategoryBlocks.adapter = categoryBlockMainAdapter
+            recyclerCategoryBlocks.layoutManager =
+                LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL,
+                    false
+                )
         }
 
         viewModel.showLoading
@@ -59,6 +78,9 @@ class CatalogMainFragment :
         viewModel.categories
             .onEach {
                 categoryMainAdapter.submitList(it)
+                for (category in it) {
+                    viewModel.getCategoryBlockProducts(category.id, category.name)
+                }
             }
             .launchWhenStarted(lifecycleScope)
 
@@ -77,6 +99,14 @@ class CatalogMainFragment :
                 lst.plusAssign(MainBlock(1, getString(R.string.discounts), it))
                 actualMainAdapter.submitList(lst)
 
+            }
+            .launchWhenStarted(lifecycleScope)
+
+        viewModel.categoryBlockProducts
+            .onEach {
+                categoryBlockMainAdapter.submitList(
+                    categoryBlockMainAdapter.currentList.toMutableList().plus(it)
+                )
             }
             .launchWhenStarted(lifecycleScope)
 
