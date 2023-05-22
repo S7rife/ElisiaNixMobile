@@ -8,16 +8,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
-import ru.feip.elisianix.databinding.ItemMainProductBinding
+import ru.feip.elisianix.databinding.ItemMainActualProductBinding
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
-class ProductMainListAdapter(
+class ProductActualMainListAdapter(
 
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
-    inner class ProductMainList(item: View) : RecyclerView.ViewHolder(item) {
-        private var binding = ItemMainProductBinding.bind(item)
+    inner class ProductActualMainList(item: View) : RecyclerView.ViewHolder(item) {
+        private var binding = ItemMainActualProductBinding.bind(item)
 
         fun bind(item: ProductMainPreview) {
             binding.apply {
@@ -45,13 +45,13 @@ class ProductMainListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_main_product, parent, false)
-        return ProductMainList(view)
+            .inflate(R.layout.item_main_actual_product, parent, false)
+        return ProductActualMainList(view)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is ProductMainList -> {
+            is ProductActualMainList -> {
                 val item = currentList[position]
                 holder.bind(item)
             }
