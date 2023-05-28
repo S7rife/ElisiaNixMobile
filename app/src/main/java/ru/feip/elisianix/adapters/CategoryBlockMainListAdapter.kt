@@ -38,7 +38,8 @@ class CategoryBlockMainListAdapter(
             binding.apply {
                 categoryBlockName.text = item.name
 
-                productCategoryBlockAdapter = ProductCategoryBlockMainListAdapter()
+                productCategoryBlockAdapter =
+                    ProductCategoryBlockMainListAdapter(clickListenerToProduct)
                 recyclerProduct.adapter = productCategoryBlockAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

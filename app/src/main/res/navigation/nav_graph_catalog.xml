@@ -11,10 +11,28 @@
         <action
             android:id="@+id/action_catalogMainFragment_to_catalogCategoryFragment"
             app:destination="@id/catalogCategoryFragment" />
+        <action
+            android:id="@+id/action_catalogMainFragment_to_catalogProductFragment"
+            app:destination="@id/catalogProductFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogCategoryFragment"
         android:name="ru.feip.elisianix.catalog.CatalogCategoryFragment"
         android:label="fragment_catalog_category"
-        tools:layout="@layout/fragment_catalog_category" />
+        tools:layout="@layout/fragment_catalog_category" >
+        <action
+            android:id="@+id/action_catalogCategoryFragment_to_catalogProductFragment"
+            app:destination="@id/catalogProductFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/catalogProductFragment"
+        android:name="ru.feip.elisianix.catalog.CatalogProductFragment"
+        android:label="CatalogProductFragment" >
+        <action
+            android:id="@+id/action_catalogProductFragment_self"
+            app:destination="@id/catalogProductFragment" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_catalogCategoryFragment"
+            app:destination="@id/catalogCategoryFragment" />
+    </fragment>
 </navigation>

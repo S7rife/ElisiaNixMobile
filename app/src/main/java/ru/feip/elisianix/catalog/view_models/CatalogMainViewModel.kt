@@ -2,11 +2,13 @@ package ru.feip.elisianix.catalog.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.ApiService
+import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.*
 
 class CatalogMainViewModel : ViewModel() {
@@ -75,11 +77,11 @@ class CatalogMainViewModel : ViewModel() {
         }
     }
 
-    fun getCategoryBlockProducts(category_id: Int, category_name: String) {
+    fun getCategoryBlockProducts(categoryId: Int, categoryName: String) {
         viewModelScope.launch {
             apiService.getProducts(
                 ProductsQueryMap(
-                    categoryId = category_id,
+                    categoryId = categoryId,
                     limit = 10
                 ).dataClassToMap()
             )
@@ -90,8 +92,8 @@ class CatalogMainViewModel : ViewModel() {
                         is Result.Success -> {
                             _categoryBlockProducts.emit(
                                 MainBlock(
-                                    category_id,
-                                    category_name,
+                                    categoryId,
+                                    categoryName,
                                     it.result.products
                                 )
                             )

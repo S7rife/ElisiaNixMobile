@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.GridLayoutManager
-import ru.feip.elisianix.R
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
+import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.ActualMainListAdapter
 import ru.feip.elisianix.adapters.CategoryBlockMainListAdapter
 import ru.feip.elisianix.adapters.CategoryMainListAdapter
@@ -44,7 +44,12 @@ class CatalogMainFragment :
             recyclerCategoriesPreview.adapter = categoryMainAdapter
             recyclerCategoriesPreview.layoutManager = GridLayoutManager(requireContext(), 3)
 
-            actualMainAdapter = ActualMainListAdapter()
+            actualMainAdapter = ActualMainListAdapter {
+                findNavController().navigate(
+                    R.id.action_catalogMainFragment_to_catalogProductFragment,
+                    bundleOf("product_id" to it.id)
+                )
+            }
             recyclerActual.adapter = actualMainAdapter
             recyclerActual.layoutManager =
                 LinearLayoutManager(
@@ -60,7 +65,12 @@ class CatalogMainFragment :
                         bundleOf("category_id" to it.id, "category_name" to it.name)
                     )
                 },
-                {}
+                {
+                    findNavController().navigate(
+                        R.id.action_catalogMainFragment_to_catalogProductFragment,
+                        bundleOf("product_id" to it.id)
+                    )
+                }
             )
             recyclerCategoryBlocks.adapter = categoryBlockMainAdapter
             recyclerCategoryBlocks.layoutManager =

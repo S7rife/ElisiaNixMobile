@@ -10,10 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualBinding
 import ru.feip.elisianix.remote.models.MainBlock
+import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ActualMainListAdapter(
-
+    private val clickListenerToProduct: (ProductMainPreview) -> Unit,
 ) : ListAdapter<MainBlock, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ActualMainList(item: View) : RecyclerView.ViewHolder(item) {
@@ -24,7 +25,7 @@ class ActualMainListAdapter(
             binding.apply {
                 actualSectionName.text = item.name
 
-                productActualMainAdapter = ProductActualMainListAdapter()
+                productActualMainAdapter = ProductActualMainListAdapter(clickListenerToProduct)
                 recyclerProduct.adapter = productActualMainAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

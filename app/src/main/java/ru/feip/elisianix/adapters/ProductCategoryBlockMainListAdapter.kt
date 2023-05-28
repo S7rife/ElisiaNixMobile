@@ -13,11 +13,28 @@ import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ProductCategoryBlockMainListAdapter(
-
+    private val clickListenerToProduct: (ProductMainPreview) -> Unit
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductCategoryBlockMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainActualProductBinding.bind(item)
+
+        init {
+            binding.apply {
+                productImageContainer.setOnClickListener {
+                    val position = adapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerToProduct.invoke(currentList[position])
+                    }
+                }
+                productName.setOnClickListener {
+                    val position = adapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerToProduct.invoke(currentList[position])
+                    }
+                }
+            }
+        }
 
         fun bind(item: ProductMainPreview) {
             binding.apply {
