@@ -11,4 +11,11 @@
     <string name="search">Search</string>
     <string name="sorting">Sorting</string>
     <string name="all">All</string>
+    <string name="to_cart">To cart</string>
+    <string name="in_the_cart">In tne cart</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="color">Color</string>
+    <string name="choose_size">Choose size</string>
+    <string name="table_of_sizes">Table of size</string>
+    <string name="you_may_like">You may like</string>
 </resources>
