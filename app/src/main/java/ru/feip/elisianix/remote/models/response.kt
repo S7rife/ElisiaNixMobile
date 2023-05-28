@@ -26,7 +26,7 @@ data class ProductMainPreview(
     var images: List<Image>,
 
     @SerializedName("color")
-    var color: Color,
+    var color: ProductColor,
 
     @SerializedName("discount")
     var discount: Double?,
@@ -70,4 +70,43 @@ data class ProductMainPreviews(
 
     @SerializedName("products")
     var products: List<ProductMainPreview>
+)
+
+data class ProductDetail(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("name")
+    var name: String?,
+
+    @SerializedName("article")
+    var article: String?,
+
+    @SerializedName("price")
+    var price: Double,
+
+    @SerializedName("description")
+    var description: String?,
+
+    @SerializedName("isNew")
+    var isNew: Boolean,
+
+    @SerializedName("color")
+    var color: ProductColor,
+
+    @SerializedName("brand")
+    var brand: Brand,
+
+    @SerializedName("category")
+    var category: Category,
+
+    // don't work, have null
+    @SerializedName("discount")
+    var discount: Pair<String, String>?,
+
+    @SerializedName("images")
+    var images: List<Image>,
+
+    @SerializedName("sizes")
+    var sizes: List<Size>,
 )

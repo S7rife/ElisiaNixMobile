@@ -16,4 +16,10 @@ interface Api {
     @GET("api/products")
     suspend fun getProducts(@QueryMap options: Map<String, String>): ProductMainPreviews
 
+    @GET("api/products/{productId}")
+    suspend fun getProductDetail(@Path("productId") productId: Int): ProductDetail
+
+    @GET("api/products/{categoryId}/recs")
+    suspend fun getProductRecs(@Path("categoryId") categoryId: Int): ProductMainPreviews
+
 }
