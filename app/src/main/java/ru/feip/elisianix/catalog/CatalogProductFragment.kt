@@ -20,7 +20,6 @@ import ru.feip.elisianix.catalog.view_models.CatalogProductViewModel
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
-import ru.feip.elisianix.remote.models.ProductColor
 
 class CatalogProductFragment :
     BaseFragment<FragmentCatalogProductBinding>(R.layout.fragment_catalog_product) {
@@ -95,7 +94,7 @@ class CatalogProductFragment :
                     productImageAdapter.submitList(it.images)
 
                     productTagCategory.text = it.category.name
-                    productTagCategory.setOnClickListener {  }
+                    productTagCategory.setOnClickListener { }
                     productTagBrand.text = it.brand.name
 
                     productName.text = it.name
@@ -105,20 +104,12 @@ class CatalogProductFragment :
                     productPriceNew.text = newPrice
                     productPriceOld.text = oldPrice
 
-                    productColorCurrent.text = it.color.name
+                    productColorCurrent.text = it.colors[0].name
                     productDescription.text = it.description
 
                     productSizeAdapter.submitList(it.sizes.filter { it.available > 0 })
 
-                    productColorAdapter.submitList(
-                        // Hardcode
-                        listOf(
-                            it.color,
-                            ProductColor(1, "color1", "#D2691E"),
-                            ProductColor(2, "color2", "#808080"),
-                            ProductColor(3, "color3", "#FF00FF")
-                        )
-                    )
+                    productColorAdapter.submitList(it.colors)
                 }
             }
             .launchWhenStarted(lifecycleScope)

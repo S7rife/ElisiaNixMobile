@@ -35,6 +35,11 @@ class CatalogMainFragment :
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
+            searchCatalogView.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_catalogMainFragment_to_catalogSearchFragment
+                )
+            }
             categoryMainAdapter = CategoryMainListAdapter {
                 findNavController().navigate(
                     R.id.action_catalogMainFragment_to_catalogCategoryFragment,
