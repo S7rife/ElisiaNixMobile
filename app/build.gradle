@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
@@ -69,4 +71,11 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.8.21"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1'
+
+    def room_version = "2.5.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 }

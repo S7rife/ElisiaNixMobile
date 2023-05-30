@@ -3,7 +3,7 @@ package ru.feip.elisianix.remote.models
 import com.google.gson.annotations.SerializedName
 import kotlin.reflect.full.memberProperties
 
-inline fun <reified T: Any> T.dataClassToMap(): Map<String, String> {
+inline fun <reified T : Any> T.dataClassToMap(): Map<String, String> {
     val queryMap = mutableMapOf<String, String>()
     for (prop in T::class.memberProperties) {
         val paramName = prop.name
@@ -52,5 +52,5 @@ data class ProductsQueryMap(
     var colors: List<Int>? = null,
 
     @SerializedName("filter")
-    var filter: List<String>? = null,
+    var filter: String? = null,
 )

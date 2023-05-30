@@ -18,4 +18,7 @@
     <string name="choose_size">Choose size</string>
     <string name="table_of_sizes">Table of size</string>
     <string name="you_may_like">You may like</string>
+    <string name="you_searched">You searched</string>
+    <string name="categories">Categories</string>
+    <string name="nothing_found">Nothing found</string>
 </resources>

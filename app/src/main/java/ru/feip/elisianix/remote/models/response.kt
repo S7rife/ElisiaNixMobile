@@ -25,8 +25,8 @@ data class ProductMainPreview(
     @SerializedName("images")
     var images: List<Image>,
 
-    @SerializedName("color")
-    var color: ProductColor,
+    @SerializedName("colors")
+    var colors: List<ProductColor>,
 
     @SerializedName("discount")
     var discount: Double?,
@@ -91,8 +91,8 @@ data class ProductDetail(
     @SerializedName("isNew")
     var isNew: Boolean,
 
-    @SerializedName("color")
-    var color: ProductColor,
+    @SerializedName("colors")
+    var colors: List<ProductColor>,
 
     @SerializedName("brand")
     var brand: Brand,
