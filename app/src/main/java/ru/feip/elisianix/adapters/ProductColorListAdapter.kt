@@ -18,8 +18,8 @@ class ProductColorListAdapter(
     private val clickListenerColorSelector: (ProductColor) -> Unit
 ) : ListAdapter<ProductColor, RecyclerView.ViewHolder>(ItemCallback()) {
 
-    var selectedItemPos = -1
-    var lastItemSelectedPos = -1
+    var currentPos = 0
+    var lastPos = -1
 
     inner class ProductColorList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemProductColorBinding.bind(item)
@@ -35,25 +35,21 @@ class ProductColorListAdapter(
         init {
             binding.apply {
                 item.setOnClickListener {
-                    selectedItemPos = adapterPosition
-
-                    val position = adapterPosition
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerColorSelector.invoke(currentList[position])
-                        lastItemSelectedPos = if (lastItemSelectedPos == -1) {
-                            selectedItemPos
-                        } else {
-                            notifyItemChanged(lastItemSelectedPos)
-                            selectedItemPos
-                        }
-                        notifyItemChanged(selectedItemPos)
+                        lastPos = currentPos
+                        currentPos = position
+                        notifyItemChanged(lastPos)
+                        notifyItemChanged(currentPos)
                     }
                 }
             }
         }
 
         fun bind(item: ProductColor) {
-            itemView.background.mutate().colorFilter = BlendModeColorFilter(Color.parseColor(item.value), BlendMode.SRC_OVER)
+            itemView.background.mutate().colorFilter =
+                BlendModeColorFilter(Color.parseColor(item.value), BlendMode.SRC_OVER)
 
         }
     }
@@ -79,7 +75,7 @@ class ProductColorListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ProductColorList -> {
-                if (position == selectedItemPos) {
+                if (position == currentPos) {
                     holder.selected()
                 } else holder.default()
                 holder.bind(currentList[position])

@@ -20,5 +20,13 @@
         android:id="@+id/navBottomFragment"
         android:name="ru.feip.elisianix.common.NavBottomFragment"
         android:label="fragment_nav_bottom"
-        tools:layout="@layout/fragment_nav_bottom" />
+        tools:layout="@layout/fragment_nav_bottom" >
+        <action
+            android:id="@+id/action_navBottomFragment_to_catalogProductImageViewerFragment"
+            app:destination="@id/catalogProductImageViewerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/catalogProductImageViewerFragment"
+        android:name="ru.feip.elisianix.catalog.CatalogProductImageViewerFragment"
+        android:label="CatalogProductImageViewerFragment" />
 </navigation>
