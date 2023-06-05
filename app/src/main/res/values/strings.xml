@@ -21,4 +21,12 @@
     <string name="you_searched">You searched</string>
     <string name="categories">Categories</string>
     <string name="nothing_found">Nothing found</string>
+    <string name="number_of_items">Number of items</string>
+    <string name="sum_total">Sum total</string>
+    <string name="discount_sum">Discount sum</string>
+    <string name="total_payable">Total payable</string>
+    <string name="brand">Brand</string>
+    <string name="size">Size</string>
+    <string name="category">Category</string>
+    <string name="preposition_of">of</string>
 </resources>
