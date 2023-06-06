@@ -31,6 +31,9 @@ data class MainBlock(
 
     @SerializedName("products")
     var products: List<ProductMainPreview>,
+
+    @SerializedName("tag")
+    var tag: String?,
 )
 
 data class Image(

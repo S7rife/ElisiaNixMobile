@@ -26,6 +26,7 @@ class ActualMainListAdapter(
                 actualSectionName.text = item.name
 
                 productActualMainAdapter = ProductActualMainListAdapter(clickListenerToProduct)
+                productActualMainAdapter.actualName = item.tag.toString()
                 recyclerProduct.adapter = productActualMainAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(
@@ -35,6 +36,7 @@ class ActualMainListAdapter(
                     )
 
                 productActualMainAdapter.submitList(item.products)
+                recyclerActualSectionIndicator.attachToRecyclerView(recyclerProduct)
             }
         }
     }

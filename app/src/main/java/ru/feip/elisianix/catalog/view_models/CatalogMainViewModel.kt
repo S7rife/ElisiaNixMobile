@@ -94,7 +94,8 @@ class CatalogMainViewModel : ViewModel() {
                                 MainBlock(
                                     categoryId,
                                     categoryName,
-                                    it.result.products
+                                    it.result.products,
+                                    null
                                 )
                             )
                         }

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualProductBinding
+import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
@@ -16,19 +17,21 @@ class ProductActualMainListAdapter(
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
+    var actualName = ""
+
     inner class ProductActualMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainActualProductBinding.bind(item)
 
         init {
             binding.apply {
                 productImageContainer.setOnClickListener {
-                    val position = adapterPosition
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerToProduct.invoke(currentList[position])
                     }
                 }
                 productName.setOnClickListener {
-                    val position = adapterPosition
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerToProduct.invoke(currentList[position])
                     }
@@ -41,9 +44,13 @@ class ProductActualMainListAdapter(
                 Glide.with(itemView).load(item.images[0].url)
                     .error(R.drawable.ic_no_image)
                     .into(productImage)
-                val price = "${item.price} ₽"
                 productName.text = item.name
-                productPrice.text = price
+                productNewPrice.text =
+                    item.price.inCurrency(itemView.resources.getString(R.string.currency))
+                productOldPrice.text = productNewPrice.text
+                productActualTag.text = actualName
+
+                // TODO change old price with remote
             }
         }
     }

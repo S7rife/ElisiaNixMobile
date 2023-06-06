@@ -22,7 +22,7 @@ class CategoryMainListAdapter(
         init {
             binding.apply {
                 categoryImage.setOnClickListener {
-                    val position = adapterPosition
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerCategoryPreview.invoke(currentList[position])
                     }

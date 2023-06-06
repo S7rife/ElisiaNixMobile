@@ -2,25 +2,43 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="40dp">
 
     <TextView
         android:id="@+id/actualSectionName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:textAllCaps="true"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textAllCaps="true"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
+        android:id="@+id/recyclerActualSectionIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        app:dotColor="@color/black30"
+        app:dotCount="3"
+        app:dotRadius="4dp"
+        app:dotSeparation="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/actualSectionName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/actualSectionName"
+        app:selectedDotColor="@color/black60"
+        app:selectedDotRadius="5dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerProduct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/actualSectionName"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/actualSectionName" />
 </androidx.constraintlayout.widget.ConstraintLayout>

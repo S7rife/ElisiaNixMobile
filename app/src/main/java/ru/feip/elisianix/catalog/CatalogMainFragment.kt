@@ -102,7 +102,12 @@ class CatalogMainFragment :
         viewModel.newProducts
             .onEach {
                 actualMainAdapter.submitList(
-                    listOf(MainBlock(0, getString(R.string.new_arrivals), it))
+                    listOf(
+                        MainBlock(
+                            0, getString(R.string.new_arrivals),
+                            it, getString(R.string.new_)
+                        )
+                    )
                 )
                 viewModel.getDiscountProducts()
             }
@@ -111,7 +116,12 @@ class CatalogMainFragment :
         viewModel.discountProducts
             .onEach {
                 val lst = mutableListOf(actualMainAdapter.currentList[0])
-                lst.plusAssign(MainBlock(1, getString(R.string.discounts), it))
+                lst.plusAssign(
+                    MainBlock(
+                        1, getString(R.string.discounts),
+                        it, getString(R.string.best_price)
+                    )
+                )
                 actualMainAdapter.submitList(lst)
 
             }
