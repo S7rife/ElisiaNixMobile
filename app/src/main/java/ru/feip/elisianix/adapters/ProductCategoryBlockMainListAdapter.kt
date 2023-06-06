@@ -8,29 +8,38 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
-import ru.feip.elisianix.databinding.ItemMainActualProductBinding
+import ru.feip.elisianix.databinding.ItemMainCategoryBlockProductBinding
+import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ProductCategoryBlockMainListAdapter(
-    private val clickListenerToProduct: (ProductMainPreview) -> Unit
+    private val clickListenerToProduct: (ProductMainPreview) -> Unit,
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductCategoryBlockMainList(item: View) : RecyclerView.ViewHolder(item) {
-        private var binding = ItemMainActualProductBinding.bind(item)
+        private var binding = ItemMainCategoryBlockProductBinding.bind(item)
 
         init {
             binding.apply {
-                productImageContainer.setOnClickListener {
-                    val position = adapterPosition
+                productName.setOnClickListener {
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerToProduct.invoke(currentList[position])
                     }
                 }
-                productName.setOnClickListener {
-                    val position = adapterPosition
+                productCartBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
-                        clickListenerToProduct.invoke(currentList[position])
+                        clickListenerCartBtn.invoke(currentList[position])
+                    }
+                }
+                productFavoriteBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerFavoriteBtn.invoke(currentList[position])
                     }
                 }
             }
@@ -41,7 +50,7 @@ class ProductCategoryBlockMainListAdapter(
                 Glide.with(itemView).load(item.images[0].url)
                     .error(R.drawable.ic_no_image)
                     .into(productImage)
-                val price = "${item.price} ₽"
+                val price = item.price.inCurrency(itemView.resources.getString(R.string.currency))
                 productName.text = item.name
                 productPrice.text = price
             }

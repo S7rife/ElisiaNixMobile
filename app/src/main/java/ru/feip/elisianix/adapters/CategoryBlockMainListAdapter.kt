@@ -25,7 +25,7 @@ class CategoryBlockMainListAdapter(
         init {
             binding.apply {
                 categoryBlockToCategoryBtn.setOnClickListener {
-                    val position = adapterPosition
+                    val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerToCategory.invoke(currentList[position])
                     }
@@ -39,7 +39,7 @@ class CategoryBlockMainListAdapter(
                 categoryBlockName.text = item.name
 
                 productCategoryBlockAdapter =
-                    ProductCategoryBlockMainListAdapter(clickListenerToProduct)
+                    ProductCategoryBlockMainListAdapter(clickListenerToProduct, {}, {})
                 recyclerProduct.adapter = productCategoryBlockAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

@@ -23,6 +23,7 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
+import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.ProductDetail
 import kotlin.properties.Delegates
@@ -49,6 +50,7 @@ class CatalogProductFragment :
                 findNavController().popBackStack()
             }
             tableOfSizesBtn.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+
             productImageAdapter = ProductImageListAdapter {
                 Navigation.findNavController(requireActivity(), R.id.rootActivityContainer)
                     .navigate(
@@ -82,12 +84,14 @@ class CatalogProductFragment :
             recyclerSizeSelector.adapter = productSizeAdapter
             recyclerSizeSelector.layoutManager = GridLayoutManager(requireContext(), 4)
 
-            productRecsAdapter = ProductCategoryBlockMainListAdapter {
-                findNavController().navigate(
-                    R.id.action_catalogProductFragment_self,
-                    bundleOf("product_id" to it.id)
-                )
-            }
+            productRecsAdapter = ProductCategoryBlockMainListAdapter(
+                {
+                    findNavController().navigate(
+                        R.id.action_catalogProductFragment_self,
+                        bundleOf("product_id" to it.id)
+                    )
+                }, {}, {}
+            )
             recyclerProductRecsBlock.adapter = productRecsAdapter
             recyclerProductRecsBlock.layoutManager =
                 LinearLayoutManager(
@@ -132,11 +136,8 @@ class CatalogProductFragment :
 
             productName.text = prod.name
 
-            // TODO update prepare prices for ui
-            val newPrice = String.format("%.3f", prod.price) + "₽"
-            val oldPrice = String.format("%.3f", prod.price * 2) + "₽"
-            productPriceNew.text = newPrice
-            productPriceOld.text = oldPrice
+            productPriceNew.text = prod.price.inCurrency(getString(R.string.currency))
+            productPriceOld.text = prod.price.inCurrency(getString(R.string.currency))
 
             productColorCurrent.text = prod.colors[0].name
 

@@ -18,14 +18,14 @@
             android:id="@+id/productImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_favorite"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/productImage"/>
+            app:layout_constraintTop_toTopOf="@id/productImage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -51,15 +51,17 @@
             android:id="@+id/productPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/productCartBtn"
             android:textSize="20sp"
             android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/productBuyButton"
+            android:id="@+id/productCartBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_buy"/>
+            android:src="@drawable/ic_to_cart" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
