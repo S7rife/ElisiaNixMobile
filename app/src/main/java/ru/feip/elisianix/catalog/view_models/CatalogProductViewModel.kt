@@ -18,8 +18,8 @@ class CatalogProductViewModel : ViewModel() {
 
     private val _showLoading = MutableStateFlow(false)
     private val _success = MutableStateFlow(false)
-    private val _product = MutableSharedFlow<ProductDetail>(replay = 0)
-    private val _productRecs = MutableSharedFlow<List<ProductMainPreview>>(replay = 0)
+    private val _product = MutableSharedFlow<ProductDetail>(replay = 1)
+    private val _productRecs = MutableSharedFlow<List<ProductMainPreview>>(replay = 1)
 
     val showLoading get() = _showLoading
     val product get() = _product
@@ -36,6 +36,7 @@ class CatalogProductViewModel : ViewModel() {
                         is Result.Success -> {
                             _product.emit(it.result)
                         }
+
                         is Result.Error -> {}
                     }
                 }
@@ -52,6 +53,7 @@ class CatalogProductViewModel : ViewModel() {
                         is Result.Success -> {
                             _productRecs.emit(it.result.products)
                         }
+
                         is Result.Error -> {}
                     }
                 }

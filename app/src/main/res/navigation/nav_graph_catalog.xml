@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/catalogMainFragment"
         android:name="ru.feip.elisianix.catalog.CatalogMainFragment"
-        android:label="CatalogMainFragment" >
+        android:label="CatalogMainFragment">
         <action
             android:id="@+id/action_catalogMainFragment_to_catalogCategoryFragment"
             app:destination="@id/catalogCategoryFragment" />
@@ -15,22 +15,28 @@
             android:id="@+id/action_catalogMainFragment_to_catalogProductFragment"
             app:destination="@id/catalogProductFragment" />
         <action
-            android:id="@+id/action_catalogMainFragment_to_catalogSearchFragment"
-            app:destination="@id/catalogSearchFragment" />
+            android:id="@+id/action_catalogMainFragment_to_searchWidgetFragment"
+            app:destination="@id/searchWidgetFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogCategoryFragment"
         android:name="ru.feip.elisianix.catalog.CatalogCategoryFragment"
         android:label="fragment_catalog_category"
-        tools:layout="@layout/fragment_catalog_category" >
+        tools:layout="@layout/fragment_catalog_category">
         <action
             android:id="@+id/action_catalogCategoryFragment_to_catalogProductFragment"
             app:destination="@id/catalogProductFragment" />
+        <action
+            android:id="@+id/action_catalogCategoryFragment_to_catalogSortMethodDialog"
+            app:destination="@id/catalogSortMethodDialog" />
+        <action
+            android:id="@+id/action_catalogCategoryFragment_to_searchWidgetFragment"
+            app:destination="@id/searchWidgetFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogProductFragment"
         android:name="ru.feip.elisianix.catalog.CatalogProductFragment"
-        android:label="CatalogProductFragment" >
+        android:label="CatalogProductFragment">
         <action
             android:id="@+id/action_catalogProductFragment_self"
             app:destination="@id/catalogProductFragment" />
@@ -38,15 +44,18 @@
             android:id="@+id/action_catalogProductFragment_to_catalogCategoryFragment"
             app:destination="@id/catalogCategoryFragment" />
     </fragment>
+    <dialog
+        android:id="@+id/catalogSortMethodDialog"
+        android:name="ru.feip.elisianix.catalog.CatalogSortMethodDialog"
+        android:label="CatalogSortMethodDialog" />
     <fragment
-        android:id="@+id/catalogSearchFragment"
-        android:name="ru.feip.elisianix.catalog.CatalogSearchFragment"
-        android:label="CatalogSearchFragment" >
+        android:id="@+id/searchWidgetFragment"
+        android:name="ru.feip.elisianix.common.SearchWidgetFragment"
+        android:label="SearchWidgetFragment">
         <action
-            android:id="@+id/action_catalogSearchFragment_to_catalogCategoryFragment"
-            app:destination="@id/catalogCategoryFragment" />
-        <action
-            android:id="@+id/action_catalogSearchFragment_to_catalogProductFragment"
-            app:destination="@id/catalogProductFragment" />
+            android:id="@+id/action_searchWidgetFragment_to_catalogCategoryFragment"
+            app:destination="@id/catalogCategoryFragment"
+            app:popUpTo="@id/searchWidgetFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

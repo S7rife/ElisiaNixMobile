@@ -23,6 +23,7 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
+import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.ProductDetail
@@ -39,11 +40,16 @@ class CatalogProductFragment :
     private lateinit var productColorAdapter: ProductColorListAdapter
     private lateinit var productSizeAdapter: ProductSizeListAdapter
     private lateinit var productRecsAdapter: ProductCategoryBlockMainListAdapter
+    private var productId = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        productId = requireArguments().getInt("product_id")
+        viewModel.getProductDetail(productId)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val productId = requireArguments().getInt("product_id")
 
         binding.apply {
             toolbar.setNavigationOnClickListener {
@@ -65,6 +71,7 @@ class CatalogProductFragment :
                     LinearLayoutManager.HORIZONTAL,
                     false
                 )
+            PagerSnapHelper().attachToRecyclerView(recyclerProductImage)
 
             productColorAdapter = ProductColorListAdapter {
                 currentProduct = currentProduct.copy(colorId = it.id)
@@ -99,6 +106,9 @@ class CatalogProductFragment :
                     LinearLayoutManager.HORIZONTAL,
                     false
                 )
+            recyclerProductRecsIndicator.attachToRecyclerView(recyclerProductRecsBlock)
+
+            swipeRefresh.setOnRefreshListener { viewModel.getProductDetail(productId) }
         }
 
         viewModel.showLoading
@@ -119,13 +129,11 @@ class CatalogProductFragment :
             .onEach {
                 productRecsAdapter.submitList(it)
                 binding.apply {
+                    swipeRefresh.isRefreshing = false
                     productRecsBlock.isVisible = true
-                    recyclerProductRecsIndicator.attachToRecyclerView(recyclerProductRecsBlock)
                 }
             }
             .launchWhenStarted(lifecycleScope)
-
-        viewModel.getProductDetail(productId)
     }
 
     private fun updateProductUi(prod: ProductDetail) {
@@ -136,8 +144,9 @@ class CatalogProductFragment :
 
             productName.text = prod.name
 
-            productPriceNew.text = prod.price.inCurrency(getString(R.string.currency))
-            productPriceOld.text = prod.price.inCurrency(getString(R.string.currency))
+            val cur = getString(R.string.currency)
+            productPriceNew.text = prod.price.inCurrency(cur)
+            productPriceOld.addStrikethrough(prod.price.inCurrency(cur))
 
             productColorCurrent.text = prod.colors[0].name
 
@@ -154,14 +163,25 @@ class CatalogProductFragment :
             productIsNew.isVisible = prod.isNew
 
             if (prod.images.count() > 1) {
-                PagerSnapHelper().attachToRecyclerView(recyclerProductImage)
                 recyclerProductImageIndicator.attachToRecyclerView(recyclerProductImage)
             }
 
             productTagCategory.setOnClickListener {
                 findNavController().navigate(
                     R.id.action_catalogProductFragment_to_catalogCategoryFragment,
-                    bundleOf("category_id" to prod.category.id)
+                    bundleOf(
+                        "category_id" to prod.category.id.toString(),
+                        "section_name" to prod.category.name
+                    )
+                )
+            }
+            productTagBrand.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_catalogProductFragment_to_catalogCategoryFragment,
+                    bundleOf(
+                        "brand_id" to prod.brand.id.toString(),
+                        "section_name" to prod.brand.name
+                    )
                 )
             }
         }

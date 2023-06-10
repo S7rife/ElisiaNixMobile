@@ -37,13 +37,14 @@ class CatalogMainFragment :
         binding.apply {
             searchCatalogView.setOnClickListener {
                 findNavController().navigate(
-                    R.id.action_catalogMainFragment_to_catalogSearchFragment
+                    R.id.action_catalogMainFragment_to_searchWidgetFragment,
+                    bundleOf("sort_method" to null)
                 )
             }
             categoryMainAdapter = CategoryMainListAdapter {
                 findNavController().navigate(
                     R.id.action_catalogMainFragment_to_catalogCategoryFragment,
-                    bundleOf("category_id" to it.id, "category_name" to it.name)
+                    bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
                 )
             }
             recyclerCategoriesPreview.adapter = categoryMainAdapter
@@ -67,7 +68,7 @@ class CatalogMainFragment :
                 {
                     findNavController().navigate(
                         R.id.action_catalogMainFragment_to_catalogCategoryFragment,
-                        bundleOf("category_id" to it.id, "category_name" to it.name)
+                        bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
                     )
                 },
                 {
@@ -84,6 +85,10 @@ class CatalogMainFragment :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
+
+            swipeRefresh.setOnRefreshListener {
+                viewModel.getCategories()
+            }
         }
 
         viewModel.showLoading
@@ -93,49 +98,33 @@ class CatalogMainFragment :
         viewModel.categories
             .onEach {
                 categoryMainAdapter.submitList(it)
-                for (category in it) {
-                    viewModel.getCategoryBlockProducts(category.id, category.name)
+                binding.swipeRefresh.isRefreshing = false
+            }
+            .launchWhenStarted(lifecycleScope)
+
+        viewModel.productActualBlocks
+            .onEach {
+                if (it.new != null && it.discount != null) {
+                    actualMainAdapter.submitList(
+                        listOf(
+                            MainBlock(
+                                0, getString(R.string.new_arrivals),
+                                it.new!!.products, getString(R.string.new_)
+                            ),
+                            MainBlock(
+                                1, getString(R.string.discounts),
+                                it.discount!!.products, getString(R.string.best_price)
+                            )
+                        )
+                    )
                 }
             }
             .launchWhenStarted(lifecycleScope)
 
-        viewModel.newProducts
-            .onEach {
-                actualMainAdapter.submitList(
-                    listOf(
-                        MainBlock(
-                            0, getString(R.string.new_arrivals),
-                            it, getString(R.string.new_)
-                        )
-                    )
-                )
-                viewModel.getDiscountProducts()
-            }
-            .launchWhenStarted(lifecycleScope)
-
-        viewModel.discountProducts
-            .onEach {
-                val lst = mutableListOf(actualMainAdapter.currentList[0])
-                lst.plusAssign(
-                    MainBlock(
-                        1, getString(R.string.discounts),
-                        it, getString(R.string.best_price)
-                    )
-                )
-                actualMainAdapter.submitList(lst)
-
-            }
-            .launchWhenStarted(lifecycleScope)
-
-        viewModel.categoryBlockProducts
-            .onEach {
-                categoryBlockMainAdapter.submitList(
-                    categoryBlockMainAdapter.currentList.toMutableList().plus(it)
-                )
-            }
+        viewModel.productCategoryBlocks
+            .onEach { categoryBlockMainAdapter.submitList(it) }
             .launchWhenStarted(lifecycleScope)
 
         viewModel.getCategories()
-        viewModel.getNewProducts()
     }
 }

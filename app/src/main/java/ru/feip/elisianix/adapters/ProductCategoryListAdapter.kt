@@ -3,28 +3,69 @@ package ru.feip.elisianix.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemCategoryProductBinding
+import ru.feip.elisianix.extensions.addStrikethrough
+import ru.feip.elisianix.extensions.inCurrency
+import ru.feip.elisianix.remote.models.Image
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 class ProductCategoryListAdapter(
-) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ProductCategoryListAdapter.ItemCallback()) {
+    private val clickListenerToProduct: (Pair<Int, Image>) -> Unit,
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
+) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductCategoryList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemCategoryProductBinding.bind(item)
+        private lateinit var productImageAdapter: ProductImageToListAdapter
+
+        init {
+            binding.apply {
+                productCartBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerCartBtn.invoke(currentList[position])
+                    }
+                }
+                productFavoriteBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerFavoriteBtn.invoke(currentList[position])
+                    }
+                }
+            }
+        }
 
         fun bind(item: ProductMainPreview) {
             binding.apply {
-                Glide.with(itemView).load(item.images[0].url)
-                    .error(R.drawable.ic_no_image)
-                    .into(productImage)
-                val price = "${item.price} ₽"
                 productName.text = item.name
-                productPrice.text = price
+
+                val cur = itemView.resources.getString(R.string.currency)
+                productNewPrice.text = item.price.inCurrency(cur)
+                productOldPrice.addStrikethrough(item.price.inCurrency(cur))
+
+                // TODO change tag and price with discount from remote
+                productActualTag.isVisible = item.isNew
+
+                productImageAdapter = ProductImageToListAdapter(clickListenerToProduct)
+                recyclerProductImage.adapter = productImageAdapter
+                recyclerProductImage.layoutManager =
+                    LinearLayoutManager(
+                        itemView.context,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                productImageAdapter.submitList(item.images.map { Pair(item.id, it) })
+
+                if (item.images.count() > 1) {
+                    recyclerProductImageIndicator.attachToRecyclerView(recyclerProductImage)
+                }
             }
         }
     }

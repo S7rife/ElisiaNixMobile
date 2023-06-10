@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualProductBinding
+import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
@@ -44,12 +45,13 @@ class ProductActualMainListAdapter(
                 Glide.with(itemView).load(item.images[0].url)
                     .error(R.drawable.ic_no_image)
                     .into(productImage)
+
                 productName.text = item.name
-                productNewPrice.text =
-                    item.price.inCurrency(itemView.resources.getString(R.string.currency))
-                productOldPrice.text = productNewPrice.text
                 productActualTag.text = actualName
 
+                val cur = itemView.resources.getString(R.string.currency)
+                productNewPrice.text = item.price.inCurrency(cur)
+                productOldPrice.addStrikethrough(item.price.inCurrency(cur))
                 // TODO change old price with remote
             }
         }
