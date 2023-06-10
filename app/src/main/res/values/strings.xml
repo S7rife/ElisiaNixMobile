@@ -30,4 +30,5 @@
     <string name="category">Category</string>
     <string name="preposition_of">of</string>
     <string name="currency">₽</string>
+    <string name="close">Close</string>
 </resources>

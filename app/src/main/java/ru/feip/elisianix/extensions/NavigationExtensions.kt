@@ -3,6 +3,7 @@ package ru.feip.elisianix.extensions
 
 import android.content.Intent
 import android.util.SparseArray
+import androidx.annotation.IdRes
 import androidx.core.util.forEach
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
@@ -229,3 +230,7 @@ private fun FragmentManager.isOnBackStack(backStackName: String): Boolean {
 }
 
 private fun getFragmentTag(index: Int) = "bottomNavigation#$index"
+
+fun NavController.isPreviousDest(@IdRes id: Int): Boolean {
+    return previousBackStackEntry?.destination?.id == id
+}
