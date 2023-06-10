@@ -2,7 +2,9 @@ package ru.feip.elisianix.catalog
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -14,6 +16,9 @@ import ru.feip.elisianix.catalog.view_models.CatalogCategoryViewModel
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
+import ru.feip.elisianix.remote.models.SearchSettings
+import ru.feip.elisianix.remote.models.sortMethods
+import kotlin.properties.Delegates
 
 
 class CatalogCategoryFragment :
@@ -24,22 +29,94 @@ class CatalogCategoryFragment :
     }
 
     private lateinit var productCategoryAdapter: ProductCategoryListAdapter
+    private var searchSettings by Delegates.observable(SearchSettings()) { _, _, newSettings ->
+        if (newSettings.safe) {
+            searchFocus()
+            viewModel.getProductsByFilters(newSettings)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setFragmentResultListener("resultSortMethodDialog") { _, bundle ->
+            searchSettings = searchSettings.copy(
+                sortMethod = sortMethods.first { bundle.getInt("sort_method") == it.value.first }
+            )
+        }
+
+        setFragmentResultListener("resultSearchQueryDialog") { _, bundle ->
+            val newSearchQuery = bundle.getString("search_query")
+            searchSettings = searchSettings.copy(query = newSearchQuery)
+        }
+        searchSettings = SearchSettings(
+            safe = false,
+            query = requireArguments().getString("search_query"),
+            categoryId = requireArguments().getString("category_id")?.toIntOrNull(),
+            brandId = requireArguments().getString("brand_id")?.toIntOrNull(),
+        )
+        viewModel.getProductsByFilters(searchSettings)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val categoryId = requireArguments().getInt("category_id")
-        val categoryName = requireArguments().getString("category_name")
-
+        if (!searchSettings.safe) {
+            searchSettings = searchSettings.copy(safe = true)
+        }
+        val sectionName = requireArguments().getString("section_name")
+        searchFocus()
 
         binding.apply {
+            searchViewContainer.isChecked = true
             toolbar.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
-            toolbar.title = categoryName?.uppercase()
-            productCategoryAdapter = ProductCategoryListAdapter()
+            toolbar.title = sectionName?.uppercase() ?: getString(R.string.search).uppercase()
+
+            toolbar.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.category_toolbar_search -> {
+                        findNavController().navigate(
+                            R.id.action_catalogCategoryFragment_to_searchWidgetFragment,
+                            bundleOf("search_query" to currentSearchQuery.text)
+                        )
+                    }
+
+                    R.id.category_toolbar_close -> {
+                        searchSettings = searchSettings.copy(query = null)
+                        emptyState.isVisible = false
+                    }
+                }
+                true
+            }
+
+            searchViewContainer.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_catalogCategoryFragment_to_searchWidgetFragment,
+                    bundleOf("search_query" to currentSearchQuery.text)
+                )
+            }
+
+            categorySortingBtn.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_catalogCategoryFragment_to_catalogSortMethodDialog,
+                    bundleOf("sort_method" to searchSettings.sortMethod.value.first)
+                )
+            }
+
+            productCategoryAdapter = ProductCategoryListAdapter(
+                {
+                    findNavController().navigate(
+                        R.id.action_catalogCategoryFragment_to_catalogProductFragment,
+                        bundleOf("product_id" to it.first)
+                    )
+                }, {}, {}
+            )
             recyclerCatalogCategory.adapter = productCategoryAdapter
             recyclerCatalogCategory.layoutManager = GridLayoutManager(requireContext(), 2)
+
+            swipeRefresh.setOnRefreshListener { viewModel.getProductsByFilters(searchSettings) }
         }
 
         viewModel.showLoading
@@ -49,9 +126,22 @@ class CatalogCategoryFragment :
         viewModel.products
             .onEach {
                 productCategoryAdapter.submitList(it)
+                binding.emptyState.isVisible = it.isEmpty()
+                binding.swipeRefresh.isRefreshing = false
             }
             .launchWhenStarted(lifecycleScope)
+    }
 
-        viewModel.getCategoryProducts(categoryId)
+    private fun searchFocus() {
+        binding.apply {
+            val focus = !searchSettings.query.isNullOrEmpty()
+            searchViewContainer.isVisible = focus
+
+            toolbar.menu.findItem(R.id.category_toolbar_close).isVisible = focus
+            toolbar.menu.findItem(R.id.category_toolbar_search).isVisible = !focus
+
+            categorySortingBtn.text = searchSettings.sortMethod.value.third
+            currentSearchQuery.text = searchSettings.query.orEmpty()
+        }
     }
 }

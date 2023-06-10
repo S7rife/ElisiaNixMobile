@@ -35,7 +35,7 @@ data class ProductMainPreview(
     var sizes: List<Size>,
 
     @SerializedName("createdDate")
-    var createdDate: String,
+    var createdDate: String?,
 )
 
 data class CategoryMainPreview(
@@ -72,12 +72,17 @@ data class ProductMainPreviews(
     var products: List<ProductMainPreview>
 )
 
+data class ActualBlocks(
+    var new: ProductMainPreviews? = null,
+    var discount: ProductMainPreviews? = null,
+)
+
 data class ProductDetail(
     @SerializedName("id")
     var id: Int,
 
     @SerializedName("name")
-    var name: String?,
+    var name: String,
 
     @SerializedName("article")
     var article: String?,
@@ -109,4 +114,7 @@ data class ProductDetail(
 
     @SerializedName("sizes")
     var sizes: List<Size>,
+
+    @SerializedName("features")
+    var features: List<ProductFeature>
 )

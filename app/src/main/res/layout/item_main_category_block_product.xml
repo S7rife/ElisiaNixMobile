@@ -66,6 +66,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="4dp"
-            android:src="@drawable/ic_to_cart" />
+            android:src="@drawable/ic_to_cart_32" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package ru.feip.elisianix.catalog
+package ru.feip.elisianix.common
 
 
 import android.os.Bundle
@@ -6,89 +6,86 @@ import android.view.View
 import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
-import ru.feip.elisianix.adapters.ProductCategoryBlockMainListAdapter
 import ru.feip.elisianix.adapters.SearchCategoriesListAdapter
 import ru.feip.elisianix.adapters.SearchHistoryListAdapter
-import ru.feip.elisianix.catalog.view_models.CatalogSearchViewModel
-import ru.feip.elisianix.common.App
-import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.SearchQuery
-import ru.feip.elisianix.databinding.FragmentCatalogSearchBinding
+import ru.feip.elisianix.databinding.FragmentSearchWidgetBinding
+import ru.feip.elisianix.extensions.isPreviousDest
 import ru.feip.elisianix.extensions.launchWhenStarted
 import kotlin.properties.Delegates
 
 
-class CatalogSearchFragment :
-    BaseFragment<FragmentCatalogSearchBinding>(R.layout.fragment_catalog_search) {
+class SearchWidgetFragment :
+    BaseFragment<FragmentSearchWidgetBinding>(R.layout.fragment_search_widget) {
 
     private lateinit var searchCategoriesAdapter: SearchCategoriesListAdapter
     private lateinit var searchHistoryAdapter: SearchHistoryListAdapter
-    private lateinit var searchResultAdapter: ProductCategoryBlockMainListAdapter
-    private var currentSearchHistory: List<SearchQuery> by Delegates.observable(mutableListOf()) { property, oldValue, newValue ->
+    private var currentSearchHistory: List<SearchQuery> by Delegates.observable(mutableListOf()) { _, _, newValue ->
         searchHistoryAdapter.submitList(newValue)
     }
 
     private val viewModel by lazy {
-        ViewModelProvider(this)[CatalogSearchViewModel::class.java]
+        ViewModelProvider(this)[SearchWidgetViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val currentSearchQuery = requireArguments().getString("search_query")
+
         App.INSTANCE.db.searchHistoryDao().deleteExcept()
         App.INSTANCE.db.searchHistoryDao().getAll().observe(viewLifecycleOwner) {
             currentSearchHistory = it
+            binding.youSearched.isVisible = it.isNotEmpty()
         }
 
         binding.apply {
-            toolbarSearch.setNavigationOnClickListener {
+            toolbar.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
 
-            toolbarSearch.setOnMenuItemClickListener {
-                // TODO make focus on search field
-                searchCatalogView.requestFocus()
+            toolbar.setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.category_toolbar_search -> {}
+                    R.id.category_toolbar_close -> {
+                        searchView.setQuery("", false)
+                    }
+                }
+                true
             }
 
-
-            searchCatalogView.setOnQueryTextFocusChangeListener { _, onFocus ->
+            searchView.setOnQueryTextFocusChangeListener { _, onFocus ->
                 // TODO suggestions
-                changeFocus(searchInFocus = onFocus)
-                emptyStateContainer.isVisible =
-                    searchResultAdapter.currentList.isEmpty() and !onFocus and searchCatalogView.query.isNotEmpty()
             }
 
-            searchCatalogView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
                 androidx.appcompat.widget.SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
                     if (query.isNotEmpty()) {
-                        changeFocus(searchInFocus = false)
                         doSearch(query)
                     }
-                    return false
+                    return query.isNotEmpty()
                 }
 
                 override fun onQueryTextChange(newText: String): Boolean {
-                    toolbarSearch.menu.findItem(R.id.action_search).isVisible =
-                        newText.isEmpty()
-                    emptyStateContainer.isVisible =
-                        searchResultAdapter.currentList.isEmpty() and newText.isEmpty() and !searchToolsContainer.isVisible
-                    return false
+                    toolbarUpdate()
+                    return true
                 }
             })
 
+            searchView.setQuery(currentSearchQuery, false)
 
             searchCategoriesAdapter = SearchCategoriesListAdapter {
                 findNavController().navigate(
-                    R.id.action_catalogSearchFragment_to_catalogCategoryFragment,
-                    bundleOf("category_id" to it.id, "category_name" to it.name)
+                    R.id.action_searchWidgetFragment_to_catalogCategoryFragment,
+                    bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
                 )
             }
             recyclerSearchCategories.adapter = searchCategoriesAdapter
@@ -100,8 +97,7 @@ class CatalogSearchFragment :
                 )
 
             searchHistoryAdapter = SearchHistoryListAdapter {
-                searchCatalogView.setQuery(it.query, true)
-                doSearch(it.query)
+                searchView.setQuery(it.query, true)
             }
             recyclerSearchHistory.adapter = searchHistoryAdapter
             recyclerSearchHistory.layoutManager =
@@ -110,15 +106,6 @@ class CatalogSearchFragment :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
-
-            searchResultAdapter = ProductCategoryBlockMainListAdapter {
-                findNavController().navigate(
-                    R.id.action_catalogSearchFragment_to_catalogProductFragment,
-                    bundleOf("product_id" to it.id)
-                )
-            }
-            recyclerSearchResult.adapter = searchResultAdapter
-            recyclerSearchResult.layoutManager = GridLayoutManager(requireContext(), 2)
 
             App.INSTANCE.db.searchHistoryDao().getAll().observe(viewLifecycleOwner) {
                 currentSearchHistory = it
@@ -136,27 +123,22 @@ class CatalogSearchFragment :
             }
             .launchWhenStarted(lifecycleScope)
 
-        viewModel.products
-            .onEach {
-                searchResultAdapter.submitList(it)
-                binding.apply {
-                    changeFocus(searchInFocus = false)
-                    emptyStateContainer.isVisible = it.isEmpty()
-                }
-            }
-            .launchWhenStarted(lifecycleScope)
-
         viewModel.getCategories()
     }
 
     private fun doSearch(query: String) {
-        binding.apply {
-            searchCatalogView.clearFocus()
-            emptyStateContainer.isVisible = false
-        }
-        viewModel.getSearchProducts(query)
         if (currentSearchHistory.none { it.query == query }) {
             updateSearchHistory(query)
+        }
+
+        if (findNavController().isPreviousDest(R.id.catalogCategoryFragment)) {
+            setFragmentResult("resultSearchQueryDialog", bundleOf("search_query" to query))
+            findNavController().popBackStack()
+        } else {
+            findNavController().navigate(
+                R.id.action_searchWidgetFragment_to_catalogCategoryFragment,
+                bundleOf("search_query" to query)
+            )
         }
     }
 
@@ -168,13 +150,11 @@ class CatalogSearchFragment :
         }
     }
 
-    private fun changeFocus(searchInFocus: Boolean) {
+    private fun toolbarUpdate() {
         binding.apply {
-            searchToolsContainer.isVisible = searchInFocus
-            recyclerSearchResult.isVisible = !searchInFocus
-            if (searchInFocus) {
-                emptyStateContainer.isVisible = false
-            }
+            val focus = searchView.query.isNotEmpty()
+            toolbar.menu.findItem(R.id.category_toolbar_close).isVisible = focus
+            toolbar.menu.findItem(R.id.category_toolbar_search).isVisible = !focus
         }
     }
 }

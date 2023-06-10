@@ -1,6 +1,7 @@
 package ru.feip.elisianix.remote.models
 
 import com.google.gson.annotations.SerializedName
+import ru.feip.elisianix.common.db.CartItem
 
 
 data class Brand(
@@ -76,6 +77,26 @@ enum class SizeMap(val sizes: Pair<Int, Int>) {
     XXL(Pair(54, 56))
 }
 
+enum class SortMethod(val value: Triple<Int, String?, String>) {
+    NEWEST(Triple(0, "Newest", "sort newest")),
+    PRICE_ASC(Triple(1, "ByPriceAsc", "sorting by price ascending")),
+    PRICE_DESC(Triple(2, "ByPriceDesc", "sorting by price descending")),
+}
+
+val sortMethods: List<SortMethod> = listOf(
+    SortMethod.NEWEST,
+    SortMethod.PRICE_ASC,
+    SortMethod.PRICE_DESC
+)
+
+data class SearchSettings(
+    var safe: Boolean = true,
+    var query: String? = null,
+    var categoryId: Int? = null,
+    var brandId: Int? = null,
+    var sortMethod: SortMethod = SortMethod.NEWEST,
+)
+
 data class Category(
     @SerializedName("id")
     var id: Int,
@@ -85,4 +106,17 @@ data class Category(
 
     @SerializedName("image")
     var image: Image
+)
+
+data class ProductCart(
+    @SerializedName("productCartInfo")
+    var productCartInfo: CartItem,
+
+    @SerializedName("productDetailInfo")
+    var productDetailInfo: ProductDetail,
+)
+
+data class ProductFeature(
+    @SerializedName("value")
+    var value: String,
 )

@@ -16,10 +16,11 @@ inline fun <reified T : Any> T.dataClassToMap(): Map<String, String> {
 
 data class ProductsQueryMap(
     @SerializedName("brands")
-    var brands: List<Int>? = null,
+    // TODO put ids as list
+    var brands: Int? = null,
 
-    @SerializedName("sortBy")
-    var sortBy: String? = null,
+    @SerializedName("sortMethod")
+    var sortMethod: String? = null,
 
     @SerializedName("minPrice")
     var minPrice: Int? = null,
