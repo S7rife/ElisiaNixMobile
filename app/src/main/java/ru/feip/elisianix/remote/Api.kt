@@ -22,4 +22,10 @@ interface Api {
     @GET("api/products/{categoryId}/recs")
     suspend fun getProductRecs(@Path("categoryId") categoryId: Int): ProductMainPreviews
 
+
+    ///////////////////////////////////////////__CART__////////////////////////////////////////////
+
+
+    @POST("api/basket/basketInfo")
+    suspend fun getCartNoAuth(@Body items: RequestCartItems): Cart
 }

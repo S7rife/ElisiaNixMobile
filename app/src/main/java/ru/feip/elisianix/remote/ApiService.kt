@@ -5,9 +5,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import ru.feip.elisianix.remote.models.Cart
 import ru.feip.elisianix.remote.models.CategoryMainPreview
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreviews
+import ru.feip.elisianix.remote.models.RequestCartItems
+import ru.feip.elisianix.remote.models.RequestProductCart
 
 class ApiService {
     private val api = NetworkService().retrofit.create(Api::class.java)
@@ -43,6 +46,17 @@ class ApiService {
     suspend fun getProductRecs(categoryId: Int): Flow<Result<ProductMainPreviews>> =
         flow<Result<ProductMainPreviews>> {
             emit(Result.Success(api.getProductRecs(categoryId)))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
+    ///////////////////////////////////////////__CART__////////////////////////////////////////////
+
+
+    suspend fun getCartNoAuth(productsInCart: List<RequestProductCart>): Flow<Result<Cart>> =
+        flow<Result<Cart>> {
+            emit(Result.Success(api.getCartNoAuth(RequestCartItems(productsInCart))))
         }
             .catch { emit(Result.Error(it)) }
             .flowOn(Dispatchers.IO)
