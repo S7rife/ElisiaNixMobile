@@ -76,14 +76,14 @@ class CatalogCategoryFragment :
 
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.category_toolbar_search -> {
+                    R.id.categoryToolbarSearch -> {
                         findNavController().navigate(
                             R.id.action_catalogCategoryFragment_to_searchWidgetFragment,
                             bundleOf("search_query" to currentSearchQuery.text)
                         )
                     }
 
-                    R.id.category_toolbar_close -> {
+                    R.id.categoryToolbarClose -> {
                         searchSettings = searchSettings.copy(query = null)
                         emptyState.isVisible = false
                     }
@@ -137,8 +137,8 @@ class CatalogCategoryFragment :
             val focus = !searchSettings.query.isNullOrEmpty()
             searchViewContainer.isVisible = focus
 
-            toolbar.menu.findItem(R.id.category_toolbar_close).isVisible = focus
-            toolbar.menu.findItem(R.id.category_toolbar_search).isVisible = !focus
+            toolbar.menu.findItem(R.id.categoryToolbarClose).isVisible = focus
+            toolbar.menu.findItem(R.id.categoryToolbarSearch).isVisible = !focus
 
             categorySortingBtn.text = searchSettings.sortMethod.value.third
             currentSearchQuery.text = searchSettings.query.orEmpty()

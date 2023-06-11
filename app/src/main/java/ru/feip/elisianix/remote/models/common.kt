@@ -1,7 +1,6 @@
 package ru.feip.elisianix.remote.models
 
 import com.google.gson.annotations.SerializedName
-import ru.feip.elisianix.common.db.CartItem
 
 
 data class Brand(
@@ -21,20 +20,6 @@ data class ProductColor(
 
     @SerializedName("value")
     var value: String,
-)
-
-data class MainBlock(
-    @SerializedName("id")
-    var id: Int,
-
-    @SerializedName("name")
-    var name: String,
-
-    @SerializedName("products")
-    var products: List<ProductMainPreview>,
-
-    @SerializedName("tag")
-    var tag: String?,
 )
 
 data class Image(
@@ -68,35 +53,6 @@ data class Size(
     var subscribed: Boolean,
 )
 
-enum class SizeMap(val sizes: Pair<Int, Int>) {
-    XS(Pair(38, 40)),
-    S(Pair(40, 42)),
-    M(Pair(42, 44)),
-    L(Pair(46, 48)),
-    XL(Pair(50, 52)),
-    XXL(Pair(54, 56))
-}
-
-enum class SortMethod(val value: Triple<Int, String?, String>) {
-    NEWEST(Triple(0, "Newest", "sort newest")),
-    PRICE_ASC(Triple(1, "ByPriceAsc", "sorting by price ascending")),
-    PRICE_DESC(Triple(2, "ByPriceDesc", "sorting by price descending")),
-}
-
-val sortMethods: List<SortMethod> = listOf(
-    SortMethod.NEWEST,
-    SortMethod.PRICE_ASC,
-    SortMethod.PRICE_DESC
-)
-
-data class SearchSettings(
-    var safe: Boolean = true,
-    var query: String? = null,
-    var categoryId: Int? = null,
-    var brandId: Int? = null,
-    var sortMethod: SortMethod = SortMethod.NEWEST,
-)
-
 data class Category(
     @SerializedName("id")
     var id: Int,
@@ -106,14 +62,6 @@ data class Category(
 
     @SerializedName("image")
     var image: Image
-)
-
-data class ProductCart(
-    @SerializedName("productCartInfo")
-    var productCartInfo: CartItem,
-
-    @SerializedName("productDetailInfo")
-    var productDetailInfo: ProductDetail,
 )
 
 data class ProductFeature(

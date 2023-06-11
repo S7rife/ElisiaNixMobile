@@ -13,7 +13,7 @@
     <string name="all">All</string>
     <string name="to_cart">To cart</string>
     <string name="in_the_cart">In tne cart</string>
-    <string name="add_to_favorites">Add to favorites</string>
+    <string name="to_favorites">To favorites</string>
     <string name="color">Color</string>
     <string name="choose_size">Choose size</string>
     <string name="table_of_sizes">Table of size</string>
@@ -30,5 +30,10 @@
     <string name="category">Category</string>
     <string name="preposition_of">of</string>
     <string name="currency">₽</string>
+    <string name="stock_unit">pcs.</string>
     <string name="close">Close</string>
+    <string name="cart_is_empty">Cart is currently empty. Choose\nsomething in the catalog</string>
+    <string name="check_out">Go to checkout</string>
+    <string name="last_item">Last item</string>
+    <string name="remove">Remove</string>
 </resources>

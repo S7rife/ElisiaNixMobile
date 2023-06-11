@@ -9,3 +9,12 @@ data class SearchQuery(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "query") val query: String,
 )
+
+@Entity(tableName = "cart")
+data class CartItem(
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "productId") val productId: Int,
+    @ColumnInfo(name = "colorId") val colorId: Int,
+    @ColumnInfo(name = "sizeId") val sizeId: Int,
+    @ColumnInfo(name = "count") val count: Int
+)

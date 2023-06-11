@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/product_toolbar_add_to_favorites"
+        android:id="@+id/productToolbarToFavorites"
         android:icon="@drawable/ic_favorite"
-        android:title="@string/add_to_favorites"
+        android:title="@string/to_favorites"
         android:visible="false"
         app:showAsAction="always" />
 </menu>

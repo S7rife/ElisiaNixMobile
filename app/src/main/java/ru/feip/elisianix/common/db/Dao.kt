@@ -32,3 +32,41 @@ interface SearchHistoryDao {
     )
     fun deleteExcept()
 }
+
+@Dao
+interface CartDao {
+    @Query("SELECT * FROM cart ORDER BY id DESC")
+    fun getAll(): List<CartItem>
+
+    @Query("SELECT * FROM cart ORDER BY id DESC")
+    fun getAllLive(): LiveData<List<CartItem>>
+
+    @Query("SELECT * FROM cart WHERE id=:id")
+    fun getById(id: Int): CartItem
+
+    @Query(
+        "SELECT COUNT(*) FROM cart " +
+                "WHERE productId=:productId " +
+                "AND colorId=:colorId " +
+                "AND sizeId=:sizeId"
+    )
+    fun checkInCart(productId: Int, colorId: Int, sizeId: Int): Int
+
+    @Insert
+    fun insert(cartItem: CartItem)
+
+    @Insert
+    fun insertAll(vararg cartItem: CartItem)
+
+    @Delete
+    fun delete(cartItem: CartItem)
+
+
+    @Query(
+        "DELETE FROM cart " +
+                "WHERE productId=:productId " +
+                "AND colorId=:colorId " +
+                "AND sizeId=:sizeId"
+    )
+    fun deleteByInfo(productId: Int, colorId: Int, sizeId: Int): Int
+}

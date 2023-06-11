@@ -49,9 +49,9 @@ class ProductActualMainListAdapter(
                 productName.text = item.name
                 productActualTag.text = actualName
 
-                val cur = itemView.resources.getString(R.string.currency)
-                productNewPrice.text = item.price.inCurrency(cur)
-                productOldPrice.addStrikethrough(item.price.inCurrency(cur))
+                productNewPrice.inCurrency(item.price)
+                productOldPrice.inCurrency(item.price)
+                productOldPrice.addStrikethrough()
                 // TODO change old price with remote
             }
         }

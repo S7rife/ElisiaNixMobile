@@ -46,9 +46,9 @@ class ProductCategoryListAdapter(
             binding.apply {
                 productName.text = item.name
 
-                val cur = itemView.resources.getString(R.string.currency)
-                productNewPrice.text = item.price.inCurrency(cur)
-                productOldPrice.addStrikethrough(item.price.inCurrency(cur))
+                productNewPrice.inCurrency(item.price)
+                productOldPrice.inCurrency(item.price)
+                productOldPrice.addStrikethrough()
 
                 // TODO change tag and price with discount from remote
                 productActualTag.isVisible = item.isNew

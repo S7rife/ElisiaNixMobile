@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemProductSizeBinding
+import ru.feip.elisianix.extensions.sizeFormat
 import ru.feip.elisianix.remote.models.Size
-import ru.feip.elisianix.remote.models.SizeMap
 
 
 class ProductSizeListAdapter(
@@ -48,11 +48,7 @@ class ProductSizeListAdapter(
         }
 
         fun bind(item: Size) {
-            binding.apply {
-                val sizes = SizeMap.valueOf(item.value).sizes
-                val size = "${item.value}\n(${sizes.first}-${sizes.second})"
-                productSize.text = size
-            }
+            binding.productSize.sizeFormat(item.value, true)
         }
     }
 

@@ -50,9 +50,8 @@ class ProductCategoryBlockMainListAdapter(
                 Glide.with(itemView).load(item.images[0].url)
                     .error(R.drawable.ic_no_image)
                     .into(productImage)
-                val price = item.price.inCurrency(itemView.resources.getString(R.string.currency))
                 productName.text = item.name
-                productPrice.text = price
+                productPrice.inCurrency(item.price)
             }
         }
     }

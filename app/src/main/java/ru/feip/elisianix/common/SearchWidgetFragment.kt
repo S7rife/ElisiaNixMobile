@@ -53,8 +53,8 @@ class SearchWidgetFragment :
 
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
-                    R.id.category_toolbar_search -> {}
-                    R.id.category_toolbar_close -> {
+                    R.id.categoryToolbarSearch -> {}
+                    R.id.categoryToolbarClose -> {
                         searchView.setQuery("", false)
                     }
                 }
@@ -153,8 +153,8 @@ class SearchWidgetFragment :
     private fun toolbarUpdate() {
         binding.apply {
             val focus = searchView.query.isNotEmpty()
-            toolbar.menu.findItem(R.id.category_toolbar_close).isVisible = focus
-            toolbar.menu.findItem(R.id.category_toolbar_search).isVisible = !focus
+            toolbar.menu.findItem(R.id.categoryToolbarClose).isVisible = focus
+            toolbar.menu.findItem(R.id.categoryToolbarSearch).isVisible = !focus
         }
     }
 }

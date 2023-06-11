@@ -72,11 +72,6 @@ data class ProductMainPreviews(
     var products: List<ProductMainPreview>
 )
 
-data class ActualBlocks(
-    var new: ProductMainPreviews? = null,
-    var discount: ProductMainPreviews? = null,
-)
-
 data class ProductDetail(
     @SerializedName("id")
     var id: Int,
@@ -117,4 +112,62 @@ data class ProductDetail(
 
     @SerializedName("features")
     var features: List<ProductFeature>
+)
+
+data class CartItemRemote(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("name")
+    var name: String,
+
+    @SerializedName("price")
+    var price: Double,
+
+    @SerializedName("article")
+    var article: String?,
+
+    @SerializedName("productId")
+    var productId: Int,
+
+    @SerializedName("productImage")
+    var productImage: Image,
+
+    @SerializedName("productColor")
+    var productColor: ProductColor,
+
+    @SerializedName("productSize")
+    var productSize: Size,
+
+    @SerializedName("brand")
+    var brand: Brand,
+
+    @SerializedName("category")
+    var category: Category,
+
+    @SerializedName("isLast")
+    var isLast: Boolean,
+
+    @SerializedName("count")
+    var count: Int,
+
+    @SerializedName("available")
+    var available: Int,
+)
+
+data class Cart(
+    @SerializedName("items")
+    var items: List<CartItemRemote>,
+
+    @SerializedName("itemsCount")
+    var itemsCount: Int,
+
+    @SerializedName("totalPrice")
+    var totalPrice: Double,
+
+    @SerializedName("discountPrice")
+    var discountPrice: Double,
+
+    @SerializedName("finalPrice")
+    var finalPrice: Double,
 )

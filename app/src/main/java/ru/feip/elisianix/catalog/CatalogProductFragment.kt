@@ -144,9 +144,9 @@ class CatalogProductFragment :
 
             productName.text = prod.name
 
-            val cur = getString(R.string.currency)
-            productPriceNew.text = prod.price.inCurrency(cur)
-            productPriceOld.addStrikethrough(prod.price.inCurrency(cur))
+            productPriceNew.inCurrency(prod.price)
+            productPriceOld.inCurrency(prod.price)
+            productPriceOld.addStrikethrough()
 
             productColorCurrent.text = prod.colors[0].name
 
@@ -159,7 +159,7 @@ class CatalogProductFragment :
 
             productAllContainer.isVisible = true
             productCartBtnContainer.isVisible = true
-            toolbar.menu.findItem(R.id.product_toolbar_add_to_favorites).isVisible = true
+            toolbar.menu.findItem(R.id.productToolbarToFavorites).isVisible = true
             productIsNew.isVisible = prod.isNew
 
             if (prod.images.count() > 1) {
