@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainCategoryBlockProductBinding
 import ru.feip.elisianix.extensions.inCurrency
+import ru.feip.elisianix.extensions.setCartStatus
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
@@ -34,12 +35,14 @@ class ProductCategoryBlockMainListAdapter(
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerCartBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
                     }
                 }
                 productFavoriteBtn.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerFavoriteBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
                     }
                 }
             }
@@ -52,6 +55,8 @@ class ProductCategoryBlockMainListAdapter(
                     .into(productImage)
                 productName.text = item.name
                 productPrice.inCurrency(item.price)
+
+                productCartBtn.setCartStatus(item.inCart)
             }
         }
     }

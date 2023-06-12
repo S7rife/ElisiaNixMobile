@@ -26,7 +26,10 @@ import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
+import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.checkInCart
+import ru.feip.elisianix.remote.models.editItemInCart
 import kotlin.properties.Delegates
 
 class CatalogProductFragment :
@@ -97,7 +100,14 @@ class CatalogProductFragment :
                         R.id.action_catalogProductFragment_self,
                         bundleOf("product_id" to it.id)
                     )
-                }, {}, {}
+                },
+                {
+                    editItemInCart(it)
+                    it.inCart = checkInCart(it)
+                },
+                {
+
+                }
             )
             recyclerProductRecsBlock.adapter = productRecsAdapter
             recyclerProductRecsBlock.layoutManager =
@@ -198,19 +208,14 @@ class CatalogProductFragment :
     }
 
     private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
-        val blackColor = resources.getColor(R.color.black, context?.theme)
-        val whiteColor = resources.getColor(R.color.white, context?.theme)
         binding.apply {
+            productCartBtn.withColors(inCart)
             if (inCart) {
                 productCartBtn.setOnClickListener(deleteFromCartBtnClickListener)
                 productCartBtn.text = getString(R.string.in_the_cart)
-                productCartBtn.setTextColor(blackColor)
-                productCartBtn.setBackgroundColor(whiteColor)
             } else {
                 productCartBtn.setOnClickListener(insertToCartBtnClickListener)
                 productCartBtn.text = getString(R.string.to_cart)
-                productCartBtn.setTextColor(whiteColor)
-                productCartBtn.setBackgroundColor(blackColor)
             }
         }
     }

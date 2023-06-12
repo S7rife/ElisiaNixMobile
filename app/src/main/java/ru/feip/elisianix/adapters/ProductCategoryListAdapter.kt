@@ -12,6 +12,7 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemCategoryProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
+import ru.feip.elisianix.extensions.setCartStatus
 import ru.feip.elisianix.remote.models.Image
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
@@ -31,12 +32,14 @@ class ProductCategoryListAdapter(
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerCartBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
                     }
                 }
                 productFavoriteBtn.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         clickListenerFavoriteBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
                     }
                 }
             }
@@ -49,6 +52,8 @@ class ProductCategoryListAdapter(
                 productNewPrice.inCurrency(item.price)
                 productOldPrice.inCurrency(item.price)
                 productOldPrice.addStrikethrough()
+
+                productCartBtn.setCartStatus(item.inCart)
 
                 // TODO change tag and price with discount from remote
                 productActualTag.isVisible = item.isNew

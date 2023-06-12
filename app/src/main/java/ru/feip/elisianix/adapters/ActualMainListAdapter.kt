@@ -15,6 +15,8 @@ import ru.feip.elisianix.remote.models.ProductMainPreview
 
 class ActualMainListAdapter(
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
 ) : ListAdapter<MainBlock, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ActualMainList(item: View) : RecyclerView.ViewHolder(item) {
@@ -25,7 +27,11 @@ class ActualMainListAdapter(
             binding.apply {
                 actualSectionName.text = item.name
 
-                productActualMainAdapter = ProductActualMainListAdapter(clickListenerToProduct)
+                productActualMainAdapter = ProductActualMainListAdapter(
+                    clickListenerToProduct,
+                    clickListenerCartBtn,
+                    clickListenerFavoriteBtn
+                )
                 productActualMainAdapter.actualName = item.tag.toString()
                 recyclerProduct.adapter = productActualMainAdapter
                 recyclerProduct.layoutManager =

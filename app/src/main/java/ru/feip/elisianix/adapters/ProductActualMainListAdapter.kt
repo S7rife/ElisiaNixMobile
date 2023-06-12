@@ -11,11 +11,14 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
+import ru.feip.elisianix.extensions.setCartStatus
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ProductActualMainListAdapter(
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     var actualName = ""
@@ -37,6 +40,20 @@ class ProductActualMainListAdapter(
                         clickListenerToProduct.invoke(currentList[position])
                     }
                 }
+                productCartBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerCartBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
+                    }
+                }
+                productFavoriteBtn.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerFavoriteBtn.invoke(currentList[position])
+                        notifyItemChanged(position)
+                    }
+                }
             }
         }
 
@@ -53,6 +70,8 @@ class ProductActualMainListAdapter(
                 productOldPrice.inCurrency(item.price)
                 productOldPrice.addStrikethrough()
                 // TODO change old price with remote
+
+                productCartBtn.setCartStatus(item.inCart, true)
             }
         }
     }

@@ -15,6 +15,7 @@ import ru.feip.elisianix.remote.models.ActualBlocks
 import ru.feip.elisianix.remote.models.CategoryMainPreview
 import ru.feip.elisianix.remote.models.MainBlock
 import ru.feip.elisianix.remote.models.ProductsQueryMap
+import ru.feip.elisianix.remote.models.checkInCart
 import ru.feip.elisianix.remote.models.dataClassToMap
 
 class CatalogMainViewModel : ViewModel() {
@@ -64,10 +65,14 @@ class CatalogMainViewModel : ViewModel() {
                 .collect {
                     when (it) {
                         is Result.Success -> {
+                            val productsTransform = it.result.products.map { prod ->
+                                prod.copy(inCart = checkInCart(prod))
+                            }
+
                             if (new) {
-                                actualBlocks.new = it.result
+                                actualBlocks.new = it.result.copy(products = productsTransform)
                             } else if (discount) {
-                                actualBlocks.discount = it.result
+                                actualBlocks.discount = it.result.copy(products = productsTransform)
                             }
                             _productActualBlocks.emit(actualBlocks)
                         }
@@ -92,11 +97,14 @@ class CatalogMainViewModel : ViewModel() {
                             .collect {
                                 when (it) {
                                     is Result.Success -> {
+                                        val productsTransform = it.result.products.map { prod ->
+                                            prod.copy(inCart = checkInCart(prod))
+                                        }
                                         blocks.add(
                                             MainBlock(
                                                 cat.id,
                                                 cat.name,
-                                                it.result.products,
+                                                productsTransform,
                                                 null
                                             )
                                         )

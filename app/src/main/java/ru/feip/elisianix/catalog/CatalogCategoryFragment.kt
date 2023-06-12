@@ -16,7 +16,10 @@ import ru.feip.elisianix.catalog.view_models.CatalogCategoryViewModel
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
+import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
+import ru.feip.elisianix.remote.models.checkInCart
+import ru.feip.elisianix.remote.models.editItemInCart
 import ru.feip.elisianix.remote.models.sortMethods
 import kotlin.properties.Delegates
 
@@ -29,6 +32,7 @@ class CatalogCategoryFragment :
     }
 
     private lateinit var productCategoryAdapter: ProductCategoryListAdapter
+    private var orderChanged = false
     private var searchSettings by Delegates.observable(SearchSettings()) { _, _, newSettings ->
         if (newSettings.safe) {
             searchFocus()
@@ -40,9 +44,13 @@ class CatalogCategoryFragment :
         super.onCreate(savedInstanceState)
 
         setFragmentResultListener("resultSortMethodDialog") { _, bundle ->
-            searchSettings = searchSettings.copy(
-                sortMethod = sortMethods.first { bundle.getInt("sort_method") == it.value.first }
-            )
+            val newSortMethod = bundle.getInt("sort_method")
+            if (searchSettings.sortMethod.value.first != newSortMethod) {
+                orderChanged = true
+                searchSettings = searchSettings.copy(
+                    sortMethod = sortMethods.first { newSortMethod == it.value.first }
+                )
+            }
         }
 
         setFragmentResultListener("resultSearchQueryDialog") { _, bundle ->
@@ -111,7 +119,14 @@ class CatalogCategoryFragment :
                         R.id.action_catalogCategoryFragment_to_catalogProductFragment,
                         bundleOf("product_id" to it.first)
                     )
-                }, {}, {}
+                },
+                {
+                    editItemInCart(it)
+                    it.inCart = checkInCart(it)
+                },
+                {
+
+                }
             )
             recyclerCatalogCategory.adapter = productCategoryAdapter
             recyclerCatalogCategory.layoutManager = GridLayoutManager(requireContext(), 2)
@@ -124,11 +139,7 @@ class CatalogCategoryFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.products
-            .onEach {
-                productCategoryAdapter.submitList(it)
-                binding.emptyState.isVisible = it.isEmpty()
-                binding.swipeRefresh.isRefreshing = false
-            }
+            .onEach { updateList(it) }
             .launchWhenStarted(lifecycleScope)
     }
 
@@ -143,5 +154,26 @@ class CatalogCategoryFragment :
             categorySortingBtn.text = searchSettings.sortMethod.value.third
             currentSearchQuery.text = searchSettings.query.orEmpty()
         }
+    }
+
+    private fun updateList(it: List<ProductMainPreview>) {
+        productCategoryAdapter.submitList(it)
+        binding.apply {
+            emptyState.isVisible = it.isEmpty()
+            swipeRefresh.isRefreshing = false
+
+            if (orderChanged) {
+                recyclerCatalogCategory.layoutManager?.smoothScrollToPosition(
+                    recyclerCatalogCategory,
+                    null, 0
+                )
+            }
+            orderChanged = false
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        searchSettings = searchSettings
     }
 }

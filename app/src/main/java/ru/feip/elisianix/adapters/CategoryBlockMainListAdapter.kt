@@ -16,6 +16,8 @@ import ru.feip.elisianix.remote.models.ProductMainPreview
 class CategoryBlockMainListAdapter(
     private val clickListenerToCategory: (MainBlock) -> Unit,
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
 ) : ListAdapter<MainBlock, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class CategoryBlockMainList(item: View) : RecyclerView.ViewHolder(item) {
@@ -39,7 +41,11 @@ class CategoryBlockMainListAdapter(
                 categoryBlockName.text = item.name
 
                 productCategoryBlockAdapter =
-                    ProductCategoryBlockMainListAdapter(clickListenerToProduct, {}, {})
+                    ProductCategoryBlockMainListAdapter(
+                        clickListenerToProduct,
+                        clickListenerCartBtn,
+                        clickListenerFavoriteBtn
+                    )
                 recyclerProduct.adapter = productCategoryBlockAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

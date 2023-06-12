@@ -12,6 +12,7 @@ import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.ProductsQueryMap
 import ru.feip.elisianix.remote.models.SearchSettings
+import ru.feip.elisianix.remote.models.checkInCart
 import ru.feip.elisianix.remote.models.dataClassToMap
 
 class CatalogCategoryViewModel : ViewModel() {
@@ -40,7 +41,10 @@ class CatalogCategoryViewModel : ViewModel() {
                 .collect {
                     when (it) {
                         is Result.Success -> {
-                            _products.emit(it.result.products)
+                            val productsTransform = it.result.products.map { prod ->
+                                prod.copy(inCart = checkInCart(prod))
+                            }
+                            _products.emit(productsTransform)
                         }
 
                         is Result.Error -> {}

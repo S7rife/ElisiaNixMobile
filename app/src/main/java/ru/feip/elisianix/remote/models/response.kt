@@ -36,6 +36,12 @@ data class ProductMainPreview(
 
     @SerializedName("createdDate")
     var createdDate: String?,
+
+    @SerializedName("inCart")
+    var inCart: Boolean = false,
+
+    @SerializedName("inFavorites")
+    var inFavorites: Boolean = false,
 )
 
 data class CategoryMainPreview(

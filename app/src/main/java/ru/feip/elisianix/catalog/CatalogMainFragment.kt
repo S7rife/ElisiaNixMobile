@@ -19,6 +19,8 @@ import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.MainBlock
+import ru.feip.elisianix.remote.models.checkInCart
+import ru.feip.elisianix.remote.models.editItemInCart
 
 class CatalogMainFragment :
     BaseFragment<FragmentCatalogMainBinding>(R.layout.fragment_catalog_main) {
@@ -50,12 +52,21 @@ class CatalogMainFragment :
             recyclerCategoriesPreview.adapter = categoryMainAdapter
             recyclerCategoriesPreview.layoutManager = GridLayoutManager(requireContext(), 3)
 
-            actualMainAdapter = ActualMainListAdapter {
-                findNavController().navigate(
-                    R.id.action_catalogMainFragment_to_catalogProductFragment,
-                    bundleOf("product_id" to it.id)
-                )
-            }
+            actualMainAdapter = ActualMainListAdapter(
+                {
+                    findNavController().navigate(
+                        R.id.action_catalogMainFragment_to_catalogProductFragment,
+                        bundleOf("product_id" to it.id)
+                    )
+                },
+                {
+                    editItemInCart(it)
+                    it.inCart = checkInCart(it)
+                },
+                {
+
+                }
+            )
             recyclerActual.adapter = actualMainAdapter
             recyclerActual.layoutManager =
                 LinearLayoutManager(
@@ -76,6 +87,13 @@ class CatalogMainFragment :
                         R.id.action_catalogMainFragment_to_catalogProductFragment,
                         bundleOf("product_id" to it.id)
                     )
+                },
+                {
+                    editItemInCart(it)
+                    it.inCart = checkInCart(it)
+                },
+                {
+
                 }
             )
             recyclerCategoryBlocks.adapter = categoryBlockMainAdapter
