@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/menuItemBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"
+
+        android:layout_gravity="center"
+
+        android:background="@drawable/shape_badge_nav_background"
+        android:duplicateParentState="true"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:minWidth="21dp"
+        android:textColor="?colorPrimary" />
+</merge>

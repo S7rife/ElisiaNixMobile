@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.FragmentNavBottomBinding
+import ru.feip.elisianix.extensions.setBadge
 import ru.feip.elisianix.extensions.setupWithNavController
 
 
@@ -29,11 +30,20 @@ class NavBottomFragment : BaseFragment<FragmentNavBottomBinding>(R.layout.fragme
             R.navigation.nav_graph_favorite,
             R.navigation.nav_graph_profile,
         )
-        binding.bottomNavView.setupWithNavController(
-            navGraphIds = navGraphIds,
-            fragmentManager = childFragmentManager,
-            containerId = R.id.bottomNavContainer,
-            intent = requireActivity().intent
-        )
+        binding.apply {
+            bottomNavView.setupWithNavController(
+                navGraphIds = navGraphIds,
+                fragmentManager = childFragmentManager,
+                containerId = R.id.bottomNavContainer,
+                intent = requireActivity().intent
+            )
+
+            App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+                bottomNavView.setBadge(R.id.nav_graph_favorite, it)
+            }
+            App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+                bottomNavView.setBadge(R.id.nav_graph_cart, it)
+            }
+        }
     }
 }
