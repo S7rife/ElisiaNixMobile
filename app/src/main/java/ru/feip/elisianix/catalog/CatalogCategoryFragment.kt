@@ -14,12 +14,14 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.ProductCategoryListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogCategoryViewModel
 import ru.feip.elisianix.common.BaseFragment
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.editItemInCart
+import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
-import ru.feip.elisianix.remote.models.checkInCart
-import ru.feip.elisianix.remote.models.editItemInCart
 import ru.feip.elisianix.remote.models.sortMethods
 import kotlin.properties.Delegates
 
@@ -125,7 +127,8 @@ class CatalogCategoryFragment :
                     it.inCart = checkInCart(it)
                 },
                 {
-
+                    editItemInFavorites(it.id)
+                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
             recyclerCatalogCategory.adapter = productCategoryAdapter

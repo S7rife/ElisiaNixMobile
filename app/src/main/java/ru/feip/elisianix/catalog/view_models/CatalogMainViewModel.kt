@@ -9,13 +9,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.ActualBlocks
 import ru.feip.elisianix.remote.models.CategoryMainPreview
 import ru.feip.elisianix.remote.models.MainBlock
 import ru.feip.elisianix.remote.models.ProductsQueryMap
-import ru.feip.elisianix.remote.models.checkInCart
 import ru.feip.elisianix.remote.models.dataClassToMap
 
 class CatalogMainViewModel : ViewModel() {
@@ -66,7 +67,10 @@ class CatalogMainViewModel : ViewModel() {
                     when (it) {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
-                                prod.copy(inCart = checkInCart(prod))
+                                prod.copy(
+                                    inCart = checkInCart(prod),
+                                    inFavorites = checkInFavorites(prod.id)
+                                )
                             }
 
                             if (new) {
@@ -90,7 +94,11 @@ class CatalogMainViewModel : ViewModel() {
                 categories.forEach { cat ->
                     async {
                         apiService.getProducts(
-                            ProductsQueryMap(categoryId = cat.id, limit = 10).dataClassToMap()
+                            ProductsQueryMap(
+                                categories = cat.id.toString(),
+                                limit = 10,
+                                inSubCategories = true,
+                            ).dataClassToMap()
                         )
                             .onStart { _showLoading.value = true }
                             .onCompletion { _showLoading.value = false }
@@ -98,9 +106,12 @@ class CatalogMainViewModel : ViewModel() {
                                 when (it) {
                                     is Result.Success -> {
                                         val productsTransform = it.result.products.map { prod ->
-                                            prod.copy(inCart = checkInCart(prod))
+                                            prod.copy(
+                                                inCart = checkInCart(prod),
+                                                inFavorites = checkInFavorites(prod.id)
+                                            )
                                         }
-                                        blocks.add(
+                                        blocks.plusAssign(
                                             MainBlock(
                                                 cat.id,
                                                 cat.name,

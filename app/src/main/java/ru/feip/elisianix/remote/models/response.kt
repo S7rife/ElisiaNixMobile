@@ -117,7 +117,13 @@ data class ProductDetail(
     var sizes: List<Size>,
 
     @SerializedName("features")
-    var features: List<ProductFeature>
+    var features: List<ProductFeature>,
+
+    @SerializedName("inCart")
+    var inCart: Boolean = false,
+
+    @SerializedName("inFavorites")
+    var inFavorites: Boolean = false,
 )
 
 data class CartItemRemote(
@@ -159,6 +165,12 @@ data class CartItemRemote(
 
     @SerializedName("available")
     var available: Int,
+
+    @SerializedName("inCart")
+    var inCart: Boolean = false,
+
+    @SerializedName("inFavorites")
+    var inFavorites: Boolean = false,
 )
 
 data class Cart(

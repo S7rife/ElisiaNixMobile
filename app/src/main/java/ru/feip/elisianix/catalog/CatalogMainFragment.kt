@@ -16,11 +16,13 @@ import ru.feip.elisianix.adapters.CategoryBlockMainListAdapter
 import ru.feip.elisianix.adapters.CategoryMainListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogMainViewModel
 import ru.feip.elisianix.common.BaseFragment
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.editItemInCart
+import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.MainBlock
-import ru.feip.elisianix.remote.models.checkInCart
-import ru.feip.elisianix.remote.models.editItemInCart
 
 class CatalogMainFragment :
     BaseFragment<FragmentCatalogMainBinding>(R.layout.fragment_catalog_main) {
@@ -64,7 +66,8 @@ class CatalogMainFragment :
                     it.inCart = checkInCart(it)
                 },
                 {
-
+                    editItemInFavorites(it.id)
+                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
             recyclerActual.adapter = actualMainAdapter
@@ -93,7 +96,8 @@ class CatalogMainFragment :
                     it.inCart = checkInCart(it)
                 },
                 {
-
+                    editItemInFavorites(it.id)
+                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
             recyclerCategoryBlocks.adapter = categoryBlockMainAdapter

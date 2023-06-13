@@ -16,6 +16,9 @@ import ru.feip.elisianix.adapters.ProductCartListAdapter
 import ru.feip.elisianix.cart.view_models.CartViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCartBinding
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.inStockUnits
@@ -39,6 +42,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             viewModel.getCartNoAuth(list.map {
                 RequestProductCart(it.productId, it.sizeId, it.colorId, it.count)
             })
+            binding.emptyState.isVisible = list.isEmpty()
         }
 
         binding.apply {
@@ -78,8 +82,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     }
 
     private fun updateCart(cart: Cart) {
-        productCartAdapter.submitList(cart.items)
-        val draw = cart.items.isNotEmpty()
+        val newCart = cart.items.filter { checkInCart(it) }
+        productCartAdapter.submitList(newCart)
+        val draw = newCart.isNotEmpty()
         hideCart(draw, !draw)
         binding.apply {
             if (draw) {
@@ -91,25 +96,33 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideCart(productCartAdapter.currentList.isNotEmpty())
-    }
-
     private fun performCartItemActionsMenuClick(
         cIt: CartItemRemote,
         pos: Int,
         view: View
     ) {
+        val inCart = checkInFavorites(cIt.productId)
         val path = view.findViewById<ImageView>(R.id.cartProductActions)
         val popupMenu = PopupMenu(view.context, path, Gravity.END)
         popupMenu.inflate(R.menu.cart_item_actions_menu)
+        popupMenu.menu.findItem(R.id.cartToFavorite).isVisible = !inCart
+        popupMenu.menu.findItem(R.id.cartRemoveFavorite).isVisible = inCart
         popupMenu.setForceShowIcon(true)
         popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
+                val id = cIt.productId
                 when (item.itemId) {
                     R.id.cartToFavorite -> {
-                        // TODO add to favorites
+                        editItemInFavorites(id)
+                        productCartAdapter.currentList[pos].inFavorites = checkInFavorites(id)
+                        productCartAdapter.notifyItemChanged(pos)
+                        return true
+                    }
+
+                    R.id.cartRemoveFavorite -> {
+                        editItemInFavorites(id)
+                        productCartAdapter.currentList[pos].inFavorites = checkInFavorites(id)
+                        productCartAdapter.notifyItemChanged(pos)
                         return true
                     }
 

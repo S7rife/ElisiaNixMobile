@@ -7,12 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.ProductsQueryMap
 import ru.feip.elisianix.remote.models.SearchSettings
-import ru.feip.elisianix.remote.models.checkInCart
 import ru.feip.elisianix.remote.models.dataClassToMap
 
 class CatalogCategoryViewModel : ViewModel() {
@@ -30,7 +31,7 @@ class CatalogCategoryViewModel : ViewModel() {
         viewModelScope.launch {
             apiService.getProducts(
                 ProductsQueryMap(
-                    categoryId = ss.categoryId,
+                    categories = ss.categoryId.toString(),
                     brands = ss.brandId,
                     sortMethod = ss.sortMethod.value.second,
                     filter = ss.query
@@ -42,7 +43,10 @@ class CatalogCategoryViewModel : ViewModel() {
                     when (it) {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
-                                prod.copy(inCart = checkInCart(prod))
+                                prod.copy(
+                                    inCart = checkInCart(prod),
+                                    inFavorites = checkInFavorites(prod.id)
+                                )
                             }
                             _products.emit(productsTransform)
                         }

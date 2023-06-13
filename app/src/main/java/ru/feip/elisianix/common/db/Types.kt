@@ -18,3 +18,9 @@ data class CartItem(
     @ColumnInfo(name = "sizeId") val sizeId: Int,
     @ColumnInfo(name = "count") val count: Int
 )
+
+@Entity(tableName = "favorites")
+data class FavoriteItem(
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    @ColumnInfo(name = "productId") val productId: Int
+)

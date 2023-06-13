@@ -13,6 +13,7 @@ import ru.feip.elisianix.databinding.ItemCategoryProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.setCartStatus
+import ru.feip.elisianix.extensions.setFavoriteStatus
 import ru.feip.elisianix.remote.models.Image
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
@@ -54,6 +55,7 @@ class ProductCategoryListAdapter(
                 productOldPrice.addStrikethrough()
 
                 productCartBtn.setCartStatus(item.inCart)
+                productFavoriteBtn.setFavoriteStatus(item.inFavorites)
 
                 // TODO change tag and price with discount from remote
                 productActualTag.isVisible = item.isNew

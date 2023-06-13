@@ -1,8 +1,5 @@
 package ru.feip.elisianix.remote.models
 
-import ru.feip.elisianix.common.App
-import ru.feip.elisianix.common.db.CartItem
-
 enum class SizeMap(val sizes: Pair<Int, Int>) {
     XS(Pair(38, 40)),
     S(Pair(40, 42)),
@@ -43,17 +40,3 @@ data class ActualBlocks(
     var new: ProductMainPreviews? = null,
     var discount: ProductMainPreviews? = null,
 )
-
-fun editItemInCart(item: ProductMainPreview) {
-    if (item.inCart) {
-        App.INSTANCE.db.CartDao().deleteByInfo(item.id, item.colors[0].id, item.sizes[0].id)
-    } else {
-        App.INSTANCE.db.CartDao()
-            .insert(CartItem(0, item.id, item.colors[0].id, item.sizes[0].id, 1))
-    }
-}
-
-fun checkInCart(item: ProductMainPreview): Boolean {
-    return App.INSTANCE.db.CartDao()
-        .checkInCart(item.id, item.colors[0].id, item.sizes[0].id) > 0
-}

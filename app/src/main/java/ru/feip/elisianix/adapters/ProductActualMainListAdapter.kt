@@ -12,6 +12,7 @@ import ru.feip.elisianix.databinding.ItemMainActualProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.setCartStatus
+import ru.feip.elisianix.extensions.setFavoriteStatus
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
@@ -72,6 +73,7 @@ class ProductActualMainListAdapter(
                 // TODO change old price with remote
 
                 productCartBtn.setCartStatus(item.inCart, true)
+                productFavoriteBtn.setFavoriteStatus(item.inFavorites)
             }
         }
     }

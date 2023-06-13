@@ -1,10 +1,14 @@
 package ru.feip.elisianix.extensions
 
 import android.text.style.StrikethroughSpan
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.toSpannable
+import androidx.core.view.isVisible
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import ru.feip.elisianix.R
 import ru.feip.elisianix.remote.models.SizeMap
@@ -58,4 +62,33 @@ fun MaterialButton.withColors(activated: Boolean) {
 
     this.setTextColor(white)
     this.setBackgroundColor(black)
+}
+
+fun ImageView.setFavoriteStatus(inFavorites: Boolean) {
+    val newImg = when (inFavorites) {
+        true -> R.drawable.ic_favorite_in
+        false -> R.drawable.ic_favorite
+    }
+    this.setImageDrawable(ContextCompat.getDrawable(this.context, newImg))
+}
+
+fun BottomNavigationView.setBadge(tabResId: Int, badgeValue: Int) {
+    var value = badgeValue.toString()
+    if (badgeValue > 99) value = "99+"
+    getOrCreateCustomBadge(this, tabResId)?.let { badge ->
+        badge.isVisible = badgeValue > 0
+        badge.text = value
+    }
+}
+
+private fun getOrCreateCustomBadge(bottomBar: BottomNavigationView, tabResId: Int): TextView? {
+    val parentView = bottomBar.findViewById<ViewGroup>(tabResId)
+    return parentView?.let {
+        var badge = parentView.findViewById<TextView>(R.id.menuItemBadge)
+        if (badge == null) {
+            LayoutInflater.from(parentView.context).inflate(R.layout.nav_badge, parentView, true)
+            badge = parentView.findViewById(R.id.menuItemBadge)
+        }
+        badge
+    }
 }

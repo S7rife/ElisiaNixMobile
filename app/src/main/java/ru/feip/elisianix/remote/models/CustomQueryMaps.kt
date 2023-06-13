@@ -31,8 +31,8 @@ data class ProductsQueryMap(
     @SerializedName("sizes")
     var sizes: List<Int>? = null,
 
-    @SerializedName("categoryId")
-    var categoryId: Int? = null,
+    @SerializedName("categories")
+    var categories: String? = null,
 
     @SerializedName("discount")
     var discount: Boolean? = null,
@@ -54,4 +54,13 @@ data class ProductsQueryMap(
 
     @SerializedName("filter")
     var filter: String? = null,
+
+    @SerializedName("inSubCategories")
+    var inSubCategories: Boolean? = null,
+
+    @SerializedName("allPossibleProperties")
+    var allPossibleProperties: Boolean? = null,
+
+    @SerializedName("selectOnlyAvailableProducts")
+    var selectOnlyAvailableProducts: Boolean? = null,
 )

@@ -22,14 +22,14 @@ import ru.feip.elisianix.catalog.view_models.CatalogProductViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductDetail
-import ru.feip.elisianix.remote.models.checkInCart
-import ru.feip.elisianix.remote.models.editItemInCart
 import kotlin.properties.Delegates
 
 class CatalogProductFragment :
