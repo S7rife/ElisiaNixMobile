@@ -21,6 +21,7 @@ class CatalogSortMethodDialog :
 
         binding.apply {
             dialogCloseBtn.setOnClickListener { findNavController().popBackStack() }
+            dialogLabel.text = getString(R.string.sorting)
 
             val currentSortMethod = sortMethods.first {
                 requireArguments().getInt("sort_method") == it.value.first

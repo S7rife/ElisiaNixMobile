@@ -32,6 +32,12 @@ class ProductCategoryBlockMainListAdapter(
                         clickListenerToProduct.invoke(currentList[position])
                     }
                 }
+                productImage.setOnClickListener {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        clickListenerToProduct.invoke(currentList[position])
+                    }
+                }
                 productCartBtn.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {

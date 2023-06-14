@@ -20,6 +20,7 @@ import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
+import ru.feip.elisianix.extensions.smoothScrollToTop
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
 import ru.feip.elisianix.remote.models.sortMethods
@@ -59,6 +60,7 @@ class CatalogCategoryFragment :
             val newSearchQuery = bundle.getString("search_query")
             searchSettings = searchSettings.copy(query = newSearchQuery)
         }
+
         searchSettings = SearchSettings(
             safe = false,
             query = requireArguments().getString("search_query"),
@@ -166,12 +168,9 @@ class CatalogCategoryFragment :
             swipeRefresh.isRefreshing = false
 
             if (orderChanged) {
-                recyclerCatalogCategory.layoutManager?.smoothScrollToPosition(
-                    recyclerCatalogCategory,
-                    null, 0
-                )
+                recyclerCatalogCategory.smoothScrollToTop()
+                orderChanged = false
             }
-            orderChanged = false
         }
     }
 

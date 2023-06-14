@@ -31,7 +31,7 @@ class CatalogCategoryViewModel : ViewModel() {
         viewModelScope.launch {
             apiService.getProducts(
                 ProductsQueryMap(
-                    categories = ss.categoryId.toString(),
+                    categories = ss.categoryId?.toString(),
                     brands = ss.brandId,
                     sortMethod = ss.sortMethod.value.second,
                     filter = ss.query
