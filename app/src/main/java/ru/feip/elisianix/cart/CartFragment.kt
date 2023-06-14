@@ -6,9 +6,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavGraph
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
@@ -51,7 +54,14 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
             productCartAdapter = ProductCartListAdapter(
                 {
-                    //TODO go to product detail screen
+                    val navController = findNavController(view)
+                    val graph = navController.graph
+                    val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+                    walletGraph.setStartDestination(R.id.catalogProductFragment)
+                    navController.navigate(
+                        R.id.action_cartFragment_to_nav_graph_catalog,
+                        bundleOf("product_id" to it.productId)
+                    )
                 },
                 object : ProductCartListAdapter.OptionsMenuClickListener {
                     override fun onOptionsMenuClicked(

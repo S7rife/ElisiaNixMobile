@@ -2,9 +2,12 @@ package ru.feip.elisianix.favorite
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavGraph
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
@@ -44,7 +47,14 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
 
             productFavoriteAdapter = ProductFavoriteListAdapter(
                 {
-                    // TODO go to detail screen
+                    val navController = Navigation.findNavController(view)
+                    val graph = navController.graph
+                    val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+                    walletGraph.setStartDestination(R.id.catalogProductFragment)
+                    navController.navigate(
+                        R.id.action_favoriteFragment_to_nav_graph_catalog,
+                        bundleOf("product_id" to it.first)
+                    )
                 },
                 {
                     editItemInCart(it.id)
