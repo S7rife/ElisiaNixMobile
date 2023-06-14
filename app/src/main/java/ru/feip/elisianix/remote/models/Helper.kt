@@ -9,6 +9,14 @@ enum class SizeMap(val sizes: Pair<Int, Int>) {
     XXL(Pair(54, 56))
 }
 
+fun SizeMap.last(): String {
+    return "${this.sizes.second}" + " (${this.name})"
+}
+
+val allSizes: List<SizeMap> = listOf(
+    SizeMap.XS, SizeMap.S, SizeMap.M, SizeMap.L, SizeMap.XL, SizeMap.XXL
+)
+
 enum class SortMethod(val value: Triple<Int, String?, String>) {
     NEWEST(Triple(0, "Newest", "sort newest")),
     PRICE_ASC(Triple(1, "ByPriceAsc", "sorting by price ascending")),

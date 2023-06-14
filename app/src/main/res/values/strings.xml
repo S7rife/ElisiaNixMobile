@@ -38,4 +38,12 @@
     <string name="last_item">Last item</string>
     <string name="remove">Remove</string>
     <string name="do_not_have_favorites">You don\'t have any favorites yet.\nThe desired product will be\ncarefully stored here</string>
+    <string name="bust_girth">Bust girth</string>
+    <string name="waist_girth">Waist girth</string>
+    <string name="hip_girth">Hip girth</string>
+    <string name="rus">rus</string>
+    <string name="cm">cm</string>
+    <string name="select_size">Select size</string>
+    <string name="cant_find_size">Can\'t find the right size?</string>
+    <string name="sign_up_fitting">Sign up for a fitting</string>
 </resources>
