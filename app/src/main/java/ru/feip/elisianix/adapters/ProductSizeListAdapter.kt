@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemProductSizeBinding
+import ru.feip.elisianix.extensions.setStrokeSelector
 import ru.feip.elisianix.extensions.sizeFormat
 import ru.feip.elisianix.remote.models.Size
 
@@ -16,20 +17,18 @@ class ProductSizeListAdapter(
     private val clickListenerSizeSelector: (Size) -> Unit
 ) : ListAdapter<Size, RecyclerView.ViewHolder>(ItemCallback()) {
 
-    var currentPos = 0
+    var currentPos = -1
     var lastPos = -1
 
     inner class ProductSizeList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemProductSizeBinding.bind(item)
 
         fun default() {
-            binding.item.isChecked = false
+            binding.cardItem.setStrokeSelector(false)
         }
 
         fun selected() {
-            binding.apply {
-                item.isChecked = true
-            }
+            binding.cardItem.setStrokeSelector(true)
         }
 
         init {
@@ -37,18 +36,26 @@ class ProductSizeListAdapter(
                 item.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
-                        clickListenerSizeSelector.invoke(currentList[position])
-                        lastPos = currentPos
-                        currentPos = position
-                        notifyItemChanged(lastPos)
-                        notifyItemChanged(currentPos)
+                        if (currentList[position].available > 0) {
+                            lastPos = currentPos.also { currentPos = position }
+                            if (lastPos == currentPos) {
+                                lastPos = -1
+                                currentPos = -1
+                            }
+                            notifyItemChanged(lastPos)
+                            notifyItemChanged(position)
+                            clickListenerSizeSelector.invoke(currentList[position])
+                        }
                     }
                 }
             }
         }
 
         fun bind(item: Size) {
-            binding.productSize.sizeFormat(item.value, true)
+            binding.apply {
+                productSize.sizeFormat(item.value, true)
+                cardItem.isChecked = item.available <= 0
+            }
         }
     }
 

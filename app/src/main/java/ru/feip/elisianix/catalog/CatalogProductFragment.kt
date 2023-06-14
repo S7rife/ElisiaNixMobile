@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -23,7 +24,9 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInCart
+import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
@@ -31,6 +34,7 @@ import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductDetail
 import kotlin.properties.Delegates
+
 
 class CatalogProductFragment :
     BaseFragment<FragmentCatalogProductBinding>(R.layout.fragment_catalog_product) {
@@ -44,21 +48,62 @@ class CatalogProductFragment :
     private lateinit var productSizeAdapter: ProductSizeListAdapter
     private lateinit var productRecsAdapter: ProductCategoryBlockMainListAdapter
     private var productId = 0
+    private var colorId: Int? = null
+    private var sizeId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productId = requireArguments().getInt("product_id")
+        colorId = requireArguments().getInt("color_id")
+        sizeId = requireArguments().getInt("size_id")
         viewModel.getProductDetail(productId)
+
+        setFragmentResultListener("resultSizeSelectorDialog") { _, bundle ->
+            val selectedSizeId = bundle.getInt("selected_size_id")
+            val sizePosition = bundle.getInt("size_position")
+            productSizeAdapter.currentPos = sizePosition
+            productSizeAdapter.notifyItemChanged(sizePosition)
+            currentProduct = currentProduct.copy(sizeId = selectedSizeId)
+            editItemInCart(currentProduct)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        currentProduct = currentProduct.copy(
+            productId = productId,
+            colorId = colorId ?: 0,
+            sizeId = sizeId ?: -1
+        )
+
+        val toFavoriteBtn = binding.toolbar.menu.findItem(R.id.productNotInFavorites)
+        val removeFavoriteBtn = binding.toolbar.menu.findItem(R.id.productInFavorites)
+
+        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+            productInCart = checkInCart(currentProduct)
+        }
+        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+            val inFav = checkInFavorites(productId)
+            toFavoriteBtn.isVisible = !inFav.also { toFavoriteBtn.isEnabled = !inFav }
+            removeFavoriteBtn.isVisible = inFav.also { removeFavoriteBtn.isEnabled = inFav }
+        }
+
         binding.apply {
             toolbar.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
+            toolbar.setOnMenuItemClickListener {
+                editItemInFavorites(productId)
+                true
+            }
+
             tableOfSizesBtn.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+            tableOfSizesBtn.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_catalogProductFragment_to_catalogTableOfSizesDialog
+                )
+            }
 
             productImageAdapter = ProductImageListAdapter {
                 Navigation.findNavController(requireActivity(), R.id.rootActivityContainer)
@@ -90,6 +135,10 @@ class CatalogProductFragment :
 
             productSizeAdapter = ProductSizeListAdapter {
                 currentProduct = currentProduct.copy(sizeId = it.id)
+                if (productSizeAdapter.currentPos == -1) {
+                    currentProduct = currentProduct.copy(sizeId = -1)
+                }
+                productInCart = checkInCart(currentProduct)
             }
             recyclerSizeSelector.adapter = productSizeAdapter
             recyclerSizeSelector.layoutManager = GridLayoutManager(requireContext(), 4)
@@ -106,7 +155,8 @@ class CatalogProductFragment :
                     it.inCart = checkInCart(it)
                 },
                 {
-
+                    editItemInFavorites(it.id)
+                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
             recyclerProductRecsBlock.adapter = productRecsAdapter
@@ -129,9 +179,7 @@ class CatalogProductFragment :
             .onEach { prod ->
                 viewModel.getProductRecs(prod.category.id)
                 updateProductUi(prod)
-                currentProduct = CartItem(
-                    0, prod.id, prod.colors[0].id, prod.sizes[0].id, 1
-                )
+                productInCart = checkInCart(currentProduct)
             }
             .launchWhenStarted(lifecycleScope)
 
@@ -158,18 +206,25 @@ class CatalogProductFragment :
             productPriceOld.inCurrency(prod.price)
             productPriceOld.addStrikethrough()
 
-            productColorCurrent.text = prod.colors[0].name
-
             val features = prod.features.joinToString(separator = "\n") { "● " + it.value }
             productDescription.text = features
 
-            productSizeAdapter.submitList(prod.sizes.filter { it.available > 0 })
-            productImageAdapter.submitList(prod.images)
+            val colorPos =
+                prod.colors.indexOfFirst { it.id == colorId }.takeUnless { it == -1 } ?: 0
+            val color = prod.colors[colorPos]
+            productColorCurrent.text = color.name
+            productColorAdapter.currentPos = colorPos
             productColorAdapter.submitList(prod.colors)
+
+            val sizePos = prod.sizes.indexOfFirst { it.id == sizeId }.takeUnless { it == -1 }
+            val size = sizePos?.let { prod.sizes[sizePos] }
+            productSizeAdapter.currentPos = sizePos ?: -1
+            productSizeAdapter.submitList(prod.sizes)
+
+            productImageAdapter.submitList(prod.images)
 
             productAllContainer.isVisible = true
             productCartBtnContainer.isVisible = true
-            toolbar.menu.findItem(R.id.productToolbarToFavorites).isVisible = true
             productIsNew.isVisible = prod.isNew
 
             if (prod.images.count() > 1) {
@@ -194,49 +249,38 @@ class CatalogProductFragment :
                     )
                 )
             }
+            productCartBtn.setOnClickListener {
+                if (currentProduct.sizeId != -1) {
+                    editItemInCart(currentProduct)
+                } else {
+                    val availableSizes = prod.sizes.filter { it.available > 0 }.map { it.value }
+                    val sizeIds = prod.sizes.map { it.id.toString() }
+                    findNavController().navigate(
+                        R.id.action_catalogProductFragment_to_catalogSizeSelectorDialog,
+                        bundleOf(
+                            "available_sizes" to availableSizes,
+                            "product_id" to currentProduct.productId,
+                            "color_id" to currentProduct.colorId,
+                            "size_ids" to sizeIds
+                        )
+                    )
+                }
+            }
+            currentProduct = currentProduct.copy(colorId = color.id, sizeId = size?.id ?: -1)
         }
-    }
-
-    private fun checkCountProductInCart() {
-        val currentCount = App.INSTANCE.db.CartDao()
-            .checkInCart(
-                currentProduct.productId,
-                currentProduct.colorId,
-                currentProduct.sizeId
-            )
-        productInCart = currentCount > 0
     }
 
     private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
-        binding.apply {
-            productCartBtn.withColors(inCart)
-            if (inCart) {
-                productCartBtn.setOnClickListener(deleteFromCartBtnClickListener)
-                productCartBtn.text = getString(R.string.in_the_cart)
-            } else {
-                productCartBtn.setOnClickListener(insertToCartBtnClickListener)
-                productCartBtn.text = getString(R.string.to_cart)
-            }
+        binding.productCartBtn.withColors(inCart)
+        binding.productCartBtn.text = when (inCart) {
+            true -> getString(R.string.in_the_cart)
+            false -> getString(R.string.to_cart)
         }
     }
 
-    //productId, productColor, productSize, cnt
     private var currentProduct: CartItem by Delegates.observable(
-        CartItem(0, 0, 0, 0, 0)
-    ) { _, _, _ ->
-        checkCountProductInCart()
-    }
-
-    private val insertToCartBtnClickListener = View.OnClickListener {
-        App.INSTANCE.db.CartDao().insert(currentProduct)
-        checkCountProductInCart()
-    }
-    private val deleteFromCartBtnClickListener = View.OnClickListener {
-        App.INSTANCE.db.CartDao().deleteByInfo(
-            currentProduct.productId,
-            currentProduct.colorId,
-            currentProduct.sizeId
-        )
-        checkCountProductInCart()
+        CartItem(0, 0, 0, -1, 1)
+    ) { _, _, newProduct ->
+        productInCart = checkInCart(newProduct)
     }
 }

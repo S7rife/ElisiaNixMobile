@@ -60,7 +60,11 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     walletGraph.setStartDestination(R.id.catalogProductFragment)
                     navController.navigate(
                         R.id.action_cartFragment_to_nav_graph_catalog,
-                        bundleOf("product_id" to it.productId)
+                        bundleOf(
+                            "product_id" to it.productId,
+                            "color_id" to it.productColor.id,
+                            "size_id" to it.productSize.id
+                        )
                     )
                 },
                 object : ProductCartListAdapter.OptionsMenuClickListener {

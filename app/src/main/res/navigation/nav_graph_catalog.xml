@@ -43,6 +43,12 @@
         <action
             android:id="@+id/action_catalogProductFragment_to_catalogCategoryFragment"
             app:destination="@id/catalogCategoryFragment" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_catalogSizeSelectorDialog"
+            app:destination="@id/catalogSizeSelectorDialog" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_catalogTableOfSizesDialog"
+            app:destination="@id/catalogTableOfSizesDialog" />
     </fragment>
     <dialog
         android:id="@+id/catalogSortMethodDialog"
@@ -58,4 +64,12 @@
             app:popUpTo="@id/searchWidgetFragment"
             app:popUpToInclusive="true" />
     </fragment>
+    <dialog
+        android:id="@+id/catalogSizeSelectorDialog"
+        android:name="ru.feip.elisianix.catalog.CatalogSizeSelectorDialog"
+        android:label="CatalogSizeSelectorDialog" />
+    <dialog
+        android:id="@+id/catalogTableOfSizesDialog"
+        android:name="ru.feip.elisianix.catalog.CatalogTableOfSizesDialog"
+        android:label="CatalogTableOfSizesDialog" />
 </navigation>
