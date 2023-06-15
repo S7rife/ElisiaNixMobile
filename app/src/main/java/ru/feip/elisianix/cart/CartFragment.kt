@@ -27,7 +27,6 @@ import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.inStockUnits
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.Cart
-import ru.feip.elisianix.remote.models.CartItemRemote
 import ru.feip.elisianix.remote.models.RequestProductCart
 
 class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
@@ -69,11 +68,13 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 },
                 object : ProductCartListAdapter.OptionsMenuClickListener {
                     override fun onOptionsMenuClicked(
-                        cartItem: CartItemRemote,
+                        id: Int,
+                        colorId: Int,
+                        sizeId: Int,
                         position: Int,
                         view: View
                     ) {
-                        performCartItemActionsMenuClick(cartItem, position, view)
+                        performCartItemActionsMenuClick(id, colorId, sizeId, position, view)
                     }
                 },
             )
@@ -111,11 +112,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     }
 
     private fun performCartItemActionsMenuClick(
-        cIt: CartItemRemote,
-        pos: Int,
-        view: View
+        id: Int, colorId: Int, sizeId: Int, pos: Int, view: View
     ) {
-        val inCart = checkInFavorites(cIt.productId)
+        val inCart = checkInFavorites(id)
         val path = view.findViewById<ImageView>(R.id.cartProductActions)
         val popupMenu = PopupMenu(view.context, path, Gravity.END)
         popupMenu.inflate(R.menu.cart_item_actions_menu)
@@ -124,7 +123,6 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         popupMenu.setForceShowIcon(true)
         popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(item: MenuItem): Boolean {
-                val id = cIt.productId
                 when (item.itemId) {
                     R.id.cartToFavorite -> {
                         editItemInFavorites(id)
@@ -141,7 +139,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     }
 
                     R.id.cartRemove -> {
-                        deleteFromCart(cIt.productId, cIt.productColor.id, cIt.productSize.id, pos)
+                        deleteFromCart(id, colorId, sizeId, pos)
                         return true
                     }
                 }

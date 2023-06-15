@@ -22,11 +22,7 @@ class ProductCartListAdapter(
 ) : ListAdapter<CartItemRemote, RecyclerView.ViewHolder>(ItemCallback()) {
 
     interface OptionsMenuClickListener {
-        fun onOptionsMenuClicked(
-            cartItem: CartItemRemote,
-            position: Int,
-            view: View
-        )
+        fun onOptionsMenuClicked(id: Int, colorId: Int, sizeId: Int, position: Int, view: View)
     }
 
     inner class ProductCartList(item: View) : RecyclerView.ViewHolder(item) {
@@ -49,8 +45,10 @@ class ProductCartListAdapter(
                 cartProductActions.setOnClickListener {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
+                        val cIt = currentList[position]
                         cartItemActionsMenuClickListener.onOptionsMenuClicked(
-                            currentList[absoluteAdapterPosition], position, itemView
+                            cIt.productId, cIt.productColor.id, cIt.productSize.id,
+                            position, itemView
                         )
                     }
                 }

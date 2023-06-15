@@ -9,11 +9,13 @@ fun <T> editItemInCart(item: T) {
     when (item) {
         is ProductMainPreview -> when (item.inCart) {
             true -> dao.deleteByInfo(item.id, item.colors[0].id, item.sizes[0].id)
-            false -> dao.insert(CartItem(0, item.id, item.colors[0].id, item.sizes[0].id, 1))
+            false -> {
+                dao.insert(CartItem(0, item.id, item.colors[0].id, item.sizes[0].id, 1))
+            }
         }
 
         is CartItemRemote -> when (item.inCart) {
-            true -> dao.deleteByInfo(item.id, item.productColor.id, item.productSize.id)
+            true -> dao.deleteByInfo(item.productId, item.productColor.id, item.productSize.id)
             false -> dao.insert(
                 CartItem(0, item.productId, item.productColor.id, item.productSize.id, 1)
             )
