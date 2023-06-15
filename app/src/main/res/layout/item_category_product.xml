@@ -16,7 +16,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerProductImage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:overScrollMode="never" />
 
         <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
             android:id="@+id/recyclerProductImageIndicator"

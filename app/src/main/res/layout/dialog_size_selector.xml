@@ -35,6 +35,7 @@
         android:id="@+id/recyclerSizeSelector"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@id/dialogLabelContainer" />
 
     <View
@@ -49,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         layout="@layout/dialog_product_footer"
-        app:layout_constraintTop_toBottomOf="@+id/line"/>
+        app:layout_constraintTop_toBottomOf="@+id/line" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cartBtnContainer"

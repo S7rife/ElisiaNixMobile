@@ -37,6 +37,7 @@
                 android:id="@+id/recyclerCartProducts"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:overScrollMode="never"
                 app:layout_constraintTop_toBottomOf="@id/startLine" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -160,6 +161,7 @@
                     android:id="@+id/recyclerCartYouLiked"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:overScrollMode="never"
                     app:layout_constraintTop_toBottomOf="@id/cartTotalPayableValue" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
