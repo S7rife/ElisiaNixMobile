@@ -1,5 +1,7 @@
 package ru.feip.elisianix.remote.models
 
+fun Boolean.toInt() = if (this) 1 else 0
+
 enum class SizeMap(val sizes: Pair<Int, Int>) {
     XS(Pair(38, 40)),
     S(Pair(40, 42)),

@@ -23,6 +23,7 @@ import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.MainBlock
+import ru.feip.elisianix.remote.models.toInt
 
 class CatalogMainFragment :
     BaseFragment<FragmentCatalogMainBinding>(R.layout.fragment_catalog_main) {
@@ -44,6 +45,10 @@ class CatalogMainFragment :
                     R.id.action_catalogMainFragment_to_searchWidgetFragment,
                     bundleOf("sort_method" to null)
                 )
+            }
+            appBar.addOnOffsetChangedListener { _, vOffset ->
+                searchCatalogContainer.isChecked = vOffset != 0
+                searchCatalogContainer.elevation = 30f * (vOffset == 0).toInt()
             }
             categoryMainAdapter = CategoryMainListAdapter {
                 findNavController().navigate(

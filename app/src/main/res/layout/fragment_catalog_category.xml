@@ -1,66 +1,83 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".catalog.CatalogCategoryFragment">
+    android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/search_toolbar_menu"
-        app:navigationIcon="@drawable/ic_back_arrow"
-        app:titleCentered="true" />
+        android:animateLayoutChanges="true"
+        android:backgroundTint="@color/transparent"
+        android:elevation="0dp"
+        app:elevation="0dp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/searchViewContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:checkable="true"
-        android:visibility="gone"
-        app:checkedIconTint="@android:color/transparent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
-
-        <TextView
-            android:id="@+id/currentSearchQuery"
-            android:layout_width="wrap_content"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
+            android:fitsSystemWindows="true"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/sortingContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/searchViewContainer">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/categorySortingBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginVertical="10dp"
-            android:drawableStart="@drawable/ic_vert_arrows"
-            android:drawablePadding="6dp" />
-    </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:menu="@menu/search_toolbar_menu"
+                    app:navigationIcon="@drawable/ic_back_arrow"
+                    app:titleCentered="true" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/searchViewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:visibility="gone"
+                    app:checkedIconTint="@android:color/transparent">
+
+                    <TextView
+                        android:id="@+id/currentSearchQuery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/sortingContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/categorySortingBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginVertical="10dp"
+                        android:drawableStart="@drawable/ic_vert_arrows"
+                        android:drawablePadding="6dp" />
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/sortingContainer">
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerCatalogCategory"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:clipToPadding="false"
+            android:overScrollMode="never"
             android:paddingHorizontal="8dp"
             android:paddingTop="24dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -69,22 +86,17 @@
         android:id="@+id/emptyState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:drawablePadding="24dp"
         android:text="@string/nothing_found"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:drawableTopCompat="@drawable/ic_search_empty_state" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/loader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:indeterminate="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
