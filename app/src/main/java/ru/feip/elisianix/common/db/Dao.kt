@@ -9,7 +9,10 @@ import androidx.room.Query
 @Dao
 interface SearchHistoryDao {
     @Query("SELECT * FROM searchHistory ORDER BY id DESC")
-    fun getAll(): LiveData<List<SearchQuery>>
+    fun getAllLive(): LiveData<List<SearchQuery>>
+
+    @Query("SELECT * FROM searchHistory ORDER BY id DESC")
+    fun getAll(): List<SearchQuery>
 
     @Query("SELECT * FROM searchHistory WHERE id=:id")
     fun getById(id: Int): SearchQuery

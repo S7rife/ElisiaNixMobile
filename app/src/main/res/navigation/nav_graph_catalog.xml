@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_catalogMainFragment_to_searchWidgetFragment"
             app:destination="@id/searchWidgetFragment" />
+        <action
+            android:id="@+id/action_catalogMainFragment_to_catalogAddToCartDialog"
+            app:destination="@id/catalogAddToCartDialog" />
     </fragment>
     <fragment
         android:id="@+id/catalogCategoryFragment"
@@ -32,6 +35,9 @@
         <action
             android:id="@+id/action_catalogCategoryFragment_to_searchWidgetFragment"
             app:destination="@id/searchWidgetFragment" />
+        <action
+            android:id="@+id/action_catalogCategoryFragment_to_catalogAddToCartDialog"
+            app:destination="@id/catalogAddToCartDialog" />
     </fragment>
     <fragment
         android:id="@+id/catalogProductFragment"
@@ -49,6 +55,12 @@
         <action
             android:id="@+id/action_catalogProductFragment_to_catalogTableOfSizesDialog"
             app:destination="@id/catalogTableOfSizesDialog" />
+        <action
+            android:id="@+id/action_catalogProductFragment_self2"
+            app:destination="@id/catalogProductFragment" />
+        <action
+            android:id="@+id/action_catalogProductFragment_to_catalogAddToCartDialog"
+            app:destination="@id/catalogAddToCartDialog" />
     </fragment>
     <dialog
         android:id="@+id/catalogSortMethodDialog"
@@ -72,4 +84,8 @@
         android:id="@+id/catalogTableOfSizesDialog"
         android:name="ru.feip.elisianix.catalog.CatalogTableOfSizesDialog"
         android:label="CatalogTableOfSizesDialog" />
+    <dialog
+        android:id="@+id/catalogAddToCartDialog"
+        android:name="ru.feip.elisianix.catalog.CatalogAddToCartDialog"
+        android:label="CatalogAddToCartDialog" />
 </navigation>

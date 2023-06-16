@@ -16,11 +16,13 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.checkInFavorites
-import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentFavoriteBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.favorite.view_models.FavoriteViewModel
+import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.toCartDialogData
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment_favorite) {
 
@@ -34,8 +36,12 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
         super.onViewCreated(view, savedInstanceState)
 
         App.INSTANCE.db.FavoritesDao().getAllLive().observe(viewLifecycleOwner) { list ->
+            updateFavoriteList()
             viewModel.getFavoritesNoAuth(list.map { it.productId })
             binding.emptyState.isVisible = list.isEmpty()
+        }
+        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
         }
 
         binding.apply {
@@ -57,15 +63,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
                     )
                 },
                 {
-                    editItemInCart(it.id)
-                    it.inCart = checkInCart(it.id)
+                    openAddToCartDialog(it)
                 },
                 {
                     editItemInFavorites(it.id)
-                    it.inFavorites = checkInFavorites(it.id)
-                    updateFavoriteList()
                 }
             )
+            recyclerFavoriteProducts.disableAnimation()
             recyclerFavoriteProducts.adapter = productFavoriteAdapter
             recyclerFavoriteProducts.layoutManager = GridLayoutManager(requireContext(), 2)
         }
@@ -85,5 +89,27 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
     private fun updateFavoriteList() {
         val newLst = productFavoriteAdapter.currentList.filter { checkInFavorites(it.id) }
         productFavoriteAdapter.submitList(newLst)
+    }
+
+    private fun openAddToCartDialog(item: ProductDetail) {
+        val bundle = toCartDialogData(item)
+        bundle?.apply {
+            val navController = Navigation.findNavController(requireView())
+            val graph = navController.graph
+            val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+            walletGraph.setStartDestination(R.id.catalogAddToCartDialog)
+            navController.navigate(R.id.action_favoriteFragment_to_nav_graph_catalog, bundle)
+        }
+    }
+
+    private fun updateAdapterFromOther() {
+        val lst = productFavoriteAdapter.currentList
+        lst.forEachIndexed { idx, item ->
+            val inCart = checkInCart(item.id)
+            if (item.inCart != inCart) {
+                item.inCart = inCart
+                productFavoriteAdapter.notifyItemChanged(idx)
+            }
+        }
     }
 }

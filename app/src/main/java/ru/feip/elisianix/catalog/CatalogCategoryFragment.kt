@@ -13,17 +13,19 @@ import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.ProductCategoryListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogCategoryViewModel
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.checkInFavorites
-import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.smoothScrollToTop
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
 import ru.feip.elisianix.remote.models.sortMethods
+import ru.feip.elisianix.remote.models.toCartDialogData
 import kotlin.properties.Delegates
 
 
@@ -36,6 +38,7 @@ class CatalogCategoryFragment :
 
     private lateinit var productCategoryAdapter: ProductCategoryListAdapter
     private var orderChanged = false
+    private var searchWidgetBundle: Bundle? = null
     private var searchSettings by Delegates.observable(SearchSettings()) { _, _, newSettings ->
         if (newSettings.safe) {
             searchFocus()
@@ -73,11 +76,19 @@ class CatalogCategoryFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
+        }
+        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
+        }
+
         if (!searchSettings.safe) {
             searchSettings = searchSettings.copy(safe = true)
         }
         val sectionName = requireArguments().getString("section_name")
         searchFocus()
+        viewModel.getCategories()
 
         binding.apply {
             searchViewContainer.isChecked = true
@@ -89,10 +100,7 @@ class CatalogCategoryFragment :
             toolbar.setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.categoryToolbarSearch -> {
-                        findNavController().navigate(
-                            R.id.action_catalogCategoryFragment_to_searchWidgetFragment,
-                            bundleOf("search_query" to currentSearchQuery.text)
-                        )
+                        toSearchWidget()
                     }
 
                     R.id.categoryToolbarClose -> {
@@ -103,12 +111,7 @@ class CatalogCategoryFragment :
                 true
             }
 
-            searchViewContainer.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_catalogCategoryFragment_to_searchWidgetFragment,
-                    bundleOf("search_query" to currentSearchQuery.text)
-                )
-            }
+            searchViewContainer.setOnClickListener { toSearchWidget() }
 
             categorySortingBtn.setOnClickListener {
                 findNavController().navigate(
@@ -125,14 +128,13 @@ class CatalogCategoryFragment :
                     )
                 },
                 {
-                    editItemInCart(it)
-                    it.inCart = checkInCart(it)
+                    openAddToCartDialog(it)
                 },
                 {
                     editItemInFavorites(it.id)
-                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
+            recyclerCatalogCategory.disableAnimation()
             recyclerCatalogCategory.adapter = productCategoryAdapter
             recyclerCatalogCategory.layoutManager = GridLayoutManager(requireContext(), 2)
 
@@ -141,6 +143,16 @@ class CatalogCategoryFragment :
 
         viewModel.showLoading
             .onEach { binding.loader.isVisible = it }
+            .launchWhenStarted(lifecycleScope)
+
+        viewModel.categories
+            .onEach { lst ->
+                searchWidgetBundle = bundleOf(
+                    "category_ids" to lst.map { it.id.toString() },
+                    "category_urls" to lst.map { it.image.url },
+                    "category_names" to lst.map { it.name }
+                )
+            }
             .launchWhenStarted(lifecycleScope)
 
         viewModel.products
@@ -171,6 +183,38 @@ class CatalogCategoryFragment :
                 recyclerCatalogCategory.smoothScrollToTop()
                 orderChanged = false
             }
+        }
+    }
+
+    private fun openAddToCartDialog(item: ProductMainPreview) {
+        val bundle = toCartDialogData(item)
+        bundle?.apply {
+            findNavController().navigate(
+                R.id.action_catalogCategoryFragment_to_catalogAddToCartDialog, bundle
+            )
+        }
+    }
+
+    private fun updateAdapterFromOther() {
+        val lst = productCategoryAdapter.currentList
+        lst.forEachIndexed { idx, item ->
+            val inCart = checkInCart(item.id)
+            val inFav = checkInFavorites(item.id)
+            if (item.inFavorites != inFav || item.inCart != inCart) {
+                item.inCart = inCart
+                item.inFavorites = inFav
+                productCategoryAdapter.notifyItemChanged(idx)
+            }
+        }
+    }
+
+    private fun toSearchWidget() {
+        if (searchWidgetBundle != null) {
+            val bundle = searchWidgetBundle
+            bundle!!.putString("search_query", binding.currentSearchQuery.text.toString())
+            findNavController().navigate(
+                R.id.action_catalogCategoryFragment_to_searchWidgetFragment, bundle
+            )
         }
     }
 

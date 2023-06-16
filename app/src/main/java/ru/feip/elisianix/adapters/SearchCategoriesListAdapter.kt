@@ -9,27 +9,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemSearchToolBinding
-import ru.feip.elisianix.remote.models.CategoryMainPreview
+import ru.feip.elisianix.remote.models.Category
 
 
 class SearchCategoriesListAdapter(
-    private val clickListenerToCategory: (CategoryMainPreview) -> Unit
-) : ListAdapter<CategoryMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
+    private val clickListenerToCategory: (Category) -> Unit
+) : ListAdapter<Category, RecyclerView.ViewHolder>(ItemCallback()) {
 
 
     inner class SearchCategoriesList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemSearchToolBinding.bind(item)
 
         init {
-            item.setOnClickListener {
-                val position = adapterPosition
+            binding.itemSearchTool.setOnClickListener {
+                val position = absoluteAdapterPosition
                 if (position in currentList.indices) {
                     clickListenerToCategory.invoke(currentList[position])
                 }
             }
         }
 
-        fun bind(item: CategoryMainPreview) {
+        fun bind(item: Category) {
             binding.apply {
                 Glide.with(itemView).load(item.image.url)
                     .error(R.drawable.ic_no_image)
@@ -39,15 +39,15 @@ class SearchCategoriesListAdapter(
         }
     }
 
-    private class ItemCallback : DiffUtil.ItemCallback<CategoryMainPreview>() {
+    private class ItemCallback : DiffUtil.ItemCallback<Category>() {
         override fun areItemsTheSame(
-            oldItem: CategoryMainPreview,
-            newItem: CategoryMainPreview
+            oldItem: Category,
+            newItem: Category
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: CategoryMainPreview,
-            newItem: CategoryMainPreview
+            oldItem: Category,
+            newItem: Category
         ): Boolean = oldItem == newItem
     }
 

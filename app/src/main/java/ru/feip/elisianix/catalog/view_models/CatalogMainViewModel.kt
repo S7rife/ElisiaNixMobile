@@ -68,7 +68,7 @@ class CatalogMainViewModel : ViewModel() {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
                                 prod.copy(
-                                    inCart = checkInCart(prod),
+                                    inCart = checkInCart(prod.id),
                                     inFavorites = checkInFavorites(prod.id)
                                 )
                             }
@@ -107,7 +107,7 @@ class CatalogMainViewModel : ViewModel() {
                                     is Result.Success -> {
                                         val productsTransform = it.result.products.map { prod ->
                                             prod.copy(
-                                                inCart = checkInCart(prod),
+                                                inCart = checkInCart(prod.id),
                                                 inFavorites = checkInFavorites(prod.id)
                                             )
                                         }

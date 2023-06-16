@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.ProductDetail
@@ -51,7 +53,13 @@ class CatalogProductViewModel : ViewModel() {
                 .collect {
                     when (it) {
                         is Result.Success -> {
-                            _productRecs.emit(it.result.products)
+                            val productsTransform = it.result.products.map { prod ->
+                                prod.copy(
+                                    inCart = checkInCart(prod.id),
+                                    inFavorites = checkInFavorites(prod.id)
+                                )
+                            }
+                            _productRecs.emit(productsTransform)
                         }
 
                         is Result.Error -> {}

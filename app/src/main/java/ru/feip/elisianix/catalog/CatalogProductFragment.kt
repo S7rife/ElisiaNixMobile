@@ -29,10 +29,13 @@ import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.toCartDialogData
 import kotlin.properties.Delegates
 
 
@@ -81,9 +84,11 @@ class CatalogProductFragment :
         val removeFavoriteBtn = binding.toolbar.menu.findItem(R.id.productInFavorites)
 
         App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
             productInCart = checkInCart(currentProduct)
         }
         App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
             val inFav = checkInFavorites(productId)
             toFavoriteBtn.isVisible = !inFav.also { toFavoriteBtn.isEnabled = !inFav }
             removeFavoriteBtn.isVisible = inFav.also { removeFavoriteBtn.isEnabled = inFav }
@@ -125,6 +130,7 @@ class CatalogProductFragment :
                 currentProduct = currentProduct.copy(colorId = it.id)
                 productColorCurrent.text = it.name
             }
+            recyclerColorSelector.disableAnimation()
             recyclerColorSelector.adapter = productColorAdapter
             recyclerColorSelector.layoutManager =
                 LinearLayoutManager(
@@ -134,12 +140,14 @@ class CatalogProductFragment :
                 )
 
             productSizeAdapter = ProductSizeListAdapter {
-                currentProduct = currentProduct.copy(sizeId = it.id)
-                if (productSizeAdapter.currentPos == -1) {
-                    currentProduct = currentProduct.copy(sizeId = -1)
+                currentProduct = if (productSizeAdapter.currentPos == -1) {
+                    currentProduct.copy(sizeId = -1)
+                } else {
+                    currentProduct.copy(sizeId = it.id)
                 }
                 productInCart = checkInCart(currentProduct)
             }
+            recyclerSizeSelector.disableAnimation()
             recyclerSizeSelector.adapter = productSizeAdapter
             recyclerSizeSelector.layoutManager = GridLayoutManager(requireContext(), 4)
 
@@ -151,14 +159,13 @@ class CatalogProductFragment :
                     )
                 },
                 {
-                    editItemInCart(it)
-                    it.inCart = checkInCart(it)
+                    openAddToCartDialog(it)
                 },
                 {
                     editItemInFavorites(it.id)
-                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
+            recyclerProductRecsBlock.disableAnimation()
             recyclerProductRecsBlock.adapter = productRecsAdapter
             recyclerProductRecsBlock.layoutManager =
                 LinearLayoutManager(
@@ -282,5 +289,27 @@ class CatalogProductFragment :
         CartItem(0, 0, 0, -1, 1)
     ) { _, _, newProduct ->
         productInCart = checkInCart(newProduct)
+    }
+
+    private fun openAddToCartDialog(item: ProductMainPreview) {
+        val bundle = toCartDialogData(item)
+        bundle?.apply {
+            findNavController().navigate(
+                R.id.action_catalogProductFragment_to_catalogAddToCartDialog, bundle
+            )
+        }
+    }
+
+    private fun updateAdapterFromOther() {
+        val lst = productRecsAdapter.currentList
+        lst.forEachIndexed { idx, item ->
+            val inCart = checkInCart(item.id)
+            val inFav = checkInFavorites(item.id)
+            if (item.inFavorites != inFav || item.inCart != inCart) {
+                item.inCart = inCart
+                item.inFavorites = inFav
+                productRecsAdapter.notifyItemChanged(idx)
+            }
+        }
     }
 }

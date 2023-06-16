@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
-import ru.feip.elisianix.databinding.ItemSizeSelectorBinding
-import ru.feip.elisianix.extensions.addStrikethrough
+import ru.feip.elisianix.databinding.ItemProductSizeBinding
+import ru.feip.elisianix.extensions.setStrokeSelector
 import ru.feip.elisianix.extensions.sizeFormat
 import ru.feip.elisianix.remote.models.SizeMap
 
 
-class SizeSelectorListAdapter(
-    private val clickListenerSizeSelector: (Int) -> Unit
+class SizeSelectorGridListAdapter(
+    private val clickListenerSizeSelector: (SizeMap) -> Unit
 ) : ListAdapter<SizeMap, RecyclerView.ViewHolder>(ItemCallback()) {
 
     var currentPos = -1
@@ -22,43 +22,41 @@ class SizeSelectorListAdapter(
     var availableSizes = listOf<SizeMap>()
 
     inner class SizeSelectorList(item: View) : RecyclerView.ViewHolder(item) {
-        private var binding = ItemSizeSelectorBinding.bind(item)
-        private val black = itemView.resources.getColor(R.color.black, itemView.context?.theme)
-        private val white = itemView.resources.getColor(R.color.white, itemView.context?.theme)
-        private val grey = itemView.resources.getColor(R.color.black30, itemView.context?.theme)
+        private var binding = ItemProductSizeBinding.bind(item)
 
         fun default() {
-            binding.itemBox.setBackgroundColor(white)
-            binding.sizeValue.setTextColor(black)
+            binding.cardItem.setStrokeSelector(false)
         }
 
         fun selected() {
-            binding.itemBox.setBackgroundColor(black)
-            binding.sizeValue.setTextColor(white)
+            binding.cardItem.setStrokeSelector(true)
         }
 
         init {
-            binding.itemBox.setOnClickListener {
+            binding.cardItem.setOnClickListener {
                 val position = absoluteAdapterPosition
                 if (position in currentList.indices) {
                     if (currentList[position] in availableSizes) {
                         lastPos = currentPos.also { currentPos = position }
+                        if (lastPos == currentPos) {
+                            lastPos = -1
+                            currentPos = -1
+                        }
                         notifyItemChanged(lastPos)
                         notifyItemChanged(position)
-                        clickListenerSizeSelector.invoke(position)
+                        clickListenerSizeSelector.invoke(currentList[position])
                     }
                 }
-
             }
         }
 
         fun bind(item: SizeMap) {
             binding.apply {
-                sizeValue.sizeFormat(item.name)
-                if (item !in availableSizes) {
-                    sizeValue.addStrikethrough()
-                    sizeValue.setTextColor(grey)
-                }
+                productSize.sizeFormat(item.name, true)
+                cardItem.isChecked = item !in availableSizes
+            }
+            if (item !in availableSizes) {
+                binding.cardItem.isChecked = true
             }
         }
     }
@@ -73,7 +71,7 @@ class SizeSelectorListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_size_selector, parent, false)
+            .inflate(R.layout.item_product_size, parent, false)
         return SizeSelectorList(view)
     }
 

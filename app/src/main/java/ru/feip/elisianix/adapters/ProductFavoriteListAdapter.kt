@@ -3,6 +3,7 @@ package ru.feip.elisianix.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -51,6 +52,7 @@ class ProductFavoriteListAdapter(
                 productPrice.inCurrency(item.price)
                 productCartBtn.setCartStatus(item.inCart)
                 productFavoriteBtn.setFavoriteStatus(item.inFavorites)
+                productActualTag.isVisible = item.isNew
 
                 productImageAdapter = ProductImageToListAdapter(clickListenerToProduct)
                 recyclerProductImage.adapter = productImageAdapter

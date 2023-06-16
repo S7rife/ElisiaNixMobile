@@ -14,6 +14,7 @@ import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.databinding.DialogSizeSelectorBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.SizeMap
 import ru.feip.elisianix.remote.models.allSizes
@@ -41,6 +42,7 @@ class CatalogSizeSelectorDialog :
                 }
             }
 
+            recyclerSizeSelector.disableAnimation()
             recyclerSizeSelector.adapter = dialogSizeSelectorAdapter
             recyclerSizeSelector.layoutManager =
                 LinearLayoutManager(
@@ -48,7 +50,6 @@ class CatalogSizeSelectorDialog :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
-            println(requireArguments())
 
             availableSizes?.let {
                 dialogSizeSelectorAdapter.availableSizes =

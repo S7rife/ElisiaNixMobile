@@ -14,6 +14,7 @@ import ru.feip.elisianix.adapters.ProductImageViewerListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogProductImageViewerViewModel
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.databinding.FragmentCatalogProductImageViewerBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 
 class CatalogProductImageViewerFragment :
@@ -40,6 +41,7 @@ class CatalogProductImageViewerFragment :
             productImageAdapter = ProductImageViewerListAdapter {
                 changeImage(it.first.url, it.second)
             }
+            recyclerProductImageViewer.disableAnimation()
             recyclerProductImageViewer.adapter = productImageAdapter
             recyclerProductImageViewer.layoutManager =
                 LinearLayoutManager(

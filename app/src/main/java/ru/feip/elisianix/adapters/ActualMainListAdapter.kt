@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainActualBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.remote.models.MainBlock
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
@@ -33,6 +34,7 @@ class ActualMainListAdapter(
                     clickListenerFavoriteBtn
                 )
                 productActualMainAdapter.actualName = item.tag.toString()
+                recyclerProduct.disableAnimation()
                 recyclerProduct.adapter = productActualMainAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

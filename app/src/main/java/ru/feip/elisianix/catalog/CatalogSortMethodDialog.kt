@@ -10,6 +10,7 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.SortMethodListAdapter
 import ru.feip.elisianix.common.BaseBottomDialog
 import ru.feip.elisianix.databinding.DialogSortMethodBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.remote.models.sortMethods
 
 class CatalogSortMethodDialog :
@@ -34,6 +35,7 @@ class CatalogSortMethodDialog :
                 )
                 findNavController().popBackStack()
             }
+            recyclerSortMethod.disableAnimation()
             recyclerSortMethod.adapter = dialogSortMethodAdapter
             recyclerSortMethod.layoutManager =
                 LinearLayoutManager(

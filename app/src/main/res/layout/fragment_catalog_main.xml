@@ -73,7 +73,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerCategoriesPreview"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:clipToPadding="false"
                     android:nestedScrollingEnabled="false"
@@ -83,7 +83,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerActual"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:nestedScrollingEnabled="false"
                     app:layout_constraintTop_toBottomOf="@id/recyclerCategoriesPreview" />
@@ -91,7 +91,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerCategoryBlocks"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
                     app:layout_constraintTop_toBottomOf="@id/recyclerActual" />
             </androidx.constraintlayout.widget.ConstraintLayout>

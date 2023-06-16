@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainCategoryBlockBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.remote.models.MainBlock
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
@@ -46,6 +47,7 @@ class CategoryBlockMainListAdapter(
                         clickListenerCartBtn,
                         clickListenerFavoriteBtn
                     )
+                recyclerProduct.disableAnimation()
                 recyclerProduct.adapter = productCategoryBlockAdapter
                 recyclerProduct.layoutManager =
                     LinearLayoutManager(

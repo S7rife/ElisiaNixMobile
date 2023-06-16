@@ -23,6 +23,7 @@ import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCartBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.inStockUnits
 import ru.feip.elisianix.extensions.launchWhenStarted
@@ -45,6 +46,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 RequestProductCart(it.productId, it.sizeId, it.colorId, it.count)
             })
             binding.emptyState.isVisible = list.isEmpty()
+        }
+        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdapterFromOther()
         }
 
         binding.apply {
@@ -78,6 +82,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     }
                 },
             )
+            recyclerCartProducts.disableAnimation()
             recyclerCartProducts.adapter = productCartAdapter
             recyclerCartProducts.layoutManager =
                 LinearLayoutManager(
@@ -163,6 +168,17 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             cartContainer.isVisible = visMain
             emptyState.isVisible = visEmpty
             toBuyBtnContainer.isVisible = visMain
+        }
+    }
+
+    private fun updateAdapterFromOther() {
+        val lst = productCartAdapter.currentList
+        lst.forEachIndexed { idx, item ->
+            val inCart = checkInCart(item.id)
+            if (item.inCart != inCart) {
+                item.inCart = inCart
+                productCartAdapter.notifyItemChanged(idx)
+            }
         }
     }
 }

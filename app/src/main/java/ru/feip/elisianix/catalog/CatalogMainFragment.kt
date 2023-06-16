@@ -15,15 +15,19 @@ import ru.feip.elisianix.adapters.ActualMainListAdapter
 import ru.feip.elisianix.adapters.CategoryBlockMainListAdapter
 import ru.feip.elisianix.adapters.CategoryMainListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogMainViewModel
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.checkInFavorites
-import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.MainBlock
+import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.toCartDialogData
 import ru.feip.elisianix.remote.models.toInt
+
 
 class CatalogMainFragment :
     BaseFragment<FragmentCatalogMainBinding>(R.layout.fragment_catalog_main) {
@@ -35,16 +39,25 @@ class CatalogMainFragment :
     private lateinit var categoryMainAdapter: CategoryMainListAdapter
     private lateinit var actualMainAdapter: ActualMainListAdapter
     private lateinit var categoryBlockMainAdapter: CategoryBlockMainListAdapter
+    private var searchWidgetBundle: Bundle? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdaptersFromOther()
+        }
+        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+            updateAdaptersFromOther()
+        }
+
         binding.apply {
             searchCatalogView.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_catalogMainFragment_to_searchWidgetFragment,
-                    bundleOf("sort_method" to null)
-                )
+                searchWidgetBundle?.apply {
+                    findNavController().navigate(
+                        R.id.action_catalogMainFragment_to_searchWidgetFragment, searchWidgetBundle
+                    )
+                }
             }
             appBar.addOnOffsetChangedListener { _, vOffset ->
                 searchCatalogContainer.isChecked = vOffset != 0
@@ -56,6 +69,7 @@ class CatalogMainFragment :
                     bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
                 )
             }
+            recyclerCategoriesPreview.disableAnimation()
             recyclerCategoriesPreview.adapter = categoryMainAdapter
             recyclerCategoriesPreview.layoutManager = GridLayoutManager(requireContext(), 3)
 
@@ -67,14 +81,13 @@ class CatalogMainFragment :
                     )
                 },
                 {
-                    editItemInCart(it)
-                    it.inCart = checkInCart(it)
+                    openAddToCartDialog(it)
                 },
                 {
                     editItemInFavorites(it.id)
-                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
+            recyclerActual.disableAnimation()
             recyclerActual.adapter = actualMainAdapter
             recyclerActual.layoutManager =
                 LinearLayoutManager(
@@ -97,14 +110,13 @@ class CatalogMainFragment :
                     )
                 },
                 {
-                    editItemInCart(it)
-                    it.inCart = checkInCart(it)
+                    openAddToCartDialog(it)
                 },
                 {
                     editItemInFavorites(it.id)
-                    it.inFavorites = checkInFavorites(it.id)
                 }
             )
+            recyclerCategoryBlocks.disableAnimation()
             recyclerCategoryBlocks.adapter = categoryBlockMainAdapter
             recyclerCategoryBlocks.layoutManager =
                 LinearLayoutManager(
@@ -123,8 +135,13 @@ class CatalogMainFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.categories
-            .onEach {
-                categoryMainAdapter.submitList(it)
+            .onEach { lst ->
+                categoryMainAdapter.submitList(lst)
+                searchWidgetBundle = bundleOf(
+                    "category_ids" to lst.map { it.id.toString() },
+                    "category_urls" to lst.map { it.image.url },
+                    "category_names" to lst.map { it.name }
+                )
                 binding.swipeRefresh.isRefreshing = false
             }
             .launchWhenStarted(lifecycleScope)
@@ -153,5 +170,42 @@ class CatalogMainFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.getCategories()
+    }
+
+    private fun openAddToCartDialog(item: ProductMainPreview) {
+        val bundle = toCartDialogData(item)
+        bundle?.apply {
+            findNavController().navigate(
+                R.id.action_catalogMainFragment_to_catalogAddToCartDialog, bundle
+            )
+        }
+    }
+
+    private fun updateAdaptersFromOther() {
+        val actual = actualMainAdapter.currentList
+        actual.forEachIndexed { blockIdx, block ->
+            block.products.forEach { item ->
+                val inCart = checkInCart(item.id)
+                val inFav = checkInFavorites(item.id)
+                if (item.inFavorites != inFav || item.inCart != inCart) {
+                    item.inCart = inCart
+                    item.inFavorites = inFav
+                    actualMainAdapter.notifyItemChanged(blockIdx)
+                }
+            }
+        }
+
+        val catBlock = categoryBlockMainAdapter.currentList
+        catBlock.forEachIndexed { blockIdx, block ->
+            block.products.forEach { item ->
+                val inCart = checkInCart(item.id)
+                val inFav = checkInFavorites(item.id)
+                if (item.inFavorites != inFav || item.inCart != inCart) {
+                    item.inCart = inCart
+                    item.inFavorites = inFav
+                    categoryBlockMainAdapter.notifyItemChanged(blockIdx)
+                }
+            }
+        }
     }
 }

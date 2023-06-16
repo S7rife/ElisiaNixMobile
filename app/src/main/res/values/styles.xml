@@ -27,11 +27,11 @@
         <item name="colorOnPrimary">@color/white</item>
     </style>
 
-    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    <style name="ModalBottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ModalBottomSheet</item>
     </style>
 
-    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="ModalBottomSheet" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/shape_rounded_dialog</item>
     </style>
 </resources>

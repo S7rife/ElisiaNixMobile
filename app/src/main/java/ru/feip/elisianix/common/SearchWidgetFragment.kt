@@ -7,19 +7,17 @@ import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.SearchCategoriesListAdapter
 import ru.feip.elisianix.adapters.SearchHistoryListAdapter
 import ru.feip.elisianix.common.db.SearchQuery
 import ru.feip.elisianix.databinding.FragmentSearchWidgetBinding
+import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.isPreviousDest
-import ru.feip.elisianix.extensions.launchWhenStarted
-import kotlin.properties.Delegates
+import ru.feip.elisianix.remote.models.Category
+import ru.feip.elisianix.remote.models.Image
 
 
 class SearchWidgetFragment :
@@ -27,23 +25,27 @@ class SearchWidgetFragment :
 
     private lateinit var searchCategoriesAdapter: SearchCategoriesListAdapter
     private lateinit var searchHistoryAdapter: SearchHistoryListAdapter
-    private var currentSearchHistory: List<SearchQuery> by Delegates.observable(mutableListOf()) { _, _, newValue ->
-        searchHistoryAdapter.submitList(newValue)
-    }
-
-    private val viewModel by lazy {
-        ViewModelProvider(this)[SearchWidgetViewModel::class.java]
-    }
+    private val historyDao = App.INSTANCE.db.searchHistoryDao()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val currentSearchQuery = requireArguments().getString("search_query")
-
-        App.INSTANCE.db.searchHistoryDao().deleteExcept()
-        App.INSTANCE.db.searchHistoryDao().getAll().observe(viewLifecycleOwner) {
-            currentSearchHistory = it
+        historyDao.deleteExcept()
+        historyDao.getAllLive().observe(viewLifecycleOwner) {
             binding.youSearched.isVisible = it.isNotEmpty()
+            searchHistoryAdapter.submitList(it)
+        }
+
+        val ra = requireArguments()
+        val currentSearchQuery = ra.getString("search_query")
+        val catIds = ra.getStringArrayList("category_ids")?.map { it.toInt() }
+        val catUrls = ra.getStringArrayList("category_urls")
+        val catNames = ra.getStringArrayList("category_names")
+
+        if (catIds != null && catUrls != null && catNames != null) {
+            initCategoriesAdapter(List(catIds.size) { i ->
+                Category(catIds[i], catNames[i], Image(-1, "", catUrls[i]))
+            })
         }
 
         binding.apply {
@@ -59,10 +61,6 @@ class SearchWidgetFragment :
                     }
                 }
                 true
-            }
-
-            searchView.setOnQueryTextFocusChangeListener { _, onFocus ->
-                // TODO suggestions
             }
 
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener,
@@ -82,23 +80,9 @@ class SearchWidgetFragment :
 
             searchView.setQuery(currentSearchQuery, false)
 
-            searchCategoriesAdapter = SearchCategoriesListAdapter {
-                findNavController().navigate(
-                    R.id.action_searchWidgetFragment_to_catalogCategoryFragment,
-                    bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
-                )
-            }
-            recyclerSearchCategories.adapter = searchCategoriesAdapter
-            recyclerSearchCategories.layoutManager =
-                LinearLayoutManager(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL,
-                    false
-                )
-
-            searchHistoryAdapter = SearchHistoryListAdapter {
-                searchView.setQuery(it.query, true)
-            }
+            searchHistoryAdapter = SearchHistoryListAdapter { doSearch(it.query) }
+            searchHistoryAdapter.submitList(historyDao.getAll())
+            recyclerSearchHistory.disableAnimation()
             recyclerSearchHistory.adapter = searchHistoryAdapter
             recyclerSearchHistory.layoutManager =
                 LinearLayoutManager(
@@ -106,28 +90,11 @@ class SearchWidgetFragment :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
-
-            App.INSTANCE.db.searchHistoryDao().getAll().observe(viewLifecycleOwner) {
-                currentSearchHistory = it
-            }
         }
-
-        viewModel.showLoading
-            .onEach { binding.apply { loader.isVisible = it } }
-            .launchWhenStarted(lifecycleScope)
-
-        viewModel.categories
-            .onEach {
-                binding.categories.visibility = View.VISIBLE
-                searchCategoriesAdapter.submitList(it)
-            }
-            .launchWhenStarted(lifecycleScope)
-
-        viewModel.getCategories()
     }
 
     private fun doSearch(query: String) {
-        if (currentSearchHistory.none { it.query == query }) {
+        if (searchHistoryAdapter.currentList.none { it.query == query }) {
             updateSearchHistory(query)
         }
 
@@ -143,11 +110,8 @@ class SearchWidgetFragment :
     }
 
     private fun updateSearchHistory(query: String) {
-        App.INSTANCE.db.searchHistoryDao().insert(SearchQuery(0, query))
-        App.INSTANCE.db.searchHistoryDao().deleteExcept()
-        App.INSTANCE.db.searchHistoryDao().getAll().observe(viewLifecycleOwner) {
-            currentSearchHistory = it
-        }
+        historyDao.insert(SearchQuery(0, query))
+        historyDao.deleteExcept()
     }
 
     private fun toolbarUpdate() {
@@ -155,6 +119,28 @@ class SearchWidgetFragment :
             val focus = searchView.query.isNotEmpty()
             toolbar.menu.findItem(R.id.categoryToolbarClose).isVisible = focus
             toolbar.menu.findItem(R.id.categoryToolbarSearch).isVisible = !focus
+        }
+    }
+
+    private fun initCategoriesAdapter(lst: List<Category>) {
+        searchCategoriesAdapter = SearchCategoriesListAdapter {
+            findNavController().navigate(
+                R.id.action_searchWidgetFragment_to_catalogCategoryFragment,
+                bundleOf("category_id" to it.id.toString(), "section_name" to it.name)
+            )
+        }
+        binding.apply {
+            recyclerSearchCategories.disableAnimation()
+            recyclerSearchCategories.adapter = searchCategoriesAdapter
+            recyclerSearchCategories.layoutManager =
+                LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.VERTICAL,
+                    false
+                )
+
+            searchCategoriesAdapter.submitList(lst)
+            categories.isVisible = true
         }
     }
 }

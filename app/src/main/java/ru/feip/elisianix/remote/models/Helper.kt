@@ -1,5 +1,8 @@
 package ru.feip.elisianix.remote.models
 
+import android.os.Bundle
+import androidx.core.os.bundleOf
+
 fun Boolean.toInt() = if (this) 1 else 0
 
 enum class SizeMap(val sizes: Pair<Int, Int>) {
@@ -50,3 +53,27 @@ data class ActualBlocks(
     var new: ProductMainPreviews? = null,
     var discount: ProductMainPreviews? = null,
 )
+
+fun <T> toCartDialogData(item: T): Bundle? {
+    when (item) {
+        is ProductMainPreview -> return bundleOf(
+            "product_id" to item.id,
+            "size_ids" to item.sizes.map { it.id.toString() },
+            "available_sizes" to item.sizes.map { it.value },
+            "color_ids" to item.colors.map { it.id.toString() },
+            "color_names" to item.colors.map { it.name },
+            "color_values" to item.colors.map { it.value },
+        )
+
+        is ProductDetail -> return bundleOf(
+            "product_id" to item.id,
+            "size_ids" to item.sizes.map { it.id.toString() },
+            "available_sizes" to item.sizes.filter { it.available > 0 }.map { it.value },
+            "color_ids" to item.colors.map { it.id.toString() },
+            "color_names" to item.colors.map { it.name },
+            "color_values" to item.colors.map { it.value },
+        )
+
+        else -> return null
+    }
+}

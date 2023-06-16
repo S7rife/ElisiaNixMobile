@@ -50,35 +50,34 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp">
+            android:paddingHorizontal="16dp">
 
             <TextView
                 android:id="@+id/youSearched"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingVertical="16dp"
                 android:text="@string/you_searched"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSearchHistory"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:overScrollMode="never"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="24dp"
                 app:layout_constraintTop_toBottomOf="@id/youSearched" />
 
             <TextView
                 android:id="@+id/categories"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:paddingVertical="16dp"
                 android:text="@string/categories"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/recyclerSearchHistory" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -86,7 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:overScrollMode="never"
-                android:layout_marginTop="20dp"
                 app:layout_constraintTop_toBottomOf="@id/categories" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

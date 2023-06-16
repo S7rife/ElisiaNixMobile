@@ -1,5 +1,8 @@
 package ru.feip.elisianix.extensions
 
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
@@ -7,15 +10,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.text.toSpannable
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.remote.models.SizeMap
 import ru.feip.elisianix.remote.models.last
+import ru.feip.elisianix.remote.models.toInt
 
 
 fun TextView.inCurrency(price: Double) {
@@ -35,6 +41,22 @@ fun TextView.addStrikethrough() {
     this.text = spannable
 }
 
+fun TextView.setSelectorPaint(selected: Boolean) {
+    val p = Paint()
+    when (selected) {
+        true -> {
+            p.flags = Paint.UNDERLINE_TEXT_FLAG
+            p.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        }
+
+        false -> {
+            p.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        }
+    }
+    this.paintFlags = p.flags
+    this.paint.typeface = p.typeface
+}
+
 fun TextView.colorEnd(cntEnt: Int, color: Int, text: String) {
     val spannable = text.toSpannable()
     spannable.setSpan(ForegroundColorSpan(color), text.length - cntEnt, text.length, 0)
@@ -46,6 +68,17 @@ fun TextView.sizeFormat(value: String, BreakLine: Boolean = false) {
     val sizes = SizeMap.valueOf(value).sizes
     val size = "$value$sep(${sizes.first}-${sizes.second})"
     this.text = size
+}
+
+fun TextView.setContrastText(color: Int, text: String) {
+    var black = Color.BLACK
+    var white = Color.WHITE
+
+    val contrast = ColorUtils.calculateContrast(color, white)
+    if (contrast > 2) black = white.also { white = black }
+
+    this.setTextColor(black)
+    this.text = text
 }
 
 fun ImageView.setCartStatus(inCart: Boolean, large: Boolean = false) {
@@ -64,14 +97,18 @@ fun ImageView.setCartStatus(inCart: Boolean, large: Boolean = false) {
     this.setImageDrawable(ContextCompat.getDrawable(this.context, newImg))
 }
 
-fun MaterialButton.withColors(activated: Boolean) {
-    var black = resources.getColor(R.color.black, context?.theme)
-    var white = resources.getColor(R.color.white, context?.theme)
+fun MaterialButton.withColors(activated: Boolean, lock: Boolean = false) {
+    val gray = resources.getColor(R.color.black60, context?.theme)
+    this.isEnabled = !lock
+    this.isClickable = !lock
+    var black = Color.BLACK
+    var white = Color.WHITE
 
     if (activated) black = white.also { white = black }
-
-    this.setTextColor(white)
     this.setBackgroundColor(black)
+
+    if (lock) this.setBackgroundColor(gray)
+    this.setTextColor(white)
 }
 
 fun ImageView.setFavoriteStatus(inFavorites: Boolean) {
@@ -104,11 +141,7 @@ private fun getOrCreateCustomBadge(bottomBar: BottomNavigationView, tabResId: In
 }
 
 fun MaterialCardView.setStrokeSelector(isVisible: Boolean) {
-    var black = resources.getColor(R.color.black, context?.theme)
-    var transparent = resources.getColor(R.color.transparent, context?.theme)
-
-    if (!isVisible) black = transparent.also { transparent = black }
-    this.strokeColor = black
+    this.strokeColor = Color.BLACK * isVisible.toInt()
 }
 
 fun RecyclerView.smoothScrollToTop() {
@@ -124,4 +157,9 @@ fun buildTableOfSizes(): List<MutableList<String>> {
         mutableListOf(SizeMap.XL.last(), "94-98", "76-80", "102-106"),
         mutableListOf(SizeMap.XXL.last(), "98-102", "80-84", "106-110"),
     )
+}
+
+fun RecyclerView.disableAnimation() {
+    val anim = this.itemAnimator as SimpleItemAnimator
+    anim.supportsChangeAnimations = false.also { this.itemAnimator = anim }
 }

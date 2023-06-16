@@ -32,21 +32,14 @@ class ProductSizeListAdapter(
         }
 
         init {
-            binding.apply {
-                item.setOnClickListener {
-                    val position = absoluteAdapterPosition
-                    if (position in currentList.indices) {
-                        if (currentList[position].available > 0) {
-                            lastPos = currentPos.also { currentPos = position }
-                            if (lastPos == currentPos) {
-                                lastPos = -1
-                                currentPos = -1
-                            }
-                            notifyItemChanged(lastPos)
-                            notifyItemChanged(position)
-                            clickListenerSizeSelector.invoke(currentList[position])
-                        }
-                    }
+            binding.cardItem.setOnClickListener {
+                val position = absoluteAdapterPosition
+                if (position in currentList.indices && currentList[position].available > 0) {
+                    lastPos = currentPos.also { currentPos = position }
+                    notifyItemChanged(lastPos)
+                    if (lastPos == currentPos) lastPos = (-1).also { currentPos = -1 }
+                    notifyItemChanged(position)
+                    clickListenerSizeSelector.invoke(currentList[position])
                 }
             }
         }

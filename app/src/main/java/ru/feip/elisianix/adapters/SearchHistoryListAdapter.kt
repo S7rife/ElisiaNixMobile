@@ -21,8 +21,8 @@ class SearchHistoryListAdapter(
         private var binding = ItemSearchToolBinding.bind(item)
 
         init {
-            item.setOnClickListener {
-                val position = adapterPosition
+            binding.itemSearchTool.setOnClickListener {
+                val position = absoluteAdapterPosition
                 if (position in currentList.indices) {
                     clickListenerHistory.invoke(currentList[position])
                 }
