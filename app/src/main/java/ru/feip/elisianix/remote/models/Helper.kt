@@ -77,3 +77,8 @@ fun <T> toCartDialogData(item: T): Bundle? {
         else -> return null
     }
 }
+
+fun sortPreviewsItems(items: List<ProductMainPreview>): List<ProductMainPreview> {
+    return items.sortedWith(
+        compareByDescending<ProductMainPreview> { it.name }.thenByDescending { it.id })
+}

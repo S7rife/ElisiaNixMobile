@@ -14,14 +14,14 @@ import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.setCartStatus
 import ru.feip.elisianix.extensions.setFavoriteStatus
 import ru.feip.elisianix.remote.models.Image
-import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ProductFavoriteListAdapter(
     private val clickListenerToProduct: (Pair<Int, Image>) -> Unit,
-    private val clickListenerCartBtn: (ProductDetail) -> Unit,
-    private val clickListenerFavoriteBtn: (ProductDetail) -> Unit
-) : ListAdapter<ProductDetail, RecyclerView.ViewHolder>(ItemCallback()) {
+    private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
+) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductFavoriteList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemFavoriteProductBinding.bind(item)
@@ -46,7 +46,7 @@ class ProductFavoriteListAdapter(
             }
         }
 
-        fun bind(item: ProductDetail) {
+        fun bind(item: ProductMainPreview) {
             binding.apply {
                 productName.text = item.name
                 productPrice.inCurrency(item.price)
@@ -71,15 +71,15 @@ class ProductFavoriteListAdapter(
         }
     }
 
-    private class ItemCallback : DiffUtil.ItemCallback<ProductDetail>() {
+    private class ItemCallback : DiffUtil.ItemCallback<ProductMainPreview>() {
         override fun areItemsTheSame(
-            oldItem: ProductDetail,
-            newItem: ProductDetail
+            oldItem: ProductMainPreview,
+            newItem: ProductMainPreview
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: ProductDetail,
-            newItem: ProductDetail
+            oldItem: ProductMainPreview,
+            newItem: ProductMainPreview
         ): Boolean = oldItem == newItem
     }
 

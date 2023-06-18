@@ -71,6 +71,7 @@ class CatalogCategoryFragment :
             brandId = requireArguments().getString("brand_id")?.toIntOrNull(),
         )
         viewModel.getProductsByFilters(searchSettings)
+        viewModel.getCategories()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,12 +84,10 @@ class CatalogCategoryFragment :
             updateAdapterFromOther()
         }
 
-        if (!searchSettings.safe) {
-            searchSettings = searchSettings.copy(safe = true)
-        }
+        searchSettings = searchSettings.copy(safe = true)
+
         val sectionName = requireArguments().getString("section_name")
         searchFocus()
-        viewModel.getCategories()
 
         binding.apply {
             searchViewContainer.isChecked = true
@@ -178,11 +177,8 @@ class CatalogCategoryFragment :
         binding.apply {
             emptyState.isVisible = it.isEmpty()
             swipeRefresh.isRefreshing = false
-
-            if (orderChanged) {
-                recyclerCatalogCategory.smoothScrollToTop()
-                orderChanged = false
-            }
+            if (orderChanged) recyclerCatalogCategory.smoothScrollToTop()
+            orderChanged = false
         }
     }
 

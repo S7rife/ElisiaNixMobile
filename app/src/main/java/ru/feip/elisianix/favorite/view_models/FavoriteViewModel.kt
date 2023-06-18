@@ -2,18 +2,19 @@ package ru.feip.elisianix.favorite.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.detailToPreview
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
-import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.sortPreviewsItems
 
 class FavoriteViewModel : ViewModel() {
 
@@ -21,43 +22,30 @@ class FavoriteViewModel : ViewModel() {
 
     private val _showLoading = MutableStateFlow(false)
     private val _success = MutableStateFlow(false)
-    private val _favorites = MutableSharedFlow<List<ProductDetail>>(replay = 1)
+    private val _favorites = MutableSharedFlow<List<ProductMainPreview>>(replay = 1)
 
     val showLoading get() = _showLoading
     val favorites get() = _favorites
 
-    fun getFavoritesNoAuth(localFavoriteProducts: List<Int>) {
-        val products = mutableListOf<ProductDetail>()
+    fun getFavoritesNoAuth() {
         viewModelScope.launch {
-            coroutineScope {
-                localFavoriteProducts.forEach { prodId ->
-                    async {
-                        apiService.getProductDetail(prodId)
-                            .onStart { _showLoading.value = true }
-                            .onCompletion { _showLoading.value = false }
-                            .collect {
-                                when (it) {
-                                    is Result.Success -> {
-                                        val prodTransform = it.result.copy(
-                                            inCart = checkInCart(it.result.id),
-                                            inFavorites = checkInFavorites(it.result.id)
-                                        )
-                                        products.plusAssign(prodTransform)
-                                    }
+            val products = mutableListOf<ProductMainPreview>()
+            val localFavoriteProducts = App.INSTANCE.db.FavoritesDao().getAll().map { it.productId }
+            App.INSTANCE.db.FavoritesDao().getAllButCart().map { it.productId }
+            val flows = localFavoriteProducts.map { apiService.getProductDetail(it) }
+            flows.merge()
+                .onStart { _showLoading.value = true }
+                .onCompletion { _showLoading.value = false }
+                .collect {
+                    when (it) {
+                        is Result.Success -> {
+                            products.plusAssign(detailToPreview(it.result))
+                        }
 
-                                    is Result.Error -> {}
-                                }
-                            }
+                        else -> {}
                     }
-
                 }
-            }
-            _favorites.emit(sortItems(products))
+            _favorites.emit(sortPreviewsItems(products).filter { checkInFavorites(it.id) })
         }
-    }
-
-    private fun sortItems(items: List<ProductDetail>): List<ProductDetail> {
-        return items.sortedWith(
-            compareByDescending<ProductDetail> { it.name }.thenByDescending { it.id })
     }
 }

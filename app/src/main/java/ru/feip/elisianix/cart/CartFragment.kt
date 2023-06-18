@@ -16,19 +16,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.ProductCartListAdapter
+import ru.feip.elisianix.adapters.ProductCategoryBlockMainListAdapter
 import ru.feip.elisianix.cart.view_models.CartViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
+import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCartBinding
 import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.inStockUnits
 import ru.feip.elisianix.extensions.launchWhenStarted
-import ru.feip.elisianix.remote.models.Cart
-import ru.feip.elisianix.remote.models.RequestProductCart
+import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.toCartDialogData
 
 class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
@@ -37,38 +40,25 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     }
 
     private lateinit var productCartAdapter: ProductCartListAdapter
+    private lateinit var productLikedAdapter: ProductCategoryBlockMainListAdapter
+    private val cardDao = App.INSTANCE.db.CartDao()
+    private val favDao = App.INSTANCE.db.FavoritesDao()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App.INSTANCE.db.CartDao().getAllLive().observe(viewLifecycleOwner) { list ->
-            viewModel.getCartNoAuth(list.map {
-                RequestProductCart(it.productId, it.sizeId, it.colorId, it.count)
-            })
-            binding.emptyState.isVisible = list.isEmpty()
-        }
-        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
-        }
+        cardDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
+        favDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
 
         binding.apply {
             toolbarCart.title = getString(R.string.cart).uppercase()
             toBuyBtn.text = getString(R.string.check_out)
 
+            swipeRefresh.setOnRefreshListener { updateAdaptersFromOther() }
+
             productCartAdapter = ProductCartListAdapter(
                 {
-                    val navController = findNavController(view)
-                    val graph = navController.graph
-                    val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
-                    walletGraph.setStartDestination(R.id.catalogProductFragment)
-                    navController.navigate(
-                        R.id.action_cartFragment_to_nav_graph_catalog,
-                        bundleOf(
-                            "product_id" to it.productId,
-                            "color_id" to it.productColor.id,
-                            "size_id" to it.productSize.id
-                        )
-                    )
+                    toProductScreen(it.productId, it.productColor.id, it.productSize.id)
                 },
                 object : ProductCartListAdapter.OptionsMenuClickListener {
                     override fun onOptionsMenuClicked(
@@ -90,6 +80,29 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     LinearLayoutManager.VERTICAL,
                     false
                 )
+
+            productLikedAdapter = ProductCategoryBlockMainListAdapter(
+                {
+                    toProductScreen(it.id)
+                },
+                {
+                    openAddToCartDialog(it)
+                },
+                {
+                    editItemInFavorites(it.id)
+                }
+            )
+            recyclerLiked.disableAnimation()
+            recyclerLiked.adapter = productLikedAdapter
+            recyclerLiked.layoutManager =
+                LinearLayoutManager(
+                    requireContext(),
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+            recyclerLikedIndicator.attachToRecyclerView(recyclerLiked)
+
+            updateUi()
         }
 
         viewModel.showLoading
@@ -97,22 +110,36 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             .launchWhenStarted(lifecycleScope)
 
         viewModel.cart
-            .onEach { updateCart(it) }
+            .onEach { cart ->
+                productCartAdapter.submitList(cart.items.filter { checkInCart(it) })
+                binding.apply {
+                    cartTotalCountValue.inStockUnits(cart.itemsCount)
+                    cartTotalPayableValue.inCurrency(cart.finalPrice)
+                    cartDiscountSumValue.inCurrency(cart.discountPrice)
+                    cartTotalSumValue.inCurrency(cart.totalPrice)
+                    swipeRefresh.isRefreshing = false
+                }
+                updateUi()
+            }
+            .launchWhenStarted(lifecycleScope)
+
+        viewModel.likedProducts
+            .onEach {
+                productLikedAdapter.submitList(it)
+                binding.swipeRefresh.isRefreshing = false
+            }
             .launchWhenStarted(lifecycleScope)
     }
 
-    private fun updateCart(cart: Cart) {
-        val newCart = cart.items.filter { checkInCart(it) }
-        productCartAdapter.submitList(newCart)
-        val draw = newCart.isNotEmpty()
-        hideCart(draw, !draw)
+    private fun updateUi() {
+        val cartListVis = productCartAdapter.currentList.isNotEmpty()
+        val cartVis = cardDao.getAll().isNotEmpty()
+        val likeVis = favDao.getAllButCart().isNotEmpty()
         binding.apply {
-            if (draw) {
-                cartTotalCountValue.inStockUnits(cart.itemsCount)
-                cartTotalPayableValue.inCurrency(cart.finalPrice)
-                cartDiscountSumValue.inCurrency(cart.discountPrice)
-                cartTotalSumValue.inCurrency(cart.totalPrice)
-            }
+            emptyState.isVisible = !cartVis && !cartListVis
+            cartContainer.isVisible = cartVis && cartListVis
+            cartTotalContainer.isVisible = cartVis && cartListVis
+            likedBlock.isVisible = likeVis && cartVis
         }
     }
 
@@ -131,20 +158,16 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 when (item.itemId) {
                     R.id.cartToFavorite -> {
                         editItemInFavorites(id)
-                        productCartAdapter.currentList[pos].inFavorites = checkInFavorites(id)
-                        productCartAdapter.notifyItemChanged(pos)
                         return true
                     }
 
                     R.id.cartRemoveFavorite -> {
                         editItemInFavorites(id)
-                        productCartAdapter.currentList[pos].inFavorites = checkInFavorites(id)
-                        productCartAdapter.notifyItemChanged(pos)
                         return true
                     }
 
                     R.id.cartRemove -> {
-                        deleteFromCart(id, colorId, sizeId, pos)
+                        editItemInCart(CartItem(-1, id, colorId, sizeId, 1))
                         return true
                     }
                 }
@@ -154,31 +177,41 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         popupMenu.show()
     }
 
-    private fun deleteFromCart(id: Int, colorId: Int, sizeId: Int, pos: Int) {
-        val removed = App.INSTANCE.db.CartDao().deleteByInfo(id, colorId, sizeId)
-        if (removed > 0) {
-            val newLst = productCartAdapter.currentList.filterIndexed { idx, _ -> idx != pos }
-            productCartAdapter.submitList(newLst)
-            hideCart(newLst.isNotEmpty(), newLst.isEmpty())
+    private fun updateAdaptersFromOther() {
+        val lst1 = productCartAdapter.currentList
+        productCartAdapter.submitList(lst1.filter { checkInCart(it) })
+
+        val lst2 = productLikedAdapter.currentList
+        productLikedAdapter.submitList(lst2.filter { checkInFavorites(it.id) && !checkInCart(it.id) })
+
+        updateUi()
+        viewModel.getLikedNoAuth()
+        viewModel.getCartNoAuth()
+    }
+
+    private fun openAddToCartDialog(item: ProductMainPreview) {
+        val bundle = toCartDialogData(item)
+        bundle?.apply {
+            val navController = findNavController(requireView())
+            val graph = navController.graph
+            val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+            walletGraph.setStartDestination(R.id.catalogAddToCartDialog)
+            navController.navigate(R.id.action_cartFragment_to_nav_graph_catalog, bundle)
         }
     }
 
-    private fun hideCart(visMain: Boolean, visEmpty: Boolean = false) {
-        binding.apply {
-            cartContainer.isVisible = visMain
-            emptyState.isVisible = visEmpty
-            toBuyBtnContainer.isVisible = visMain
-        }
-    }
-
-    private fun updateAdapterFromOther() {
-        val lst = productCartAdapter.currentList
-        lst.forEachIndexed { idx, item ->
-            val inCart = checkInCart(item.id)
-            if (item.inCart != inCart) {
-                item.inCart = inCart
-                productCartAdapter.notifyItemChanged(idx)
-            }
-        }
+    private fun toProductScreen(productId: Int, colorId: Int? = null, sizeId: Int? = null) {
+        val navController = findNavController(requireView())
+        val graph = navController.graph
+        val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+        walletGraph.setStartDestination(R.id.catalogProductFragment)
+        navController.navigate(
+            R.id.action_cartFragment_to_nav_graph_catalog,
+            bundleOf(
+                "product_id" to productId,
+                "color_id" to colorId,
+                "size_id" to sizeId
+            )
+        )
     }
 }

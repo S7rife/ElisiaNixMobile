@@ -93,6 +93,14 @@ interface FavoritesDao {
     @Query("SELECT * FROM favorites ORDER BY id DESC")
     fun getAllLive(): LiveData<List<FavoriteItem>>
 
+    @Query(
+        "SELECT favorites.* FROM favorites " +
+                "WHERE NOT EXISTS(" +
+                "SELECT * FROM cart " +
+                "WHERE cart.productId = favorites.productId)"
+    )
+    fun getAllButCart(): List<FavoriteItem>
+
     @Query("SELECT * FROM favorites WHERE id=:id")
     fun getById(id: Int): FavoriteItem
 

@@ -21,7 +21,7 @@ import ru.feip.elisianix.databinding.FragmentFavoriteBinding
 import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.favorite.view_models.FavoriteViewModel
-import ru.feip.elisianix.remote.models.ProductDetail
+import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.toCartDialogData
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment_favorite) {
@@ -31,36 +31,22 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
     }
 
     private lateinit var productFavoriteAdapter: ProductFavoriteListAdapter
+    private val cartDao = App.INSTANCE.db.CartDao()
+    private val favDao = App.INSTANCE.db.FavoritesDao()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App.INSTANCE.db.FavoritesDao().getAllLive().observe(viewLifecycleOwner) { list ->
-            updateFavoriteList()
-            viewModel.getFavoritesNoAuth(list.map { it.productId })
-            binding.emptyState.isVisible = list.isEmpty()
-        }
-        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
-        }
+        favDao.checkCntLive().observe(viewLifecycleOwner) { updateAdapterFromOther() }
+        cartDao.checkCntLive().observe(viewLifecycleOwner) { updateAdapterFromOther() }
 
         binding.apply {
             toolbar.title = getString(R.string.favorite).uppercase()
-            swipeRefresh.setOnRefreshListener {
-                viewModel.getFavoritesNoAuth(
-                    App.INSTANCE.db.FavoritesDao().getAll().map { it.productId })
-            }
+            swipeRefresh.setOnRefreshListener { updateAdapterFromOther() }
 
             productFavoriteAdapter = ProductFavoriteListAdapter(
                 {
-                    val navController = Navigation.findNavController(view)
-                    val graph = navController.graph
-                    val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
-                    walletGraph.setStartDestination(R.id.catalogProductFragment)
-                    navController.navigate(
-                        R.id.action_favoriteFragment_to_nav_graph_catalog,
-                        bundleOf("product_id" to it.first)
-                    )
+                    toProductScreen(it.first)
                 },
                 {
                     openAddToCartDialog(it)
@@ -72,6 +58,8 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
             recyclerFavoriteProducts.disableAnimation()
             recyclerFavoriteProducts.adapter = productFavoriteAdapter
             recyclerFavoriteProducts.layoutManager = GridLayoutManager(requireContext(), 2)
+
+            updateUi()
         }
 
         viewModel.showLoading
@@ -79,19 +67,15 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
             .launchWhenStarted(lifecycleScope)
 
         viewModel.favorites
-            .onEach { lst ->
-                productFavoriteAdapter.submitList(lst.filter { checkInFavorites(it.id) })
+            .onEach {
+                productFavoriteAdapter.submitList(it)
                 binding.swipeRefresh.isRefreshing = false
+                updateUi()
             }
             .launchWhenStarted(lifecycleScope)
     }
 
-    private fun updateFavoriteList() {
-        val newLst = productFavoriteAdapter.currentList.filter { checkInFavorites(it.id) }
-        productFavoriteAdapter.submitList(newLst)
-    }
-
-    private fun openAddToCartDialog(item: ProductDetail) {
+    private fun openAddToCartDialog(item: ProductMainPreview) {
         val bundle = toCartDialogData(item)
         bundle?.apply {
             val navController = Navigation.findNavController(requireView())
@@ -104,12 +88,26 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
 
     private fun updateAdapterFromOther() {
         val lst = productFavoriteAdapter.currentList
-        lst.forEachIndexed { idx, item ->
-            val inCart = checkInCart(item.id)
-            if (item.inCart != inCart) {
-                item.inCart = inCart
-                productFavoriteAdapter.notifyItemChanged(idx)
-            }
-        }
+        lst.forEach { it.inCart = checkInCart(it.id) }
+        productFavoriteAdapter.submitList(lst.filter { checkInFavorites(it.id) })
+        updateUi()
+        viewModel.getFavoritesNoAuth()
+    }
+
+    private fun updateUi() {
+        val favListVis = productFavoriteAdapter.currentList.isNotEmpty()
+        val favVis = favDao.getAll().isNotEmpty()
+        binding.emptyState.isVisible = !favVis && !favListVis
+    }
+
+    private fun toProductScreen(productId: Int) {
+        val navController = Navigation.findNavController(requireView())
+        val graph = navController.graph
+        val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
+        walletGraph.setStartDestination(R.id.catalogProductFragment)
+        navController.navigate(
+            R.id.action_favoriteFragment_to_nav_graph_catalog,
+            bundleOf("product_id" to productId)
+        )
     }
 }
