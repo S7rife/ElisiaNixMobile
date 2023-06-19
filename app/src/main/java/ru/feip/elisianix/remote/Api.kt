@@ -1,6 +1,7 @@
 package ru.feip.elisianix.remote
 
 import retrofit2.http.*
+import ru.feip.elisianix.common.db.UserInfo
 import ru.feip.elisianix.remote.models.*
 
 
@@ -28,4 +29,14 @@ interface Api {
 
     @POST("api/basket/basketInfo")
     suspend fun getCartNoAuth(@Body items: RequestCartItems): Cart
+
+
+    //////////////////////////////////////////__AUTH__/////////////////////////////////////////////
+
+
+    @POST("api/account/auth/call")
+    suspend fun sendPhoneNumber(@Body body: RequestAuthSendPhoneNumber): Unit
+
+    @POST("api/account/auth")
+    suspend fun sendAuthCode(@Body body: RequestAuthSendCode): UserInfo
 }

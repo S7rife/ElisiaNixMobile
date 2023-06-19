@@ -47,4 +47,22 @@
     <string name="select_color_and_size">Select color and size</string>
     <string name="cant_find_size">Can\'t find the right size?</string>
     <string name="sign_up_fitting">Sign up for a fitting</string>
+    <string name="we_will_send_sms">We will send an SMS message with a confirmation code to the number</string>
+    <string name="auth_for_add_products">Log in to add products to your favorites and sync your collections across all devices</string>
+    <string name="auth_for_order">Log in to place an order</string>
+    <string name="you_accept">By clicking on the button, you accept</string>
+    <string name="the_user_agreement">the user agreement</string>
+    <string name="and">and</string>
+    <string name="privacy_policy">privacy policy</string>
+    <string name="sent_a_message">Sent a message to:</string>
+    <string name="get_code">Get code</string>
+    <string name="confirm">Confirm</string>
+    <string name="login_signup">Login/Sign up</string>
+    <string name="enter_code">Enter code from SMS</string>
+    <string name="send_again">Send again</string>
+    <string name="phone_number_silent_hint">Phоne number</string>
+    <string name="code_from_sms">Code from SMS</string>
+    <string name="code_emulate">Hey your code is 0000</string>
+    <string name="sth_went_wrong">Something went wrong</string>
+    <string name="code_is_wrong">Code is wrong</string>
 </resources>

@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraph
-import androidx.navigation.Navigation
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
@@ -22,6 +22,7 @@ import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.favorite.view_models.FavoriteViewModel
 import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.emptyAuthBundle
 import ru.feip.elisianix.remote.models.toCartDialogData
 
 class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment_favorite) {
@@ -52,7 +53,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerFavoriteProducts.disableAnimation()
@@ -78,7 +79,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
     private fun openAddToCartDialog(item: ProductMainPreview) {
         val bundle = toCartDialogData(item)
         bundle?.apply {
-            val navController = Navigation.findNavController(requireView())
+            val navController = findNavController(requireView())
             val graph = navController.graph
             val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
             walletGraph.setStartDestination(R.id.catalogAddToCartDialog)
@@ -88,8 +89,9 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
 
     private fun updateAdapterFromOther() {
         val lst = productFavoriteAdapter.currentList
-        lst.forEach { it.inCart = checkInCart(it.id) }
-        productFavoriteAdapter.submitList(lst.filter { checkInFavorites(it.id) })
+        productFavoriteAdapter.submitList(lst
+            .map { it.copy(inCart = checkInCart(it.id)) }
+            .filter { checkInFavorites(it.id) })
         updateUi()
         viewModel.getFavoritesNoAuth()
     }
@@ -101,7 +103,7 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
     }
 
     private fun toProductScreen(productId: Int) {
-        val navController = Navigation.findNavController(requireView())
+        val navController = findNavController(requireView())
         val graph = navController.graph
         val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
         walletGraph.setStartDestination(R.id.catalogProductFragment)
@@ -109,5 +111,13 @@ class FavoriteFragment : BaseFragment<FragmentFavoriteBinding>(R.layout.fragment
             R.id.action_favoriteFragment_to_nav_graph_catalog,
             bundleOf("product_id" to productId)
         )
+    }
+
+    private fun editFavorites(productId: Int) {
+        when (App.AUTH) {
+            true -> editItemInFavorites(productId)
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
+        }
     }
 }

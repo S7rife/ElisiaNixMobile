@@ -8,7 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +35,7 @@ import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.emptyAuthBundle
 import ru.feip.elisianix.remote.models.toCartDialogData
 import kotlin.properties.Delegates
 
@@ -99,7 +100,7 @@ class CatalogProductFragment :
                 findNavController().popBackStack()
             }
             toolbar.setOnMenuItemClickListener {
-                editItemInFavorites(productId)
+                editFavorites(productId)
                 true
             }
 
@@ -111,7 +112,7 @@ class CatalogProductFragment :
             }
 
             productImageAdapter = ProductImageListAdapter {
-                Navigation.findNavController(requireActivity(), R.id.rootActivityContainer)
+                findNavController(requireActivity(), R.id.rootActivityContainer)
                     .navigate(
                         R.id.action_navBottomFragment_to_catalogProductImageViewerFragment,
                         bundleOf("product_id" to productId)
@@ -162,7 +163,7 @@ class CatalogProductFragment :
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerProductRecsBlock.disableAnimation()
@@ -310,6 +311,14 @@ class CatalogProductFragment :
                 item.inFavorites = inFav
                 productRecsAdapter.notifyItemChanged(idx)
             }
+        }
+    }
+
+    private fun editFavorites(productId: Int) {
+        when (App.AUTH) {
+            true -> editItemInFavorites(productId)
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
         }
     }
 }

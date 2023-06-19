@@ -6,6 +6,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +26,7 @@ import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.MainBlock
 import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.emptyAuthBundle
 import ru.feip.elisianix.remote.models.toCartDialogData
 import ru.feip.elisianix.remote.models.toInt
 
@@ -84,7 +86,7 @@ class CatalogMainFragment :
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerActual.disableAnimation()
@@ -113,7 +115,7 @@ class CatalogMainFragment :
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerCategoryBlocks.disableAnimation()
@@ -206,6 +208,14 @@ class CatalogMainFragment :
                     categoryBlockMainAdapter.notifyItemChanged(blockIdx)
                 }
             }
+        }
+    }
+
+    private fun editFavorites(productId: Int) {
+        when (App.AUTH) {
+            true -> editItemInFavorites(productId)
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
         }
     }
 }

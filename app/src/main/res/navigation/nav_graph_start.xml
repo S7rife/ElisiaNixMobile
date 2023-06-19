@@ -20,13 +20,28 @@
         android:id="@+id/navBottomFragment"
         android:name="ru.feip.elisianix.common.NavBottomFragment"
         android:label="fragment_nav_bottom"
-        tools:layout="@layout/fragment_nav_bottom" >
+        tools:layout="@layout/fragment_nav_bottom">
         <action
             android:id="@+id/action_navBottomFragment_to_catalogProductImageViewerFragment"
             app:destination="@id/catalogProductImageViewerFragment" />
+        <action
+            android:id="@+id/action_navBottomFragment_to_noAuthFirstFragment"
+            app:destination="@id/noAuthFirstDialog" />
     </fragment>
     <fragment
         android:id="@+id/catalogProductImageViewerFragment"
         android:name="ru.feip.elisianix.catalog.CatalogProductImageViewerFragment"
         android:label="CatalogProductImageViewerFragment" />
+    <dialog
+        android:id="@+id/noAuthFirstDialog"
+        android:name="ru.feip.elisianix.start.NoAuthFirstDialog"
+        android:label="NoAuthFirstDialog">
+        <action
+            android:id="@+id/action_noAuthFirstDialog_to_noAuthSecondDialog"
+            app:destination="@id/noAuthSecondDialog" />
+    </dialog>
+    <dialog
+        android:id="@+id/noAuthSecondDialog"
+        android:name="ru.feip.elisianix.start.NoAuthSecondDialog"
+        android:label="NoAuthSecondDialog" />
 </navigation>

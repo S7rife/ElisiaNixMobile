@@ -31,6 +31,7 @@ import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.inStockUnits
 import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.remote.models.ProductMainPreview
+import ru.feip.elisianix.remote.models.emptyAuthBundle
 import ru.feip.elisianix.remote.models.toCartDialogData
 
 class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
@@ -53,6 +54,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         binding.apply {
             toolbarCart.title = getString(R.string.cart).uppercase()
             toBuyBtn.text = getString(R.string.check_out)
+            toBuyBtn.setOnClickListener {
+                goToCheckOut()
+            }
 
             swipeRefresh.setOnRefreshListener { updateAdaptersFromOther() }
 
@@ -89,7 +93,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerLiked.disableAnimation()
@@ -140,6 +144,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             cartContainer.isVisible = cartVis && cartListVis
             cartTotalContainer.isVisible = cartVis && cartListVis
             likedBlock.isVisible = likeVis && cartVis
+            cartBottomContainer.isVisible = cartVis && cartListVis
         }
     }
 
@@ -157,12 +162,12 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             override fun onMenuItemClick(item: MenuItem): Boolean {
                 when (item.itemId) {
                     R.id.cartToFavorite -> {
-                        editItemInFavorites(id)
+                        editFavorites(id)
                         return true
                     }
 
                     R.id.cartRemoveFavorite -> {
-                        editItemInFavorites(id)
+                        editFavorites(id)
                         return true
                     }
 
@@ -213,5 +218,24 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 "size_id" to sizeId
             )
         )
+    }
+
+    private fun editFavorites(productId: Int) {
+        when (App.AUTH) {
+            true -> editItemInFavorites(productId)
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
+        }
+    }
+
+    private fun goToCheckOut() {
+        when (App.AUTH) {
+            true -> {}
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(
+                    R.id.action_navBottomFragment_to_noAuthFirstFragment,
+                    bundleOf("from_cart" to true)
+                )
+        }
     }
 }

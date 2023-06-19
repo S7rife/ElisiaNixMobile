@@ -3,8 +3,11 @@ package ru.feip.elisianix.extensions
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -55,6 +58,19 @@ fun TextView.setSelectorPaint(selected: Boolean) {
     }
     this.paintFlags = p.flags
     this.paint.typeface = p.typeface
+}
+
+fun TextView.addUnderBoldPart(bold: String) {
+    val extra = bold.toSpannable()
+    extra.setSpan(UnderlineSpan(), 0, extra.length, 0)
+    extra.setSpan(StyleSpan(Typeface.BOLD), 0, extra.length, 0)
+    extra.setSpan(ForegroundColorSpan(Color.BLACK), 0, extra.length, 0)
+    this.text = TextUtils.concat(this.text, " ", extra)
+}
+
+fun TextView.addRegularPart(regular: String) {
+    val extra = regular.toSpannable()
+    this.text = TextUtils.concat(this.text, " ", extra)
 }
 
 fun TextView.colorEnd(cntEnt: Int, color: Int, text: String) {

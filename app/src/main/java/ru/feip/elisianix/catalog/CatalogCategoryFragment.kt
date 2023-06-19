@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.flow.onEach
@@ -24,6 +25,7 @@ import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.smoothScrollToTop
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
+import ru.feip.elisianix.remote.models.emptyAuthBundle
 import ru.feip.elisianix.remote.models.sortMethods
 import ru.feip.elisianix.remote.models.toCartDialogData
 import kotlin.properties.Delegates
@@ -130,7 +132,7 @@ class CatalogCategoryFragment :
                     openAddToCartDialog(it)
                 },
                 {
-                    editItemInFavorites(it.id)
+                    editFavorites(it.id)
                 }
             )
             recyclerCatalogCategory.disableAnimation()
@@ -211,6 +213,14 @@ class CatalogCategoryFragment :
             findNavController().navigate(
                 R.id.action_catalogCategoryFragment_to_searchWidgetFragment, bundle
             )
+        }
+    }
+
+    private fun editFavorites(productId: Int) {
+        when (App.AUTH) {
+            true -> editItemInFavorites(productId)
+            false -> findNavController(requireActivity(), R.id.rootActivityContainer)
+                .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
         }
     }
 

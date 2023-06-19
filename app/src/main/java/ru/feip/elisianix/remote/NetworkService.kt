@@ -4,7 +4,9 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BASE_URL
+import ru.feip.elisianix.remote.interceptors.AuthInterceptor
 import java.util.concurrent.TimeUnit
 
 
@@ -19,6 +21,7 @@ class NetworkService {
             .addInterceptor(HttpLoggingInterceptor().apply {
                 setLevel(HttpLoggingInterceptor.Level.BODY)
             })
+            .addInterceptor(AuthInterceptor(App.sharedPreferences))
             .build()
 
     val retrofit: Retrofit by lazy {

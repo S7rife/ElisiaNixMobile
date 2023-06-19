@@ -78,6 +78,8 @@ fun <T> toCartDialogData(item: T): Bundle? {
     }
 }
 
+val emptyAuthBundle = bundleOf("from_cart" to false)
+
 fun sortPreviewsItems(items: List<ProductMainPreview>): List<ProductMainPreview> {
     return items.sortedWith(
         compareByDescending<ProductMainPreview> { it.name }.thenByDescending { it.id })

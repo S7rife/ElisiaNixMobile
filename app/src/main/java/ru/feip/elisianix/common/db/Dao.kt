@@ -125,3 +125,15 @@ interface FavoritesDao {
     @Query("DELETE FROM favorites WHERE productId=:productId")
     fun deleteById(productId: Int): Int
 }
+
+@Dao
+interface UserInfoDao {
+    @Query("SELECT * FROM users WHERE token=:token")
+    fun getByToken(token: String): UserInfo
+
+    @Insert
+    fun insert(user: UserInfo)
+
+    @Query("DELETE FROM users WHERE token=:token")
+    fun deleteByToken(token: String): Int
+}

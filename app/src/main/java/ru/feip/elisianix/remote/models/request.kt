@@ -20,3 +20,16 @@ data class RequestCartItems(
     @SerializedName("items")
     var items: List<RequestProductCart>
 )
+
+data class RequestAuthSendPhoneNumber(
+    @SerializedName("phoneNumber")
+    var phoneNumber: String
+)
+
+data class RequestAuthSendCode(
+    @SerializedName("phone")
+    var phone: String,
+
+    @SerializedName("code")
+    var code: String
+)
