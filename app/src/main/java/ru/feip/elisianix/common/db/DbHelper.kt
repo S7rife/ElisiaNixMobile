@@ -68,6 +68,7 @@ fun detailToPreview(it: ProductDetail): ProductMainPreview {
         price = it.price,
         isNew = it.isNew,
         brand = it.brand,
+        category = it.category,
         images = it.images,
         colors = it.colors,
         discount = null,

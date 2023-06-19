@@ -18,8 +18,6 @@ import ru.feip.elisianix.adapters.CategoryMainListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogMainViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
-import ru.feip.elisianix.common.db.checkInCart
-import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogMainBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -45,13 +43,6 @@ class CatalogMainFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdaptersFromOther()
-        }
-        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdaptersFromOther()
-        }
 
         binding.apply {
             searchCatalogView.setOnClickListener {
@@ -87,7 +78,8 @@ class CatalogMainFragment :
                 },
                 {
                     editFavorites(it.id)
-                }
+                },
+                (viewLifecycleOwner)
             )
             recyclerActual.disableAnimation()
             recyclerActual.adapter = actualMainAdapter
@@ -116,7 +108,8 @@ class CatalogMainFragment :
                 },
                 {
                     editFavorites(it.id)
-                }
+                },
+                (viewLifecycleOwner)
             )
             recyclerCategoryBlocks.disableAnimation()
             recyclerCategoryBlocks.adapter = categoryBlockMainAdapter
@@ -180,34 +173,6 @@ class CatalogMainFragment :
             findNavController().navigate(
                 R.id.action_catalogMainFragment_to_catalogAddToCartDialog, bundle
             )
-        }
-    }
-
-    private fun updateAdaptersFromOther() {
-        val actual = actualMainAdapter.currentList
-        actual.forEachIndexed { blockIdx, block ->
-            block.products.forEach { item ->
-                val inCart = checkInCart(item.id)
-                val inFav = checkInFavorites(item.id)
-                if (item.inFavorites != inFav || item.inCart != inCart) {
-                    item.inCart = inCart
-                    item.inFavorites = inFav
-                    actualMainAdapter.notifyItemChanged(blockIdx)
-                }
-            }
-        }
-
-        val catBlock = categoryBlockMainAdapter.currentList
-        catBlock.forEachIndexed { blockIdx, block ->
-            block.products.forEach { item ->
-                val inCart = checkInCart(item.id)
-                val inFav = checkInFavorites(item.id)
-                if (item.inFavorites != inFav || item.inCart != inCart) {
-                    item.inCart = inCart
-                    item.inFavorites = inFav
-                    categoryBlockMainAdapter.notifyItemChanged(blockIdx)
-                }
-            }
         }
     }
 

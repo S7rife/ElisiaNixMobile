@@ -3,11 +3,15 @@ package ru.feip.elisianix.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.App
+import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.databinding.ItemMainCategoryBlockBinding
 import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.remote.models.MainBlock
@@ -18,7 +22,8 @@ class CategoryBlockMainListAdapter(
     private val clickListenerToCategory: (MainBlock) -> Unit,
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
     private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
-    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit,
+    private val lifecycleOwner: LifecycleOwner
 ) : ListAdapter<MainBlock, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class CategoryBlockMainList(item: View) : RecyclerView.ViewHolder(item) {
@@ -26,6 +31,12 @@ class CategoryBlockMainListAdapter(
         private lateinit var productCategoryBlockAdapter: ProductCategoryBlockMainListAdapter
 
         init {
+            App.INSTANCE.db.CartDao().checkCntLive().observe(lifecycleOwner) {
+                updateAdapter()
+            }
+            App.INSTANCE.db.FavoritesDao().checkCntLive().observe(lifecycleOwner) {
+                updateAdapter()
+            }
             binding.apply {
                 categoryBlockToCategoryBtn.setOnClickListener {
                     val position = absoluteAdapterPosition
@@ -36,6 +47,15 @@ class CategoryBlockMainListAdapter(
             }
         }
 
+        private fun updateAdapter() {
+            val lst = productCategoryBlockAdapter.currentList
+            productCategoryBlockAdapter.submitList(lst.map {
+                it.copy(
+                    inFavorites = checkInFavorites(it.id),
+                    inCart = checkInCart(it.id)
+                )
+            })
+        }
 
         fun bind(item: MainBlock) {
             binding.apply {

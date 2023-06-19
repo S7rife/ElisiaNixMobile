@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemMainCategoryBinding
-import ru.feip.elisianix.remote.models.CategoryMainPreview
+import ru.feip.elisianix.remote.models.Category
 
 
 class CategoryMainListAdapter(
-    private val clickListenerCategoryPreview: (CategoryMainPreview) -> Unit,
-) : ListAdapter<CategoryMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
+    private val clickListenerCategoryPreview: (Category) -> Unit,
+) : ListAdapter<Category, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class CategoryMainList(item: View) : RecyclerView.ViewHolder(item) {
         private var binding = ItemMainCategoryBinding.bind(item)
@@ -30,7 +30,7 @@ class CategoryMainListAdapter(
             }
         }
 
-        fun bind(item: CategoryMainPreview) {
+        fun bind(item: Category) {
             binding.apply {
                 Glide.with(itemView).load(item.image.url)
                     .error(R.drawable.ic_no_image)
@@ -40,15 +40,15 @@ class CategoryMainListAdapter(
         }
     }
 
-    private class ItemCallback : DiffUtil.ItemCallback<CategoryMainPreview>() {
+    private class ItemCallback : DiffUtil.ItemCallback<Category>() {
         override fun areItemsTheSame(
-            oldItem: CategoryMainPreview,
-            newItem: CategoryMainPreview
+            oldItem: Category,
+            newItem: Category
         ): Boolean = oldItem.id == newItem.id
 
         override fun areContentsTheSame(
-            oldItem: CategoryMainPreview,
-            newItem: CategoryMainPreview
+            oldItem: Category,
+            newItem: Category
         ): Boolean = oldItem == newItem
     }
 

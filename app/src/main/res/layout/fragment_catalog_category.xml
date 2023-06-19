@@ -79,6 +79,7 @@
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:paddingHorizontal="8dp"
+            android:paddingBottom="4dp"
             android:paddingTop="24dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

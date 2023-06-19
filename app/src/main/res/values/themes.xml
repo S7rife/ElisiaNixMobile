@@ -15,5 +15,6 @@
         <item name="materialButtonStyle">@style/Widget.App.Button</item>
 
         <item name="bottomSheetDialogTheme">@style/ModalBottomSheetDialog</item>
+        <item name="cardViewStyle">@style/Widget.MaterialComponents.CardView</item>
     </style>
 </resources>

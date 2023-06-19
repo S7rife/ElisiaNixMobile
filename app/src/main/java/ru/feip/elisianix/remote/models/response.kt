@@ -22,6 +22,9 @@ data class ProductMainPreview(
     @SerializedName("brand")
     var brand: Brand,
 
+    @SerializedName("category")
+    var category: Category,
+
     @SerializedName("images")
     var images: List<Image>,
 
@@ -75,7 +78,22 @@ data class ProductMainPreviews(
     var maxPrice: Double,
 
     @SerializedName("products")
-    var products: List<ProductMainPreview>
+    var products: List<ProductMainPreview>,
+
+    @SerializedName("productProperties")
+    var productProperties: List<ProductProperty>,
+
+    )
+
+data class ProductProperty(
+    @SerializedName("id")
+    var id: Int,
+
+    @SerializedName("propertyName")
+    var propertyName: String,
+
+    @SerializedName("data")
+    var data: String,
 )
 
 data class ProductDetail(
