@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCartByInfo
+import ru.feip.elisianix.common.db.deleteItemInCart
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.Address
@@ -29,7 +30,7 @@ class CartOrderingViewModel : ViewModel() {
     private val _cart = MutableSharedFlow<Cart>(replay = 1)
     private val _pickupPoints = MutableSharedFlow<List<PickupPoint>>(replay = 1)
     private val _orderId = MutableSharedFlow<Int>(replay = 0)
-    private val _productUpdatedInRemote = MutableSharedFlow<CartItem>(replay = 0)
+    private val _productUpdatedInRemote = MutableSharedFlow<Boolean>(replay = 0)
 
     val showLoading get() = _showLoading
     val pickupPoints get() = _pickupPoints
@@ -48,15 +49,17 @@ class CartOrderingViewModel : ViewModel() {
                 .collect { cartRemote ->
                     when (cartRemote) {
                         is Result.Success -> {
-                            cartRemote.result.items = sortItems(cartRemote.result.items)
-                                .filter {
-                                    checkInCartByInfo(
-                                        CartItem(
-                                            0, it.productId, it.productColor.id,
-                                            it.productSize.id, 0
+                            cartRemote.result.items?.let {
+                                cartRemote.result.items = sortItems(cartRemote.result.items!!)
+                                    .filter {
+                                        checkInCartByInfo(
+                                            CartItem(
+                                                0, it.productId, it.productColor.id,
+                                                it.productSize.id, 0
+                                            )
                                         )
-                                    )
-                                }
+                                    }
+                            }
                             _cart.emit(cartRemote.result)
                         }
 
@@ -169,7 +172,11 @@ class CartOrderingViewModel : ViewModel() {
                     .onCompletion { _showLoading.value = false }
                     .collect {
                         when (it) {
-                            is Result.Success -> _productUpdatedInRemote.emit(item.copy(count = 0))
+                            is Result.Success -> {
+                                deleteItemInCart(item)
+                                _productUpdatedInRemote.emit(true)
+                            }
+
                             is Result.Error -> {}
                         }
                     }

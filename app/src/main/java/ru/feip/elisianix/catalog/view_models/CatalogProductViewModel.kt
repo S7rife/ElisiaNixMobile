@@ -11,12 +11,14 @@ import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.RequestProductCart
 import ru.feip.elisianix.remote.models.RequestProductCartUpdate
+import ru.feip.elisianix.remote.models.contains
 
 class CatalogProductViewModel : ViewModel() {
 
@@ -26,7 +28,7 @@ class CatalogProductViewModel : ViewModel() {
     private val _success = MutableStateFlow(false)
     private val _product = MutableSharedFlow<ProductDetail>(replay = 1)
     private val _productRecs = MutableSharedFlow<List<ProductMainPreview>>(replay = 1)
-    private val _productUpdatedInRemote = MutableSharedFlow<CartItem>(replay = 0)
+    private val _productUpdatedInRemote = MutableSharedFlow<Boolean>(replay = 0)
 
     val showLoading get() = _showLoading
     val product get() = _product
@@ -80,26 +82,32 @@ class CatalogProductViewModel : ViewModel() {
         viewModelScope.launch {
             when (checkInCartByInfo(item)) {
                 true -> {
-                    val newItem = item.copy(count = 0)
                     apiService.updateInRemoteCart(remove)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
+                                is Result.Success -> {
+                                    editItemInCart(item, it.result.contains(item))
+                                    _productUpdatedInRemote.emit(true)
+                                }
+
                                 is Result.Error -> {}
                             }
                         }
                 }
 
                 false -> {
-                    val newItem = item.copy(count = 0)
                     apiService.addToRemoteCart(add)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
+                                is Result.Success -> {
+                                    editItemInCart(item, it.result.productsInBasketCount > 0)
+                                    _productUpdatedInRemote.emit(true)
+                                }
+
                                 is Result.Error -> {}
                             }
                         }

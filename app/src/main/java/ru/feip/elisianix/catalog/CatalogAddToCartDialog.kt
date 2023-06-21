@@ -100,10 +100,7 @@ class CatalogAddToCartDialog :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.productUpdatedInRemote
-            .onEach {
-                editItemInCart(it)
-                currentProduct = currentProduct
-            }
+            .onEach { findNavController().popBackStack() }
             .launchWhenStarted(lifecycleScope)
     }
 

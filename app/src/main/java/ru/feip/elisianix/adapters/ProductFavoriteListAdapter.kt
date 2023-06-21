@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
-import ru.feip.elisianix.common.db.cardDao
+import ru.feip.elisianix.common.db.cartDao
 import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.databinding.ItemFavoriteProductBinding
 import ru.feip.elisianix.extensions.inCurrency
@@ -47,7 +47,7 @@ class ProductFavoriteListAdapter(
                         notifyItemChanged(position)
                     }
                 }
-                cardDao.checkCntLive().observe(lifecycleOwner) {
+                cartDao.checkCntLive().observe(lifecycleOwner) {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         val prod = currentList[position]

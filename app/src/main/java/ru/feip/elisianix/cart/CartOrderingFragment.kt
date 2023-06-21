@@ -24,7 +24,6 @@ import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
-import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCartOrderingBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -150,7 +149,6 @@ class CartOrderingFragment :
 
         viewModel.productUpdatedInRemote
             .onEach {
-                editItemInCart(it)
                 if (cartDao.checkCnt() < 1) {
                     findNavController().popBackStack()
                 }

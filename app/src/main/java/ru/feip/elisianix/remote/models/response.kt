@@ -193,7 +193,7 @@ data class CartItemRemote(
 
 data class Cart(
     @SerializedName("items")
-    var items: List<CartItemRemote>,
+    var items: List<CartItemRemote>?,
 
     @SerializedName("itemsCount")
     var itemsCount: Int,

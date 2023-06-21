@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.db.CartItem
 
 fun Boolean.toInt() = if (this) 1 else 0
 
@@ -134,4 +135,11 @@ fun daysHoursToLine(point: PickupPoint): String {
 
 fun Context.getEmptyError(field: CharSequence?): String {
     return "$field ${this.getString(R.string.empty_error)}"
+}
+
+fun Cart.contains(item: CartItem): Boolean {
+    if (this.items == null) return false
+    return Triple(item.productId, item.colorId, item.sizeId) in this.items!!.map {
+        Triple(it.productId, it.productColor.id, it.productSize.id)
+    }
 }

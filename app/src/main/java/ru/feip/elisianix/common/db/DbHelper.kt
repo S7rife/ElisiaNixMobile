@@ -4,14 +4,31 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
-fun editItemInCart(item: CartItem) {
-    val dao = App.INSTANCE.db.CartDao()
+val cartDao = App.INSTANCE.db.CartDao()
+val favDao = App.INSTANCE.db.FavoritesDao()
 
-    when (checkInCartByInfo(item)) {
-        true -> dao.deleteByInfo(item.productId, item.colorId, item.sizeId)
+fun addItemInCart(item: CartItem) {
+    cartDao.insert(CartItem(0, item.productId, item.colorId, item.sizeId, 1))
+}
+
+fun deleteItemInCart(item: CartItem) {
+    cartDao.deleteByInfo(item.productId, item.colorId, item.sizeId)
+}
+
+fun editItemInCart(item: CartItem, inRemote: Boolean? = null) {
+    when (inRemote == null) {
+        true -> {
+            when (checkInCartByInfo(item)) {
+                true -> deleteItemInCart(item)
+                false -> addItemInCart(item)
+            }
+        }
 
         false -> {
-            dao.insert(CartItem(0, item.productId, item.colorId, item.sizeId, 1))
+            when (inRemote) {
+                true -> addItemInCart(item)
+                false -> deleteItemInCart(item)
+            }
         }
     }
 }
@@ -54,6 +71,3 @@ fun detailToPreview(it: ProductDetail): ProductMainPreview {
         inFavorites = checkInFavorites(it.id)
     )
 }
-
-val cardDao = App.INSTANCE.db.CartDao()
-val favDao = App.INSTANCE.db.FavoritesDao()

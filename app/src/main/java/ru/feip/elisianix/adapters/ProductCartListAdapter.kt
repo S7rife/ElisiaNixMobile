@@ -13,7 +13,6 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.favDao
 import ru.feip.elisianix.databinding.ItemCartProductBinding
-import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.sizeFormat
 import ru.feip.elisianix.remote.models.CartItemRemote
@@ -81,8 +80,6 @@ class ProductCartListAdapter(
 
                 cartProductSize.sizeFormat(item.productSize.value)
                 cartProductNewPrice.inCurrency(item.price)
-                cartProductOldPrice.inCurrency(item.price)
-                cartProductOldPrice.addStrikethrough()
 
                 cartProductIsLast.isVisible = item.isLast
             }

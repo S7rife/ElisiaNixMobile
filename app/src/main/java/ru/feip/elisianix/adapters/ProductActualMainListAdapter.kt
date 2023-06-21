@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
-import ru.feip.elisianix.common.db.cardDao
+import ru.feip.elisianix.common.db.cartDao
 import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.favDao
@@ -61,7 +61,7 @@ class ProductActualMainListAdapter(
                         notifyItemChanged(position)
                     }
                 }
-                cardDao.checkCntLive().observe(lifecycleOwner) {
+                cartDao.checkCntLive().observe(lifecycleOwner) {
                     val position = absoluteAdapterPosition
                     if (position in currentList.indices) {
                         val prod = currentList[position]

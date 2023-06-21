@@ -90,10 +90,7 @@ class CatalogSizeSelectorDialog :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.productUpdatedInRemote
-            .onEach {
-                editItemInCart(it)
-                updateOrBack()
-            }
+            .onEach { updateOrBack() }
             .launchWhenStarted(lifecycleScope)
     }
 

@@ -25,7 +25,7 @@ import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
-import ru.feip.elisianix.common.db.editItemInCart
+import ru.feip.elisianix.common.db.deleteItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCartBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -62,9 +62,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         binding.apply {
             toolbarCart.title = getString(R.string.cart).uppercase()
             toBuyBtn.text = getString(R.string.check_out)
-            toBuyBtn.setOnClickListener {
-                goToCheckOut()
-            }
+            toBuyBtn.setOnClickListener { goToCheckOut() }
 
             swipeRefresh.setOnRefreshListener { updateAdaptersFromOther() }
 
@@ -115,6 +113,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 )
             recyclerLikedIndicator.attachToRecyclerView(recyclerLiked)
 
+            viewModel.getLikedNoAuth()
+            viewModel.getCartNoAuth()
             updateUi()
         }
 
@@ -123,7 +123,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             .launchWhenStarted(lifecycleScope)
 
         viewModel.productUpdatedInRemote
-            .onEach { editItemInCart(it) }
+            .onEach { }
             .launchWhenStarted(lifecycleScope)
 
         viewModel.cart
@@ -188,7 +188,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                         val cartItem = CartItem(-1, id, colorId, sizeId, 0)
                         when (App.AUTH) {
                             true -> viewModel.updateItemInRemoteCart(cartItem)
-                            false -> editItemInCart(cartItem)
+                            false -> deleteItemInCart(cartItem)
                         }
                         return true
                     }

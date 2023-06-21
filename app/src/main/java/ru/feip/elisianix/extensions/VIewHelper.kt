@@ -25,10 +25,16 @@ import ru.feip.elisianix.R
 import ru.feip.elisianix.remote.models.SizeMap
 import ru.feip.elisianix.remote.models.last
 import ru.feip.elisianix.remote.models.toInt
+import java.text.NumberFormat
+import java.util.Locale
 
 
 fun TextView.inCurrency(price: Double) {
-    val text = "${String.format("%.3f", price)} ${this.resources.getString(R.string.currency)}"
+    val m = price.toInt()
+    val myNumber = NumberFormat.getNumberInstance(Locale.US)
+        .format(m)
+        .replace(",", " ")
+    val text = "$myNumber ${this.resources.getString(R.string.currency)}"
     this.text = text
 }
 

@@ -28,7 +28,6 @@ import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogProductBinding
-import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.launchWhenStarted
@@ -174,11 +173,6 @@ class CatalogProductFragment :
                     false
                 )
             recyclerProductRecsIndicator.attachToRecyclerView(recyclerProductRecsBlock)
-
-            swipeRefresh.setOnRefreshListener {
-                viewModel.getProductDetail(productId)
-                viewModel.getProductRecs(categoryId)
-            }
         }
 
         viewModel.showLoading
@@ -186,7 +180,7 @@ class CatalogProductFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.productUpdatedInRemote
-            .onEach { editItemInCart(it) }
+            .onEach { currentProduct = currentProduct }
             .launchWhenStarted(lifecycleScope)
 
         viewModel.product
@@ -196,10 +190,7 @@ class CatalogProductFragment :
         viewModel.productRecs
             .onEach {
                 productRecsAdapter.submitList(it)
-                binding.apply {
-                    swipeRefresh.isRefreshing = false
-                    productRecsBlock.isVisible = true
-                }
+                binding.productRecsBlock.isVisible = true
             }
             .launchWhenStarted(lifecycleScope)
     }
@@ -213,8 +204,6 @@ class CatalogProductFragment :
             productName.text = prod.name
 
             productPriceNew.inCurrency(prod.price)
-            productPriceOld.inCurrency(prod.price)
-            productPriceOld.addStrikethrough()
 
             val features = prod.features.joinToString(separator = "\n") { "● " + it.value }
             productDescription.text = features
@@ -279,7 +268,11 @@ class CatalogProductFragment :
                     )
                 }
             }
-            currentProduct = currentProduct.copy(colorId = color.id, sizeId = size?.id ?: -1)
+            currentProduct = if (currentProduct.colorId == 0) {
+                currentProduct.copy(colorId = color.id, sizeId = size?.id ?: -1)
+            } else {
+                currentProduct
+            }
         }
     }
 
