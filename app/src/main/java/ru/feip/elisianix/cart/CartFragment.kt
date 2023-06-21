@@ -22,7 +22,8 @@ import ru.feip.elisianix.cart.view_models.CartViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartById
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
@@ -45,6 +46,12 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     private lateinit var productLikedAdapter: ProductCategoryBlockMainListAdapter
     private val cartDao = App.INSTANCE.db.CartDao()
     private val favDao = App.INSTANCE.db.FavoritesDao()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.getLikedNoAuth()
+        viewModel.getCartNoAuth()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -75,6 +82,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                         performCartItemActionsMenuClick(id, colorId, sizeId, view)
                     }
                 },
+                (viewLifecycleOwner)
             )
             recyclerCartProducts.disableAnimation()
             recyclerCartProducts.adapter = productCartAdapter
@@ -94,7 +102,8 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                 },
                 {
                     editFavorites(it.id)
-                }
+                },
+                (viewLifecycleOwner)
             )
             recyclerLiked.disableAnimation()
             recyclerLiked.adapter = productLikedAdapter
@@ -119,7 +128,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
         viewModel.cart
             .onEach { cart ->
-                productCartAdapter.submitList(cart.items.filter { checkInCart(it) })
+                productCartAdapter.submitList(cart.items)
                 binding.apply {
                     cartTotalCountValue.inStockUnits(cart.itemsCount)
                     cartTotalPayableValue.inCurrency(cart.finalPrice)
@@ -176,7 +185,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     }
 
                     R.id.cartRemove -> {
-                        val cartItem = CartItem(-1, id, colorId, sizeId, 1)
+                        val cartItem = CartItem(-1, id, colorId, sizeId, 0)
                         when (App.AUTH) {
                             true -> viewModel.updateItemInRemoteCart(cartItem)
                             false -> editItemInCart(cartItem)
@@ -192,10 +201,16 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
     private fun updateAdaptersFromOther() {
         val lst1 = productCartAdapter.currentList
-        productCartAdapter.submitList(lst1.filter { checkInCart(it) })
+        productCartAdapter.submitList(lst1.filter {
+            checkInCartByInfo(
+                CartItem(
+                    0, it.productId, it.productColor.id, it.productSize.id, 0
+                )
+            )
+        })
 
         val lst2 = productLikedAdapter.currentList
-        productLikedAdapter.submitList(lst2.filter { checkInFavorites(it.id) && !checkInCart(it.id) })
+        productLikedAdapter.submitList(lst2.filter { checkInFavorites(it.id) && !checkInCartById(it.id) })
 
         updateUi()
         viewModel.getLikedNoAuth()

@@ -3,11 +3,16 @@ package ru.feip.elisianix.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.db.cardDao
+import ru.feip.elisianix.common.db.checkInCartById
+import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.favDao
 import ru.feip.elisianix.databinding.ItemMainCategoryBlockProductBinding
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.setCartStatus
@@ -18,7 +23,8 @@ import ru.feip.elisianix.remote.models.ProductMainPreview
 class ProductCategoryBlockMainListAdapter(
     private val clickListenerToProduct: (ProductMainPreview) -> Unit,
     private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
-    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit,
+    private val lifecycleOwner: LifecycleOwner,
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductCategoryBlockMainList(item: View) : RecyclerView.ViewHolder(item) {
@@ -50,6 +56,28 @@ class ProductCategoryBlockMainListAdapter(
                     if (position in currentList.indices) {
                         clickListenerFavoriteBtn.invoke(currentList[position])
                         notifyItemChanged(position)
+                    }
+                }
+                cardDao.checkCntLive().observe(lifecycleOwner) {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        val prod = currentList[position]
+                        val check = checkInCartById(prod.id)
+                        if (prod.inCart != check) {
+                            prod.inCart = check
+                            notifyItemChanged(position)
+                        }
+                    }
+                }
+                favDao.checkCntLive().observe(lifecycleOwner) {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        val prod = currentList[position]
+                        val check = checkInFavorites(prod.id)
+                        if (prod.inFavorites != check) {
+                            prod.inFavorites = check
+                            notifyItemChanged(position)
+                        }
                     }
                 }
             }

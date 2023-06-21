@@ -41,6 +41,13 @@ class CatalogMainFragment :
     private lateinit var categoryBlockMainAdapter: CategoryBlockMainListAdapter
     private var searchWidgetBundle: Bundle? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.getCategories()
+        viewModel.getProductActualBlock(new = true, discount = false)
+        viewModel.getProductActualBlock(new = false, discount = true)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,10 +75,7 @@ class CatalogMainFragment :
 
             actualMainAdapter = ActualMainListAdapter(
                 {
-                    findNavController().navigate(
-                        R.id.action_catalogMainFragment_to_catalogProductFragment,
-                        bundleOf("product_id" to it.id)
-                    )
+                    toProductScreen(it.id, it.category.id)
                 },
                 {
                     openAddToCartDialog(it)
@@ -98,10 +102,7 @@ class CatalogMainFragment :
                     )
                 },
                 {
-                    findNavController().navigate(
-                        R.id.action_catalogMainFragment_to_catalogProductFragment,
-                        bundleOf("product_id" to it.id)
-                    )
+                    toProductScreen(it.id, it.category.id)
                 },
                 {
                     openAddToCartDialog(it)
@@ -163,8 +164,6 @@ class CatalogMainFragment :
         viewModel.productCategoryBlocks
             .onEach { categoryBlockMainAdapter.submitList(it) }
             .launchWhenStarted(lifecycleScope)
-
-        viewModel.getCategories()
     }
 
     private fun openAddToCartDialog(item: ProductMainPreview) {
@@ -182,5 +181,12 @@ class CatalogMainFragment :
             false -> findNavController(requireActivity(), R.id.rootActivityContainer)
                 .navigate(R.id.action_navBottomFragment_to_noAuthFirstFragment, emptyAuthBundle)
         }
+    }
+
+    private fun toProductScreen(productId: Int, categoryId: Int) {
+        findNavController().navigate(
+            R.id.action_catalogMainFragment_to_catalogProductFragment,
+            bundleOf("product_id" to productId, "category_id" to categoryId)
+        )
     }
 }

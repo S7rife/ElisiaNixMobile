@@ -13,12 +13,12 @@ import ru.feip.elisianix.databinding.DialogCartOrderedBinding
 class CartOrderedDialog :
     BaseBottomDialog<DialogCartOrderedBinding>(R.layout.dialog_cart_ordered) {
 
-    private var orderNumber: String? = ""
+    private var orderNumber: Int = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        orderNumber = requireArguments().getString("order_number")
+        orderNumber = requireArguments().getInt("order_number")
 
         binding.apply {
             dialogCloseBtn.setOnClickListener { dismiss() }

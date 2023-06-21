@@ -16,8 +16,6 @@ import ru.feip.elisianix.adapters.ProductCategoryListAdapter
 import ru.feip.elisianix.catalog.view_models.CatalogCategoryViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
-import ru.feip.elisianix.common.db.checkInCart
-import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInFavorites
 import ru.feip.elisianix.databinding.FragmentCatalogCategoryBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -72,21 +70,13 @@ class CatalogCategoryFragment :
             categoryId = requireArguments().getString("category_id")?.toIntOrNull(),
             brandId = requireArguments().getString("brand_id")?.toIntOrNull(),
         )
-        viewModel.getProductsByFilters(searchSettings)
         viewModel.getCategories()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
-        }
-        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
-        }
-
-        searchSettings = searchSettings.copy(safe = true)
+        if (!searchSettings.safe) searchSettings = searchSettings.copy(safe = true)
 
         val sectionName = requireArguments().getString("section_name")
         searchFocus()
@@ -125,7 +115,7 @@ class CatalogCategoryFragment :
                 {
                     findNavController().navigate(
                         R.id.action_catalogCategoryFragment_to_catalogProductFragment,
-                        bundleOf("product_id" to it.first)
+                        bundleOf("product_id" to it.productId, "category_id" to it.categoryId)
                     )
                 },
                 {
@@ -133,7 +123,8 @@ class CatalogCategoryFragment :
                 },
                 {
                     editFavorites(it.id)
-                }
+                },
+                (viewLifecycleOwner)
             )
             recyclerCatalogCategory.disableAnimation()
             recyclerCatalogCategory.adapter = productCategoryAdapter
@@ -190,19 +181,6 @@ class CatalogCategoryFragment :
             findNavController().navigate(
                 R.id.action_catalogCategoryFragment_to_catalogAddToCartDialog, bundle
             )
-        }
-    }
-
-    private fun updateAdapterFromOther() {
-        val lst = productCategoryAdapter.currentList
-        lst.forEachIndexed { idx, item ->
-            val inCart = checkInCart(item.id)
-            val inFav = checkInFavorites(item.id)
-            if (item.inFavorites != inFav || item.inCart != inCart) {
-                item.inCart = inCart
-                item.inFavorites = inFav
-                productCategoryAdapter.notifyItemChanged(idx)
-            }
         }
     }
 

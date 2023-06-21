@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
@@ -42,14 +42,11 @@ class CatalogMainViewModel : ViewModel() {
         viewModelScope.launch {
             apiService.getCategories()
                 .onStart { _showLoading.value = true }
-                .onCompletion { _showLoading.value = false }
                 .collect { cats ->
                     when (cats) {
                         is Result.Success -> {
                             _categories.emit(cats.result.map { Category(it.id, it.name, it.image) })
                             catUtil = CategoryUtil(cats.result)
-                            getProductActualBlock(new = true, discount = false)
-                            getProductActualBlock(new = false, discount = true)
                             getProductCategoryBlocks(cats.result)
                         }
 
@@ -59,7 +56,7 @@ class CatalogMainViewModel : ViewModel() {
         }
     }
 
-    private fun getProductActualBlock(new: Boolean, discount: Boolean) {
+    fun getProductActualBlock(new: Boolean, discount: Boolean) {
         viewModelScope.launch {
             apiService.getProducts(
                 ProductsQueryMap(newProducts = new, discount = discount).dataClassToMap()
@@ -71,7 +68,7 @@ class CatalogMainViewModel : ViewModel() {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
                                 prod.copy(
-                                    inCart = checkInCart(prod.id),
+                                    inCart = checkInCartById(prod.id),
                                     inFavorites = checkInFavorites(prod.id)
                                 )
                             }
@@ -100,7 +97,6 @@ class CatalogMainViewModel : ViewModel() {
                         categories = it.id.toString(), limit = 10, inSubCategories = true,
                     ).dataClassToMap()
                 )
-                    .onStart { _showLoading.value = true }
                     .onCompletion { _showLoading.value = false }
             }
             flows.merge()
@@ -109,7 +105,7 @@ class CatalogMainViewModel : ViewModel() {
                         is Result.Success -> {
                             val newProds = it.result.products.map { prod ->
                                 prod.copy(
-                                    inCart = checkInCart(prod.id),
+                                    inCart = checkInCartById(prod.id),
                                     inFavorites = checkInFavorites(prod.id)
                                 )
                             }

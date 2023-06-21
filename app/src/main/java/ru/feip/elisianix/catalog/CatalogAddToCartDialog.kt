@@ -15,7 +15,7 @@ import ru.feip.elisianix.catalog.view_models.CatalogAddToCartViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseBottomDialog
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.databinding.DialogAddToCartBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -44,7 +44,7 @@ class CatalogAddToCartDialog :
 
     private var currentProduct: CartItem by Delegates.observable(
         CartItem(0, 0, 0, -1, 1)
-    ) { _, _, newProduct -> productInCart = checkInCart(newProduct) }
+    ) { _, _, newProduct -> productInCart = checkInCartByInfo(newProduct) }
 
     private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
         binding.apply {

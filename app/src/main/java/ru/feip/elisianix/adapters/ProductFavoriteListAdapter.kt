@@ -4,23 +4,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.db.cardDao
+import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.databinding.ItemFavoriteProductBinding
 import ru.feip.elisianix.extensions.inCurrency
 import ru.feip.elisianix.extensions.setCartStatus
 import ru.feip.elisianix.extensions.setFavoriteStatus
-import ru.feip.elisianix.remote.models.Image
+import ru.feip.elisianix.remote.models.ImageProvider
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
 
 class ProductFavoriteListAdapter(
-    private val clickListenerToProduct: (Pair<Int, Image>) -> Unit,
+    private val clickListenerToProduct: (ImageProvider) -> Unit,
     private val clickListenerCartBtn: (ProductMainPreview) -> Unit,
-    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit
+    private val clickListenerFavoriteBtn: (ProductMainPreview) -> Unit,
+    private val lifecycleOwner: LifecycleOwner,
 ) : ListAdapter<ProductMainPreview, RecyclerView.ViewHolder>(ItemCallback()) {
 
     inner class ProductFavoriteList(item: View) : RecyclerView.ViewHolder(item) {
@@ -43,6 +47,17 @@ class ProductFavoriteListAdapter(
                         notifyItemChanged(position)
                     }
                 }
+                cardDao.checkCntLive().observe(lifecycleOwner) {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        val prod = currentList[position]
+                        val check = checkInCartById(prod.id)
+                        if (prod.inCart != check) {
+                            prod.inCart = check
+                            notifyItemChanged(position)
+                        }
+                    }
+                }
             }
         }
 
@@ -62,7 +77,9 @@ class ProductFavoriteListAdapter(
                         LinearLayoutManager.HORIZONTAL,
                         false
                     )
-                productImageAdapter.submitList(item.images.map { Pair(item.id, it) })
+                productImageAdapter.submitList(item.images.map {
+                    ImageProvider(item.id, item.category.id, it)
+                })
 
                 if (item.images.count() > 1) {
                     recyclerProductImageIndicator.attachToRecyclerView(recyclerProductImage)

@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartById
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
@@ -60,7 +61,7 @@ class CatalogProductViewModel : ViewModel() {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
                                 prod.copy(
-                                    inCart = checkInCart(prod.id),
+                                    inCart = checkInCartById(prod.id),
                                     inFavorites = checkInFavorites(prod.id)
                                 )
                             }
@@ -77,26 +78,28 @@ class CatalogProductViewModel : ViewModel() {
         val add = RequestProductCart(item.productId, item.sizeId, item.colorId, 1)
         val remove = RequestProductCartUpdate(item.productId, item.sizeId, item.colorId, 0)
         viewModelScope.launch {
-            when (checkInCart(item)) {
+            when (checkInCartByInfo(item)) {
                 true -> {
+                    val newItem = item.copy(count = 0)
                     apiService.updateInRemoteCart(remove)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(item)
+                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
                                 is Result.Error -> {}
                             }
                         }
                 }
 
                 false -> {
+                    val newItem = item.copy(count = 0)
                     apiService.addToRemoteCart(add)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(item)
+                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
                                 is Result.Error -> {}
                             }
                         }

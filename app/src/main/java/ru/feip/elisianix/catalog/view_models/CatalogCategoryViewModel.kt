@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartById
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
@@ -62,7 +62,7 @@ class CatalogCategoryViewModel : ViewModel() {
                         is Result.Success -> {
                             val productsTransform = it.result.products.map { prod ->
                                 prod.copy(
-                                    inCart = checkInCart(prod.id),
+                                    inCart = checkInCartById(prod.id),
                                     inFavorites = checkInFavorites(prod.id)
                                 )
                             }

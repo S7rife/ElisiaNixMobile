@@ -23,7 +23,7 @@ import ru.feip.elisianix.catalog.view_models.CatalogProductViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
@@ -47,23 +47,25 @@ class CatalogProductFragment :
         ViewModelProvider(this)[CatalogProductViewModel::class.java]
     }
 
-    private val cartDao = App.INSTANCE.db.CartDao()
     private val favDao = App.INSTANCE.db.FavoritesDao()
 
     private lateinit var productImageAdapter: ProductImageListAdapter
     private lateinit var productColorAdapter: ProductColorListAdapter
     private lateinit var productSizeAdapter: ProductSizeListAdapter
     private lateinit var productRecsAdapter: ProductCategoryBlockMainListAdapter
+    private var categoryId = 0
     private var productId = 0
     private var colorId: Int? = null
     private var sizeId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        categoryId = requireArguments().getInt("category_id")
         productId = requireArguments().getInt("product_id")
         colorId = requireArguments().getInt("color_id")
         sizeId = requireArguments().getInt("size_id")
         viewModel.getProductDetail(productId)
+        viewModel.getProductRecs(categoryId)
 
         setFragmentResultListener("resultSizeSelectorDialog") { _, bundle ->
             val selectedSizeId = bundle.getInt("selected_size_id")
@@ -86,12 +88,7 @@ class CatalogProductFragment :
         val toFavoriteBtn = binding.toolbar.menu.findItem(R.id.productNotInFavorites)
         val removeFavoriteBtn = binding.toolbar.menu.findItem(R.id.productInFavorites)
 
-        cartDao.checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
-            productInCart = checkInCart(currentProduct)
-        }
         favDao.checkCntLive().observe(viewLifecycleOwner) {
-            updateAdapterFromOther()
             val inFav = checkInFavorites(productId)
             toFavoriteBtn.isVisible = !inFav.also { toFavoriteBtn.isEnabled = !inFav }
             removeFavoriteBtn.isVisible = inFav.also { removeFavoriteBtn.isEnabled = inFav }
@@ -148,7 +145,6 @@ class CatalogProductFragment :
                 } else {
                     currentProduct.copy(sizeId = it.id)
                 }
-                productInCart = checkInCart(currentProduct)
             }
             recyclerSizeSelector.disableAnimation()
             recyclerSizeSelector.adapter = productSizeAdapter
@@ -158,7 +154,7 @@ class CatalogProductFragment :
                 {
                     findNavController().navigate(
                         R.id.action_catalogProductFragment_self,
-                        bundleOf("product_id" to it.id)
+                        bundleOf("product_id" to it.id, "category_id" to it.category.id)
                     )
                 },
                 {
@@ -166,7 +162,8 @@ class CatalogProductFragment :
                 },
                 {
                     editFavorites(it.id)
-                }
+                },
+                (viewLifecycleOwner)
             )
             recyclerProductRecsBlock.disableAnimation()
             recyclerProductRecsBlock.adapter = productRecsAdapter
@@ -178,7 +175,10 @@ class CatalogProductFragment :
                 )
             recyclerProductRecsIndicator.attachToRecyclerView(recyclerProductRecsBlock)
 
-            swipeRefresh.setOnRefreshListener { viewModel.getProductDetail(productId) }
+            swipeRefresh.setOnRefreshListener {
+                viewModel.getProductDetail(productId)
+                viewModel.getProductRecs(categoryId)
+            }
         }
 
         viewModel.showLoading
@@ -190,11 +190,7 @@ class CatalogProductFragment :
             .launchWhenStarted(lifecycleScope)
 
         viewModel.product
-            .onEach { prod ->
-                viewModel.getProductRecs(prod.category.id)
-                updateProductUi(prod)
-                productInCart = checkInCart(currentProduct)
-            }
+            .onEach { updateProductUi(it) }
             .launchWhenStarted(lifecycleScope)
 
         viewModel.productRecs
@@ -287,18 +283,15 @@ class CatalogProductFragment :
         }
     }
 
-    private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
+    private var currentProduct: CartItem by Delegates.observable(
+        CartItem(0, 0, 0, -1, 1)
+    ) { _, _, newProduct ->
+        val inCart = checkInCartByInfo(newProduct)
         binding.productCartBtn.withColors(inCart)
         binding.productCartBtn.text = when (inCart) {
             true -> getString(R.string.in_the_cart)
             false -> getString(R.string.to_cart)
         }
-    }
-
-    private var currentProduct: CartItem by Delegates.observable(
-        CartItem(0, 0, 0, -1, 1)
-    ) { _, _, newProduct ->
-        productInCart = checkInCart(newProduct)
     }
 
     private fun openAddToCartDialog(item: ProductMainPreview) {
@@ -307,19 +300,6 @@ class CatalogProductFragment :
             findNavController().navigate(
                 R.id.action_catalogProductFragment_to_catalogAddToCartDialog, bundle
             )
-        }
-    }
-
-    private fun updateAdapterFromOther() {
-        val lst = productRecsAdapter.currentList
-        lst.forEachIndexed { idx, item ->
-            val inCart = checkInCart(item.id)
-            val inFav = checkInFavorites(item.id)
-            if (item.inFavorites != inFav || item.inCart != inCart) {
-                item.inCart = inCart
-                item.inFavorites = inFav
-                productRecsAdapter.notifyItemChanged(idx)
-            }
         }
     }
 

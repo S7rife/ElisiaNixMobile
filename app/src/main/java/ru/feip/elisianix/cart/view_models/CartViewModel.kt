@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartById
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.detailToPreview
 import ru.feip.elisianix.remote.ApiService
@@ -49,7 +50,14 @@ class CartViewModel : ViewModel() {
                     when (cartRemote) {
                         is Result.Success -> {
                             cartRemote.result.items = sortItems(cartRemote.result.items)
-                                .filter { checkInCart(it) }
+                                .filter {
+                                    checkInCartByInfo(
+                                        CartItem(
+                                            0, it.productId, it.productColor.id,
+                                            it.productSize.id, 0
+                                        )
+                                    )
+                                }
                             _cart.emit(cartRemote.result)
                         }
 
@@ -86,7 +94,7 @@ class CartViewModel : ViewModel() {
                     }
                 }
             _likedProducts.emit(sortPreviewsItems(products)
-                .filter { checkInFavorites(it.id) && !checkInCart(it.id) })
+                .filter { checkInFavorites(it.id) && !checkInCartById(it.id) })
         }
     }
 
@@ -94,26 +102,28 @@ class CartViewModel : ViewModel() {
         val add = RequestProductCart(item.productId, item.sizeId, item.colorId, 1)
         val remove = RequestProductCartUpdate(item.productId, item.sizeId, item.colorId, 0)
         viewModelScope.launch {
-            when (checkInCart(item)) {
+            when (checkInCartByInfo(item)) {
                 true -> {
+                    val newItem = item.copy(count = 0)
                     apiService.updateInRemoteCart(remove)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(item)
+                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
                                 is Result.Error -> {}
                             }
                         }
                 }
 
                 false -> {
+                    val newItem = item.copy(count = 1)
                     apiService.addToRemoteCart(add)
                         .onStart { _showLoading.value = true }
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _productUpdatedInRemote.emit(item)
+                                is Result.Success -> _productUpdatedInRemote.emit(newItem)
                                 is Result.Error -> {}
                             }
                         }

@@ -1,51 +1,27 @@
 package ru.feip.elisianix.common.db
 
 import ru.feip.elisianix.common.App
-import ru.feip.elisianix.remote.models.CartItemRemote
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreview
 
-fun <T> editItemInCart(item: T) {
+fun editItemInCart(item: CartItem) {
     val dao = App.INSTANCE.db.CartDao()
-    when (item) {
-        is ProductMainPreview -> when (item.inCart) {
-            true -> dao.deleteByInfo(item.id, item.colors[0].id, item.sizes[0].id)
-            false -> {
-                dao.insert(CartItem(0, item.id, item.colors[0].id, item.sizes[0].id, 1))
-            }
-        }
 
-        is CartItemRemote -> when (item.inCart) {
-            true -> dao.deleteByInfo(item.productId, item.productColor.id, item.productSize.id)
-            false -> dao.insert(
-                CartItem(0, item.productId, item.productColor.id, item.productSize.id, 1)
-            )
-        }
+    when (checkInCartByInfo(item)) {
+        true -> dao.deleteByInfo(item.productId, item.colorId, item.sizeId)
 
-        is CartItem -> when (dao.checkInCart(item.productId, item.colorId, item.sizeId) > 0) {
-            true -> dao.deleteByInfo(item.productId, item.colorId, item.sizeId)
-            false -> dao.insert(item)
-        }
-
-        is Int -> when (dao.checkInCartById(item) > 0) {
-            true -> dao.deleteById(item)
-            false -> {}
+        false -> {
+            dao.insert(CartItem(0, item.productId, item.colorId, item.sizeId, 1))
         }
     }
 }
 
-fun <T> checkInCart(item: T): Boolean {
-    val dao = App.INSTANCE.db.CartDao()
-    return when (item) {
-        is ProductMainPreview -> dao.checkInCart(item.id, item.colors[0].id, item.sizes[0].id) > 0
-        is CartItemRemote -> dao
-            .checkInCart(item.productId, item.productColor.id, item.productSize.id) > 0
+fun checkInCartByInfo(item: CartItem): Boolean {
+    return App.INSTANCE.db.CartDao().checkInCart(item.productId, item.colorId, item.sizeId) > 0
+}
 
-        is CartItem -> dao.checkInCart(item.productId, item.colorId, item.sizeId) > 0
-
-        is Int -> dao.checkInCartById(item) > 0
-        else -> false
-    }
+fun checkInCartById(id: Int): Boolean {
+    return App.INSTANCE.db.CartDao().checkInCartById(id) > 0
 }
 
 fun editItemInFavorites(item: Int) {
@@ -74,7 +50,10 @@ fun detailToPreview(it: ProductDetail): ProductMainPreview {
         discount = null,
         sizes = it.sizes.filter { it.available > 0 },
         createdDate = null,
-        inCart = checkInCart(it.id),
+        inCart = checkInCartById(it.id),
         inFavorites = checkInFavorites(it.id)
     )
 }
+
+val cardDao = App.INSTANCE.db.CartDao()
+val favDao = App.INSTANCE.db.FavoritesDao()

@@ -4,11 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.db.checkInFavorites
+import ru.feip.elisianix.common.db.favDao
 import ru.feip.elisianix.databinding.ItemCartProductBinding
 import ru.feip.elisianix.extensions.addStrikethrough
 import ru.feip.elisianix.extensions.inCurrency
@@ -19,6 +22,7 @@ import ru.feip.elisianix.remote.models.CartItemRemote
 class ProductCartListAdapter(
     private val clickListenerToProduct: (CartItemRemote) -> Unit,
     private val cartItemActionsMenuClickListener: OptionsMenuClickListener,
+    private val lifecycleOwner: LifecycleOwner,
 ) : ListAdapter<CartItemRemote, RecyclerView.ViewHolder>(ItemCallback()) {
 
     interface OptionsMenuClickListener {
@@ -49,6 +53,17 @@ class ProductCartListAdapter(
                         cartItemActionsMenuClickListener.onOptionsMenuClicked(
                             cIt.productId, cIt.productColor.id, cIt.productSize.id, itemView
                         )
+                    }
+                }
+                favDao.checkCntLive().observe(lifecycleOwner) {
+                    val position = absoluteAdapterPosition
+                    if (position in currentList.indices) {
+                        val prod = currentList[position]
+                        val check = checkInFavorites(prod.id)
+                        if (prod.inFavorites != check) {
+                            prod.inFavorites = check
+                            notifyItemChanged(position)
+                        }
                     }
                 }
             }

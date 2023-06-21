@@ -9,9 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
-import ru.feip.elisianix.common.App
-import ru.feip.elisianix.common.db.checkInCart
-import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.databinding.ItemMainCategoryBlockBinding
 import ru.feip.elisianix.extensions.disableAnimation
 import ru.feip.elisianix.remote.models.MainBlock
@@ -31,12 +28,6 @@ class CategoryBlockMainListAdapter(
         private lateinit var productCategoryBlockAdapter: ProductCategoryBlockMainListAdapter
 
         init {
-            App.INSTANCE.db.CartDao().checkCntLive().observe(lifecycleOwner) {
-                updateAdapter()
-            }
-            App.INSTANCE.db.FavoritesDao().checkCntLive().observe(lifecycleOwner) {
-                updateAdapter()
-            }
             binding.apply {
                 categoryBlockToCategoryBtn.setOnClickListener {
                     val position = absoluteAdapterPosition
@@ -47,16 +38,6 @@ class CategoryBlockMainListAdapter(
             }
         }
 
-        private fun updateAdapter() {
-            val lst = productCategoryBlockAdapter.currentList
-            productCategoryBlockAdapter.submitList(lst.map {
-                it.copy(
-                    inFavorites = checkInFavorites(it.id),
-                    inCart = checkInCart(it.id)
-                )
-            })
-        }
-
         fun bind(item: MainBlock) {
             binding.apply {
                 categoryBlockName.text = item.name
@@ -65,7 +46,8 @@ class CategoryBlockMainListAdapter(
                     ProductCategoryBlockMainListAdapter(
                         clickListenerToProduct,
                         clickListenerCartBtn,
-                        clickListenerFavoriteBtn
+                        clickListenerFavoriteBtn,
+                        lifecycleOwner
                     )
                 recyclerProduct.disableAnimation()
                 recyclerProduct.adapter = productCategoryBlockAdapter

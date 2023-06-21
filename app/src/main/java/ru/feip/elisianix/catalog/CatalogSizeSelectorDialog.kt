@@ -17,7 +17,7 @@ import ru.feip.elisianix.catalog.view_models.CatalogSizeSelectorViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseBottomDialog
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.databinding.DialogSizeSelectorBinding
 import ru.feip.elisianix.extensions.disableAnimation
@@ -108,7 +108,7 @@ class CatalogSizeSelectorDialog :
     private var currentProduct: CartItem by Delegates.observable(
         CartItem(0, 0, 0, -1, 1)
     ) { _, _, newProduct ->
-        productInCart = checkInCart(newProduct)
+        productInCart = checkInCartByInfo(newProduct)
     }
 
     private fun updateOrBack() {

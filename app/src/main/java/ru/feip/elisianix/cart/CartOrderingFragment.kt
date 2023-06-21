@@ -22,7 +22,7 @@ import ru.feip.elisianix.cart.view_models.CartOrderingViewModel
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseFragment
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.common.db.editItemInFavorites
@@ -52,13 +52,18 @@ class CartOrderingFragment :
 
     private lateinit var productCartAdapter: ProductCartListAdapter
     private val cartDao = App.INSTANCE.db.CartDao()
-    private val favDao = App.INSTANCE.db.FavoritesDao()
 
     private var currentDeliveryType = "Self"
     private var currentPhoneNumber = ""
     private lateinit var pickupPoints: List<PickupPoint>
     private var currentPlace: PickupPoint? by Delegates.observable(initialValue = null) { _, _, _ ->
         updatePlaceUI()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.getCartNoAuth()
+        viewModel.getPickupPoints()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,7 +79,6 @@ class CartOrderingFragment :
             }
 
         cartDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
-        favDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
 
         binding.apply {
             toolbarCart.setNavigationOnClickListener { findNavController().popBackStack() }
@@ -101,7 +105,10 @@ class CartOrderingFragment :
             pickupMapBtn.setUnderline()
             pickupMapBtn.setOnClickListener { toMap() }
             checkoutBtn.setOnClickListener { toOrder() }
-            swipeRefresh.setOnRefreshListener { updateAdaptersFromOther() }
+            swipeRefresh.setOnRefreshListener {
+                viewModel.getCartNoAuth()
+                viewModel.getPickupPoints()
+            }
 
             productCartAdapter = ProductCartListAdapter(
                 {
@@ -117,6 +124,7 @@ class CartOrderingFragment :
                         performCartItemActionsMenuClick(id, colorId, sizeId, view)
                     }
                 },
+                (viewLifecycleOwner)
             )
             recyclerCartProducts.disableAnimation()
             recyclerCartProducts.adapter = productCartAdapter
@@ -134,7 +142,6 @@ class CartOrderingFragment :
             formatWatcher.setCallback(PhoneNumberChangeListener())
 
             updateUi()
-            viewModel.getPickupPoints()
         }
 
         viewModel.showLoading
@@ -163,7 +170,7 @@ class CartOrderingFragment :
 
         viewModel.cart
             .onEach { cart ->
-                productCartAdapter.submitList(cart.items.filter { checkInCart(it) })
+                productCartAdapter.submitList(cart.items)
                 binding.apply {
                     cartTotalCountValue.inStockUnits(cart.itemsCount)
                     cartTotalPayableValue.inCurrency(cart.finalPrice)
@@ -213,7 +220,7 @@ class CartOrderingFragment :
                     }
 
                     R.id.cartRemove -> {
-                        val cartItem = CartItem(-1, id, colorId, sizeId, 0)
+                        val cartItem = CartItem(0, id, colorId, sizeId, 0)
                         viewModel.removeFromRemoteCart(cartItem)
                         return true
                     }
@@ -226,7 +233,13 @@ class CartOrderingFragment :
 
     private fun updateAdaptersFromOther() {
         val lst = productCartAdapter.currentList
-        productCartAdapter.submitList(lst.filter { checkInCart(it) })
+        productCartAdapter.submitList(lst.filter {
+            checkInCartByInfo(
+                CartItem(
+                    0, it.productId, it.productColor.id, it.productSize.id, 0
+                )
+            )
+        })
         updateUi()
         viewModel.getCartNoAuth()
     }
@@ -270,7 +283,7 @@ class CartOrderingFragment :
     private fun goToOrdered(orderNumber: Int) {
         findNavController().navigate(
             R.id.action_cartOrderingFragment_to_cartOrderedDialog,
-            bundleOf("order_number" to orderNumber.toString())
+            bundleOf("order_number" to orderNumber)
         )
     }
 

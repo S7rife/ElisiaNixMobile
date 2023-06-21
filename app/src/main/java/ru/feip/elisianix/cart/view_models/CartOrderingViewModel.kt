@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.db.CartItem
-import ru.feip.elisianix.common.db.checkInCart
+import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.Address
@@ -49,7 +49,14 @@ class CartOrderingViewModel : ViewModel() {
                     when (cartRemote) {
                         is Result.Success -> {
                             cartRemote.result.items = sortItems(cartRemote.result.items)
-                                .filter { checkInCart(it) }
+                                .filter {
+                                    checkInCartByInfo(
+                                        CartItem(
+                                            0, it.productId, it.productColor.id,
+                                            it.productSize.id, 0
+                                        )
+                                    )
+                                }
                             _cart.emit(cartRemote.result)
                         }
 
@@ -156,13 +163,13 @@ class CartOrderingViewModel : ViewModel() {
     fun removeFromRemoteCart(item: CartItem) {
         val remove = RequestProductCartUpdate(item.productId, item.sizeId, item.colorId, 0)
         viewModelScope.launch {
-            if (checkInCart(item)) {
+            if (checkInCartByInfo(item)) {
                 apiService.updateInRemoteCart(remove)
                     .onStart { _showLoading.value = true }
                     .onCompletion { _showLoading.value = false }
                     .collect {
                         when (it) {
-                            is Result.Success -> _productUpdatedInRemote.emit(item)
+                            is Result.Success -> _productUpdatedInRemote.emit(item.copy(count = 0))
                             is Result.Error -> {}
                         }
                     }

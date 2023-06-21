@@ -56,6 +56,12 @@ data class ActualBlocks(
     var discount: ProductMainPreviews? = null,
 )
 
+data class ImageProvider(
+    var productId: Int,
+    var categoryId: Int,
+    var image: Image,
+)
+
 fun <T> toCartDialogData(item: T): Bundle? {
     when (item) {
         is ProductMainPreview -> return bundleOf(
