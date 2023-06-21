@@ -32,7 +32,7 @@ class NoAuthFirstDialog :
     }
 
     var currentNumber: Pair<String?, String?> by Delegates.observable(Pair("", "")) { _, _, new ->
-        binding.getCodeBtn.isEnabled = new.first?.length == 11
+        binding.getCodeBtn.isEnabled = new.first?.length == 12
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,7 +97,7 @@ class NoAuthFirstDialog :
 
         override fun onTextFormatted(formatter: FormatWatcher?, newFormattedText: String?) {
             formatter?.apply {
-                val str = formatter.mask.toUnformattedString().filter { it.isDigit() }
+                val str = formatter.mask.toUnformattedString()
                 currentNumber = currentNumber.copy(first = str, second = newFormattedText)
             }
         }

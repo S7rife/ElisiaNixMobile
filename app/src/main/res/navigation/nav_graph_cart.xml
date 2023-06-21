@@ -10,6 +10,24 @@
         <action
             android:id="@+id/action_cartFragment_to_nav_graph_catalog"
             app:destination="@id/nav_graph_catalog" />
+        <action
+            android:id="@+id/action_cartFragment_to_cartOrderingFragment"
+            app:destination="@id/cartOrderingFragment" />
     </fragment>
     <include app:graph="@navigation/nav_graph_catalog" />
+    <fragment
+        android:id="@+id/cartOrderingFragment"
+        android:name="ru.feip.elisianix.cart.CartOrderingFragment"
+        android:label="CartOrderingFragment">
+        <action
+            android:id="@+id/action_cartOrderingFragment_to_nav_graph_catalog"
+            app:destination="@id/nav_graph_catalog" />
+        <action
+            android:id="@+id/action_cartOrderingFragment_to_cartOrderedDialog"
+            app:destination="@id/cartOrderedDialog" />
+    </fragment>
+    <dialog
+        android:id="@+id/cartOrderedDialog"
+        android:name="ru.feip.elisianix.cart.CartOrderedDialog"
+        android:label="CartOrderedDialog" />
 </navigation>

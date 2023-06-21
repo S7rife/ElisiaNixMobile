@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.flowOn
 import ru.feip.elisianix.common.db.UserInfo
 import ru.feip.elisianix.remote.models.Cart
 import ru.feip.elisianix.remote.models.CategoryMainPreview
+import ru.feip.elisianix.remote.models.PickupPoint
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreviews
 import ru.feip.elisianix.remote.models.RequestAuthSendCode
 import ru.feip.elisianix.remote.models.RequestAuthSendPhoneNumber
 import ru.feip.elisianix.remote.models.RequestCartItems
+import ru.feip.elisianix.remote.models.RequestOrder
 import ru.feip.elisianix.remote.models.RequestProductCart
 
 class ApiService {
@@ -65,6 +67,14 @@ class ApiService {
             .flowOn(Dispatchers.IO)
 
 
+    suspend fun toOrder(order: RequestOrder): Flow<Result<Int>> =
+        flow<Result<Int>> {
+            emit(Result.Success(api.toOrder(order)))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
     ///////////////////////////////////////////__AUTH__////////////////////////////////////////////
 
 
@@ -79,6 +89,17 @@ class ApiService {
     suspend fun sendAuthCode(phoneNumber: String, code: String): Flow<Result<UserInfo>> =
         flow<Result<UserInfo>> {
             emit(Result.Success(api.sendAuthCode(RequestAuthSendCode(phoneNumber, code))))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
+    ////////////////////////////////////////////__MAP__////////////////////////////////////////////
+
+
+    suspend fun getPickupPoints(): Flow<Result<List<PickupPoint>>> =
+        flow<Result<List<PickupPoint>>> {
+            emit(Result.Success(api.getPickupPoints()))
         }
             .catch { emit(Result.Error(it)) }
             .flowOn(Dispatchers.IO)

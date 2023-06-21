@@ -33,3 +33,26 @@ data class RequestAuthSendCode(
     @SerializedName("code")
     var code: String
 )
+
+data class RequestOrder(
+    @SerializedName("name")
+    var name: String,
+
+    @SerializedName("phone")
+    var phone: String,
+
+    @SerializedName("email")
+    var email: String,
+
+    @SerializedName("deliveryType")
+    var deliveryType: String,
+
+    @SerializedName("pickupPointId")
+    var pickupPointId: Int?,
+
+    @SerializedName("address")
+    var address: Address?,
+
+    @SerializedName("comment")
+    var comment: String?,
+)

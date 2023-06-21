@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraph
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
@@ -42,13 +43,13 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
     private lateinit var productCartAdapter: ProductCartListAdapter
     private lateinit var productLikedAdapter: ProductCategoryBlockMainListAdapter
-    private val cardDao = App.INSTANCE.db.CartDao()
+    private val cartDao = App.INSTANCE.db.CartDao()
     private val favDao = App.INSTANCE.db.FavoritesDao()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cardDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
+        cartDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
         favDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
 
         binding.apply {
@@ -69,10 +70,9 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                         id: Int,
                         colorId: Int,
                         sizeId: Int,
-                        position: Int,
                         view: View
                     ) {
-                        performCartItemActionsMenuClick(id, colorId, sizeId, position, view)
+                        performCartItemActionsMenuClick(id, colorId, sizeId, view)
                     }
                 },
             )
@@ -137,7 +137,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
     private fun updateUi() {
         val cartListVis = productCartAdapter.currentList.isNotEmpty()
-        val cartVis = cardDao.getAll().isNotEmpty()
+        val cartVis = cartDao.getAll().isNotEmpty()
         val likeVis = favDao.getAllButCart().isNotEmpty()
         binding.apply {
             emptyState.isVisible = !cartVis && !cartListVis
@@ -149,7 +149,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
     }
 
     private fun performCartItemActionsMenuClick(
-        id: Int, colorId: Int, sizeId: Int, pos: Int, view: View
+        id: Int, colorId: Int, sizeId: Int, view: View
     ) {
         val inCart = checkInFavorites(id)
         val path = view.findViewById<ImageView>(R.id.cartProductActions)
@@ -230,7 +230,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
     private fun goToCheckOut() {
         when (App.AUTH) {
-            true -> {}
+            true -> findNavController().navigate(R.id.action_cartFragment_to_cartOrderingFragment)
             false -> findNavController(requireActivity(), R.id.rootActivityContainer)
                 .navigate(
                     R.id.action_navBottomFragment_to_noAuthFirstFragment,

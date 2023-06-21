@@ -31,12 +31,23 @@ interface Api {
     suspend fun getCartNoAuth(@Body items: RequestCartItems): Cart
 
 
+    @POST("api/order")
+    suspend fun toOrder(@Body order: RequestOrder): Int
+
+
     //////////////////////////////////////////__AUTH__/////////////////////////////////////////////
 
 
     @POST("api/account/auth/call")
-    suspend fun sendPhoneNumber(@Body body: RequestAuthSendPhoneNumber): Unit
+    suspend fun sendPhoneNumber(@Body body: RequestAuthSendPhoneNumber)
 
     @POST("api/account/auth")
     suspend fun sendAuthCode(@Body body: RequestAuthSendCode): UserInfo
+
+
+    ///////////////////////////////////////////__MAP__/////////////////////////////////////////////
+
+
+    @GET("api/pickupPoints")
+    suspend fun getPickupPoints(): List<PickupPoint>
 }

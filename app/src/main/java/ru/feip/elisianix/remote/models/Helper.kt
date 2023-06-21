@@ -1,7 +1,9 @@
 package ru.feip.elisianix.remote.models
 
+import android.content.Context
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import ru.feip.elisianix.R
 
 fun Boolean.toInt() = if (this) 1 else 0
 
@@ -83,4 +85,47 @@ val emptyAuthBundle = bundleOf("from_cart" to false)
 fun sortPreviewsItems(items: List<ProductMainPreview>): List<ProductMainPreview> {
     return items.sortedWith(
         compareByDescending<ProductMainPreview> { it.name }.thenByDescending { it.id })
+}
+
+fun pickupPointParse(point: PickupPoint): PickupPoint {
+    val parts = point.coordinates.split("\\s".toRegex())
+    return point.copy(
+        cooParse = Pair(parts[0].toDouble(), parts[1].toDouble()),
+        workHours = point.workHours.map {
+            it.copy(to = it.to.dropLast(3), from = it.from.dropLast(3))
+        }
+    )
+}
+
+fun Context.parseDays(point: PickupPoint): PickupPoint {
+    val parsed = point.copy(
+        workHours = point.workHours.map {
+            it.copy(day = parseDayOfWeek(it.day, this))
+        }
+    )
+    return parsed.copy(dayHoursOneLine = daysHoursToLine(parsed))
+}
+
+fun parseDayOfWeek(day: String, context: Context): String {
+    val resourceId: Int =
+        context.resources.getIdentifier(day.lowercase(), "string", context.packageName)
+    return context.resources.getString(resourceId)
+}
+
+fun daysHoursToLine(point: PickupPoint): String {
+    fun WorkHours.toKey() = Pair(from, to)
+
+    val b = point.workHours.groupBy { it.toKey() }
+
+    val line = b.map { map ->
+        when (map.value.size) {
+            1 -> "${map.value.first().day}: ${map.key.first} - ${map.key.second}"
+            else -> "${map.value.first().day}-${map.value.last().day}: ${map.key.first} - ${map.key.second}"
+        }
+    }
+    return line.joinToString(separator = ", ")
+}
+
+fun Context.getEmptyError(field: CharSequence?): String {
+    return "$field ${this.getString(R.string.empty_error)}"
 }

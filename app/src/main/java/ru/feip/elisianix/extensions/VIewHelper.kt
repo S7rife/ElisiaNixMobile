@@ -60,6 +60,12 @@ fun TextView.setSelectorPaint(selected: Boolean) {
     this.paint.typeface = p.typeface
 }
 
+fun TextView.setUnderline() {
+    val p = Paint()
+    p.flags = Paint.UNDERLINE_TEXT_FLAG
+    this.paintFlags = p.flags
+}
+
 fun TextView.addUnderBoldPart(bold: String) {
     val extra = bold.toSpannable()
     extra.setSpan(UnderlineSpan(), 0, extra.length, 0)

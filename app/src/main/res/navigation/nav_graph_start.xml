@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_navBottomFragment_to_noAuthFirstFragment"
             app:destination="@id/noAuthFirstDialog" />
+        <action
+            android:id="@+id/action_navBottomFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
     <fragment
         android:id="@+id/catalogProductImageViewerFragment"
@@ -44,4 +47,8 @@
         android:id="@+id/noAuthSecondDialog"
         android:name="ru.feip.elisianix.start.NoAuthSecondDialog"
         android:label="NoAuthSecondDialog" />
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="ru.feip.elisianix.cart.MapFragment"
+        android:label="MapFragment" />
 </navigation>

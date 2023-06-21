@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.kapt'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
@@ -84,4 +85,6 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     implementation 'ru.tinkoff.decoro:decoro:1.5.2'
+
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 }
