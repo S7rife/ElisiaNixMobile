@@ -47,6 +47,9 @@ class CatalogProductFragment :
         ViewModelProvider(this)[CatalogProductViewModel::class.java]
     }
 
+    private val cartDao = App.INSTANCE.db.CartDao()
+    private val favDao = App.INSTANCE.db.FavoritesDao()
+
     private lateinit var productImageAdapter: ProductImageListAdapter
     private lateinit var productColorAdapter: ProductColorListAdapter
     private lateinit var productSizeAdapter: ProductSizeListAdapter
@@ -68,7 +71,6 @@ class CatalogProductFragment :
             productSizeAdapter.currentPos = sizePosition
             productSizeAdapter.notifyItemChanged(sizePosition)
             currentProduct = currentProduct.copy(sizeId = selectedSizeId)
-            editItemInCart(currentProduct)
         }
     }
 
@@ -84,11 +86,11 @@ class CatalogProductFragment :
         val toFavoriteBtn = binding.toolbar.menu.findItem(R.id.productNotInFavorites)
         val removeFavoriteBtn = binding.toolbar.menu.findItem(R.id.productInFavorites)
 
-        App.INSTANCE.db.CartDao().checkCntLive().observe(viewLifecycleOwner) {
+        cartDao.checkCntLive().observe(viewLifecycleOwner) {
             updateAdapterFromOther()
             productInCart = checkInCart(currentProduct)
         }
-        App.INSTANCE.db.FavoritesDao().checkCntLive().observe(viewLifecycleOwner) {
+        favDao.checkCntLive().observe(viewLifecycleOwner) {
             updateAdapterFromOther()
             val inFav = checkInFavorites(productId)
             toFavoriteBtn.isVisible = !inFav.also { toFavoriteBtn.isEnabled = !inFav }
@@ -183,6 +185,10 @@ class CatalogProductFragment :
             .onEach { binding.loader.isVisible = it }
             .launchWhenStarted(lifecycleScope)
 
+        viewModel.productUpdatedInRemote
+            .onEach { editItemInCart(it) }
+            .launchWhenStarted(lifecycleScope)
+
         viewModel.product
             .onEach { prod ->
                 viewModel.getProductRecs(prod.category.id)
@@ -259,7 +265,10 @@ class CatalogProductFragment :
             }
             productCartBtn.setOnClickListener {
                 if (currentProduct.sizeId != -1) {
-                    editItemInCart(currentProduct)
+                    when (App.AUTH) {
+                        true -> viewModel.updateItemInRemoteCart(currentProduct)
+                        false -> editItemInCart(currentProduct)
+                    }
                 } else {
                     val availableSizes = prod.sizes.filter { it.available > 0 }.map { it.value }
                     val sizeIds = prod.sizes.map { it.id.toString() }

@@ -64,10 +64,13 @@ class CartOrderingFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findNavController(requireActivity(), R.id.rootActivityContainer)
-            .currentBackStackEntry?.savedStateHandle?.getLiveData<Int>("map_choose_result")
+        val state = findNavController(requireActivity(), R.id.rootActivityContainer)
+            .currentBackStackEntry?.savedStateHandle
+
+        state?.getLiveData<Int>("map_choose_result")
             ?.observe(viewLifecycleOwner) { pointId ->
                 currentPlace = pickupPoints.first { it.id == pointId }
+                state.clearSavedStateProvider("map_choose_result")
             }
 
         cartDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
@@ -138,6 +141,15 @@ class CartOrderingFragment :
             .onEach { binding.loader.isVisible = it }
             .launchWhenStarted(lifecycleScope)
 
+        viewModel.productUpdatedInRemote
+            .onEach {
+                editItemInCart(it)
+                if (cartDao.checkCnt() < 1) {
+                    findNavController().popBackStack()
+                }
+            }
+            .launchWhenStarted(lifecycleScope)
+
         viewModel.orderId
             .onEach { goToOrdered(it) }
             .launchWhenStarted(lifecycleScope)
@@ -164,6 +176,7 @@ class CartOrderingFragment :
             .launchWhenStarted(lifecycleScope)
 
         setUpTextFields()
+        currentPlace = currentPlace
     }
 
     private fun updateUi() {
@@ -200,7 +213,8 @@ class CartOrderingFragment :
                     }
 
                     R.id.cartRemove -> {
-                        editItemInCart(CartItem(-1, id, colorId, sizeId, 1))
+                        val cartItem = CartItem(-1, id, colorId, sizeId, 0)
+                        viewModel.removeFromRemoteCart(cartItem)
                         return true
                     }
                 }
@@ -211,9 +225,6 @@ class CartOrderingFragment :
     }
 
     private fun updateAdaptersFromOther() {
-        if (cartDao.checkCnt() < 1) {
-            findNavController().popBackStack()
-        }
         val lst = productCartAdapter.currentList
         productCartAdapter.submitList(lst.filter { checkInCart(it) })
         updateUi()

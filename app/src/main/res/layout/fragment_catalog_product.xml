@@ -15,8 +15,8 @@
             android:id="@+id/productAllContainer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:overScrollMode="never"
             android:clipChildren="false"
+            android:overScrollMode="never"
             android:visibility="gone">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,8 +35,8 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerProductImage"
                         android:layout_width="match_parent"
-                        android:overScrollMode="never"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        android:overScrollMode="never" />
 
                     <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
                         android:id="@+id/recyclerProductImageIndicator"
@@ -176,9 +176,9 @@
                         android:id="@+id/recyclerColorSelector"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:overScrollMode="never"
                         android:layout_marginTop="12dp"
                         android:layout_marginEnd="-16dp"
+                        android:overScrollMode="never"
                         app:layout_constraintTop_toBottomOf="@id/productColorContainer" />
 
                     <TextView
@@ -194,10 +194,10 @@
                         android:id="@+id/recyclerSizeSelector"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:overScrollMode="never"
                         android:layout_marginTop="12dp"
                         android:layout_marginEnd="-8dp"
                         android:clipChildren="false"
+                        android:overScrollMode="never"
                         app:layout_constraintTop_toBottomOf="@id/productSize" />
 
                     <TextView
@@ -260,9 +260,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:overScrollMode="never"
                     android:layout_marginBottom="20dp"
                     android:clipToPadding="false"
+                    android:overScrollMode="never"
                     android:paddingHorizontal="12dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -280,20 +280,27 @@
         app:navigationIcon="@drawable/ic_back_arrow"
         app:titleCentered="true" />
 
-    <com.google.android.material.card.MaterialCardView
+    <LinearLayout
         android:id="@+id/productCartBtnContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/productCartBtn"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:paddingVertical="13dp" />
-    </com.google.android.material.card.MaterialCardView>
+            app:cardCornerRadius="0sp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/productCartBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:paddingVertical="13dp" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/loader"

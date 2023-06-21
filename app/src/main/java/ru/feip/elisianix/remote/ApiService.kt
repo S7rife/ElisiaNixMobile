@@ -8,14 +8,17 @@ import kotlinx.coroutines.flow.flowOn
 import ru.feip.elisianix.common.db.UserInfo
 import ru.feip.elisianix.remote.models.Cart
 import ru.feip.elisianix.remote.models.CategoryMainPreview
+import ru.feip.elisianix.remote.models.OrderIdResponse
 import ru.feip.elisianix.remote.models.PickupPoint
 import ru.feip.elisianix.remote.models.ProductDetail
 import ru.feip.elisianix.remote.models.ProductMainPreviews
+import ru.feip.elisianix.remote.models.RemoteCartItemInfo
 import ru.feip.elisianix.remote.models.RequestAuthSendCode
 import ru.feip.elisianix.remote.models.RequestAuthSendPhoneNumber
 import ru.feip.elisianix.remote.models.RequestCartItems
 import ru.feip.elisianix.remote.models.RequestOrder
 import ru.feip.elisianix.remote.models.RequestProductCart
+import ru.feip.elisianix.remote.models.RequestProductCartUpdate
 
 class ApiService {
     private val api = NetworkService().retrofit.create(Api::class.java)
@@ -67,8 +70,24 @@ class ApiService {
             .flowOn(Dispatchers.IO)
 
 
-    suspend fun toOrder(order: RequestOrder): Flow<Result<Int>> =
-        flow<Result<Int>> {
+    suspend fun addToRemoteCart(productsInCart: RequestProductCart): Flow<Result<RemoteCartItemInfo>> =
+        flow<Result<RemoteCartItemInfo>> {
+            emit(Result.Success(api.addToRemoteCart(productsInCart)))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
+    suspend fun updateInRemoteCart(productsInCart: RequestProductCartUpdate): Flow<Result<Cart>> =
+        flow<Result<Cart>> {
+            emit(Result.Success(api.updateInRemoteCart(productsInCart)))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
+    suspend fun toOrder(order: RequestOrder): Flow<Result<OrderIdResponse>> =
+        flow<Result<OrderIdResponse>> {
             emit(Result.Success(api.toOrder(order)))
         }
             .catch { emit(Result.Error(it)) }

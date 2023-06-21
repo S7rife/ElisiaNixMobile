@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.App
+import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
@@ -17,6 +18,7 @@ import ru.feip.elisianix.remote.models.CartItemRemote
 import ru.feip.elisianix.remote.models.PickupPoint
 import ru.feip.elisianix.remote.models.RequestOrder
 import ru.feip.elisianix.remote.models.RequestProductCart
+import ru.feip.elisianix.remote.models.RequestProductCartUpdate
 import ru.feip.elisianix.remote.models.pickupPointParse
 
 class CartOrderingViewModel : ViewModel() {
@@ -26,12 +28,14 @@ class CartOrderingViewModel : ViewModel() {
     private val _success = MutableStateFlow(false)
     private val _cart = MutableSharedFlow<Cart>(replay = 1)
     private val _pickupPoints = MutableSharedFlow<List<PickupPoint>>(replay = 1)
-    private val _orderId = MutableSharedFlow<Int>(replay = 1)
+    private val _orderId = MutableSharedFlow<Int>(replay = 0)
+    private val _productUpdatedInRemote = MutableSharedFlow<CartItem>(replay = 0)
 
     val showLoading get() = _showLoading
     val pickupPoints get() = _pickupPoints
     val orderId get() = _orderId
     val cart get() = _cart
+    val productUpdatedInRemote get() = _productUpdatedInRemote
 
     fun getCartNoAuth() {
         viewModelScope.launch {
@@ -127,7 +131,7 @@ class CartOrderingViewModel : ViewModel() {
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _orderId.emit(it.result)
+                                is Result.Success -> _orderId.emit(it.result.id)
                                 is Result.Error -> {}
                             }
                         }
@@ -140,11 +144,28 @@ class CartOrderingViewModel : ViewModel() {
                         .onCompletion { _showLoading.value = false }
                         .collect {
                             when (it) {
-                                is Result.Success -> _orderId.emit(it.result)
+                                is Result.Success -> _orderId.emit(it.result.id)
                                 is Result.Error -> {}
                             }
                         }
                 }
+            }
+        }
+    }
+
+    fun removeFromRemoteCart(item: CartItem) {
+        val remove = RequestProductCartUpdate(item.productId, item.sizeId, item.colorId, 0)
+        viewModelScope.launch {
+            if (checkInCart(item)) {
+                apiService.updateInRemoteCart(remove)
+                    .onStart { _showLoading.value = true }
+                    .onCompletion { _showLoading.value = false }
+                    .collect {
+                        when (it) {
+                            is Result.Success -> _productUpdatedInRemote.emit(item)
+                            is Result.Error -> {}
+                        }
+                    }
             }
         }
     }

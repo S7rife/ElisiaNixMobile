@@ -119,18 +119,18 @@ fun ImageView.setCartStatus(inCart: Boolean, large: Boolean = false) {
     this.setImageDrawable(ContextCompat.getDrawable(this.context, newImg))
 }
 
-fun MaterialButton.withColors(activated: Boolean, lock: Boolean = false) {
-    val gray = resources.getColor(R.color.black60, context?.theme)
-    this.isEnabled = !lock
-    this.isClickable = !lock
-    var black = Color.BLACK
-    var white = Color.WHITE
+fun MaterialButton.withColors(activated: Boolean, enabled: Boolean = true) {
+    when (enabled) {
+        false -> this.isEnabled = false
+        true -> {
+            var black = Color.BLACK
+            var white = Color.WHITE
 
-    if (activated) black = white.also { white = black }
-    this.setBackgroundColor(black)
-
-    if (lock) this.setBackgroundColor(gray)
-    this.setTextColor(white)
+            if (activated) black = white.also { white = black }
+            this.setBackgroundColor(black)
+            this.setTextColor(white)
+        }
+    }
 }
 
 fun ImageView.setFavoriteStatus(inFavorites: Boolean) {

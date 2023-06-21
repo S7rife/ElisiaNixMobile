@@ -207,3 +207,19 @@ data class Cart(
     @SerializedName("finalPrice")
     var finalPrice: Double,
 )
+
+data class RemoteCartItemInfo(
+    @SerializedName("productId")
+    var productId: Int,
+
+    @SerializedName("productsInBasketCount")
+    var productsInBasketCount: Int,
+
+    @SerializedName("basketTotalCount")
+    var basketTotalCount: Int
+)
+
+data class OrderIdResponse(
+    @SerializedName("id")
+    var id: Int
+)

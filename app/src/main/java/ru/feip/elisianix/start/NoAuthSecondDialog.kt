@@ -90,6 +90,10 @@ class NoAuthSecondDialog :
             .onEach { binding.loader.isVisible = it }
             .launchWhenStarted(lifecycleScope)
 
+        viewModel.productsAdded
+            .onEach { dismiss() }
+            .launchWhenStarted(lifecycleScope)
+
         viewModel.success
             .onEach {
                 if (!it) {
@@ -108,7 +112,7 @@ class NoAuthSecondDialog :
                 App.INSTANCE.db.UserInfoDao().insert(it)
                 App.AUTH = true
                 back = false
-                dismiss()
+                viewModel.addProductsToRemoteCart()
             }
             .launchWhenStarted(lifecycleScope)
     }

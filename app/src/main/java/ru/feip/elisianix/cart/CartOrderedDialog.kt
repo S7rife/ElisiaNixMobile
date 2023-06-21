@@ -1,8 +1,11 @@
 package ru.feip.elisianix.cart
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.navigation.fragment.findNavController
 import ru.feip.elisianix.R
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseBottomDialog
 import ru.feip.elisianix.databinding.DialogCartOrderedBinding
 
@@ -24,13 +27,19 @@ class CartOrderedDialog :
             youtubeBtn.isChecked = true
             telegramBtn.isChecked = true
         }
+        App.INSTANCE.db.CartDao().deleteAll()
     }
 
     private fun initMessage() {
         binding.apply {
             val message =
-                "${getString(R.string.thanks_order)} $orderNumber ${getString(R.string.has_been_completed)}"
+                "${getString(R.string.thanks_order)}$orderNumber ${getString(R.string.has_been_completed)}"
             orderedMessage.text = message
         }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        findNavController().popBackStack(R.id.cartOrderingFragment, true)
+        super.onDismiss(dialog)
     }
 }

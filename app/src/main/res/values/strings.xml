@@ -83,7 +83,7 @@
     <string name="order_details">Order details important to you</string>
     <string name="your_order">Your order</string>
     <string name="view_map">View on the map</string>
-    <string name="thanks_order">Thank you, your order</string>
+    <string name="thanks_order">Thank you, your order №</string>
     <string name="has_been_completed">has been completed!</string>
     <string name="manager_will_contact">The manager will contact you to clarify the details</string>
     <string name="vk">Vkontakte</string>

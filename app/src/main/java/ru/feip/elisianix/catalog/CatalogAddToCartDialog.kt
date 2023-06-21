@@ -2,17 +2,24 @@ package ru.feip.elisianix.catalog
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import kotlinx.coroutines.flow.onEach
 import ru.feip.elisianix.R
 import ru.feip.elisianix.adapters.ColorSelectorGridListAdapter
 import ru.feip.elisianix.adapters.SizeSelectorGridListAdapter
+import ru.feip.elisianix.catalog.view_models.CatalogAddToCartViewModel
+import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.BaseBottomDialog
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
 import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.databinding.DialogAddToCartBinding
 import ru.feip.elisianix.extensions.disableAnimation
+import ru.feip.elisianix.extensions.launchWhenStarted
 import ru.feip.elisianix.extensions.withColors
 import ru.feip.elisianix.remote.models.ProductColor
 import ru.feip.elisianix.remote.models.SizeMap
@@ -22,6 +29,10 @@ import kotlin.properties.Delegates
 class CatalogAddToCartDialog :
     BaseBottomDialog<DialogAddToCartBinding>(R.layout.dialog_add_to_cart) {
 
+    private val viewModel by lazy {
+        ViewModelProvider(this)[CatalogAddToCartViewModel::class.java]
+    }
+
     private lateinit var productSizeAdapter: SizeSelectorGridListAdapter
     private lateinit var productColorAdapter: ColorSelectorGridListAdapter
     var productId = 0
@@ -29,6 +40,23 @@ class CatalogAddToCartDialog :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         productId = requireArguments().getInt("product_id")
+    }
+
+    private var currentProduct: CartItem by Delegates.observable(
+        CartItem(0, 0, 0, -1, 1)
+    ) { _, _, newProduct -> productInCart = checkInCart(newProduct) }
+
+    private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
+        binding.apply {
+            cartBtn.isEnabled = currentProduct.sizeId != -1
+            if (currentProduct.sizeId != -1) {
+                cartBtn.withColors(inCart)
+            }
+            cartBtn.text = when (inCart) {
+                true -> getString(R.string.in_the_cart)
+                false -> getString(R.string.to_cart)
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,24 +85,27 @@ class CatalogAddToCartDialog :
             }
 
             cartBtn.setOnClickListener {
-                editItemInCart(currentProduct)
-                currentProduct = currentProduct
+                when (App.AUTH) {
+                    true -> viewModel.updateItemInRemoteCart(currentProduct)
+                    false -> {
+                        editItemInCart(currentProduct)
+                        currentProduct = currentProduct
+                    }
+                }
             }
         }
+
+        viewModel.showLoading
+            .onEach { binding.loader.isVisible = it }
+            .launchWhenStarted(lifecycleScope)
+
+        viewModel.productUpdatedInRemote
+            .onEach {
+                editItemInCart(it)
+                currentProduct = currentProduct
+            }
+            .launchWhenStarted(lifecycleScope)
     }
-
-    private var productInCart: Boolean by Delegates.observable(false) { _, _, inCart ->
-        binding.cartBtn.withColors(inCart, currentProduct.sizeId == -1)
-        binding.cartBtn.text = when (inCart) {
-            true -> getString(R.string.in_the_cart)
-            false -> getString(R.string.to_cart)
-        }
-    }
-
-    private var currentProduct: CartItem by Delegates.observable(
-        CartItem(0, 0, 0, -1, 1)
-    ) { _, _, newProduct -> productInCart = checkInCart(newProduct) }
-
 
     private fun initColorAdapter(lst: List<ProductColor>) {
         productColorAdapter = ColorSelectorGridListAdapter {

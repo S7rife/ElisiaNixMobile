@@ -16,6 +16,20 @@ data class RequestProductCart(
     var count: Int
 )
 
+data class RequestProductCartUpdate(
+    @SerializedName("productId")
+    var productId: Int,
+
+    @SerializedName("sizeId")
+    var sizeId: Int,
+
+    @SerializedName("colorId")
+    var colorId: Int,
+
+    @SerializedName("newCount")
+    var newCount: Int
+)
+
 data class RequestCartItems(
     @SerializedName("items")
     var items: List<RequestProductCart>

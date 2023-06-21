@@ -113,6 +113,10 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             .onEach { binding.loader.isVisible = it }
             .launchWhenStarted(lifecycleScope)
 
+        viewModel.productUpdatedInRemote
+            .onEach { editItemInCart(it) }
+            .launchWhenStarted(lifecycleScope)
+
         viewModel.cart
             .onEach { cart ->
                 productCartAdapter.submitList(cart.items.filter { checkInCart(it) })
@@ -172,7 +176,11 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
                     }
 
                     R.id.cartRemove -> {
-                        editItemInCart(CartItem(-1, id, colorId, sizeId, 1))
+                        val cartItem = CartItem(-1, id, colorId, sizeId, 1)
+                        when (App.AUTH) {
+                            true -> viewModel.updateItemInRemoteCart(cartItem)
+                            false -> editItemInCart(cartItem)
+                        }
                         return true
                     }
                 }

@@ -9,69 +9,21 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCart
-import ru.feip.elisianix.common.db.checkInFavorites
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
-import ru.feip.elisianix.remote.models.ProductDetail
-import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.RequestProductCart
 import ru.feip.elisianix.remote.models.RequestProductCartUpdate
 
-class CatalogProductViewModel : ViewModel() {
+class CatalogSizeSelectorViewModel : ViewModel() {
 
     private val apiService = ApiService()
 
     private val _showLoading = MutableStateFlow(false)
     private val _success = MutableStateFlow(false)
-    private val _product = MutableSharedFlow<ProductDetail>(replay = 1)
-    private val _productRecs = MutableSharedFlow<List<ProductMainPreview>>(replay = 1)
     private val _productUpdatedInRemote = MutableSharedFlow<CartItem>(replay = 0)
 
     val showLoading get() = _showLoading
-    val product get() = _product
-    val productRecs get() = _productRecs
     val productUpdatedInRemote get() = _productUpdatedInRemote
-
-
-    fun getProductDetail(productId: Int) {
-        viewModelScope.launch {
-            apiService.getProductDetail(productId)
-                .onStart { _showLoading.value = true }
-                .onCompletion { _showLoading.value = false }
-                .collect {
-                    when (it) {
-                        is Result.Success -> {
-                            _product.emit(it.result)
-                        }
-
-                        is Result.Error -> {}
-                    }
-                }
-        }
-    }
-
-    fun getProductRecs(categoryId: Int) {
-        viewModelScope.launch {
-            apiService.getProductRecs(categoryId)
-                .onStart { _showLoading.value = true }
-                .onCompletion { _showLoading.value = false }
-                .collect {
-                    when (it) {
-                        is Result.Success -> {
-                            val productsTransform = it.result.products.map { prod ->
-                                prod.copy(
-                                    inCart = checkInCart(prod.id),
-                                    inFavorites = checkInFavorites(prod.id)
-                                )
-                            }
-                            _productRecs.emit(productsTransform)
-                        }
-
-                        is Result.Error -> {}
-                    }
-                }
-        }
-    }
 
     fun updateItemInRemoteCart(item: CartItem) {
         val add = RequestProductCart(item.productId, item.sizeId, item.colorId, 1)
