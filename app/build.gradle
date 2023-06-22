@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace 'ru.feip.elisianix'
+    namespace 'ru.feip.lemodel'
     compileSdk 33
 
     defaultConfig {
-        applicationId "ru.feip.elisianix"
+        applicationId 'ru.feip.lemodel'
         minSdk 29
         targetSdk 33
         versionCode 1
