@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">Elisia Nix</string>
+    <string name="app_name">Le-Model</string>
     <string name="catalog">Catalog</string>
     <string name="cart">Cart</string>
     <string name="favorite">Favorite</string>
     <string name="profile">Profile</string>
     <string name="new_arrivals">New Arrivals</string>
     <string name="discounts">Discounts</string>
-    <string name="new_">New</string>
+    <string name="new_" translatable="false">New</string>
     <string name="best_price">Best price</string>
     <string name="search">Search</string>
     <string name="sorting">Sorting</string>
@@ -30,7 +30,7 @@
     <string name="size">Size</string>
     <string name="category">Category</string>
     <string name="preposition_of">of</string>
-    <string name="currency">₽</string>
+    <string name="currency" translatable="false">₽</string>
     <string name="stock_unit">pcs.</string>
     <string name="close">Close</string>
     <string name="cart_is_empty">Cart is currently empty. Choose\nsomething in the catalog</string>
@@ -41,7 +41,7 @@
     <string name="bust_girth">Bust girth</string>
     <string name="waist_girth">Waist girth</string>
     <string name="hip_girth">Hip girth</string>
-    <string name="rus">rus</string>
+    <string name="rus" translatable="false">rus</string>
     <string name="cm">cm</string>
     <string name="select_size">Select size</string>
     <string name="select_color_and_size">Select color and size</string>
@@ -68,7 +68,7 @@
     <string name="ordering">Ordering</string>
     <string name="name_silent_hint">Namе</string>
     <string name="checkout">Checkout</string>
-    <string name="email">E-mail</string>
+    <string name="email" translatable="false">E-mail</string>
     <string name="way_to_get">Way to get</string>
     <string name="pickup_from_showroom">Pickup from showroom</string>
     <string name="delivery">Delivery</string>
@@ -86,9 +86,9 @@
     <string name="thanks_order">Thank you, your order №</string>
     <string name="has_been_completed">has been completed!</string>
     <string name="manager_will_contact">The manager will contact you to clarify the details</string>
-    <string name="vk">Vkontakte</string>
-    <string name="youtube">Youtube</string>
-    <string name="telegram">Telegram</string>
+    <string name="vk" translatable="false">Vkontakte</string>
+    <string name="youtube" translatable="false">Youtube</string>
+    <string name="telegram" translatable="false">Telegram</string>
     <string name="choose">Choose</string>
     <string name="monday">Mo</string>
     <string name="tuesday">Th</string>
@@ -99,4 +99,7 @@
     <string name="sunday">Su</string>
     <string name="empty_error">can not be empty</string>
     <string name="incorrect_error">is incorrect</string>
+    <string name="newest">Sort newest</string>
+    <string name="bypriceasc">Sorting by price ascending</string>
+    <string name="bypricedesc">Sorting by price descending</string>
 </resources>

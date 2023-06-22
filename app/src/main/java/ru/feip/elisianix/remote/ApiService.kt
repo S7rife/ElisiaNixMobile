@@ -70,6 +70,14 @@ class ApiService {
             .flowOn(Dispatchers.IO)
 
 
+    suspend fun getCartFromRemote(): Flow<Result<Cart>> =
+        flow<Result<Cart>> {
+            emit(Result.Success(api.getCartFromRemote()))
+        }
+            .catch { emit(Result.Error(it)) }
+            .flowOn(Dispatchers.IO)
+
+
     suspend fun addToRemoteCart(productsInCart: RequestProductCart): Flow<Result<RemoteCartItemInfo>> =
         flow<Result<RemoteCartItemInfo>> {
             emit(Result.Success(api.addToRemoteCart(productsInCart)))

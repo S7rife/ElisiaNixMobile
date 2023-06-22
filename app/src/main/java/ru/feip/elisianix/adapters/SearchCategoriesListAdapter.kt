@@ -32,7 +32,9 @@ class SearchCategoriesListAdapter(
         fun bind(item: Category) {
             binding.apply {
                 Glide.with(itemView).load(item.image.url)
-                    .error(R.drawable.ic_no_image)
+                    .timeout(60000)
+                    .placeholder(R.drawable.shape_placeholder)
+                    .error(R.drawable.shape_placeholder)
                     .into(searchToolImage)
                 searchToolName.text = item.name
             }

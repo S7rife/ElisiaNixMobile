@@ -24,6 +24,7 @@ import ru.feip.elisianix.extensions.smoothScrollToTop
 import ru.feip.elisianix.remote.models.ProductMainPreview
 import ru.feip.elisianix.remote.models.SearchSettings
 import ru.feip.elisianix.remote.models.emptyAuthBundle
+import ru.feip.elisianix.remote.models.getFromLocale
 import ru.feip.elisianix.remote.models.sortMethods
 import ru.feip.elisianix.remote.models.toCartDialogData
 import kotlin.properties.Delegates
@@ -160,7 +161,7 @@ class CatalogCategoryFragment :
             toolbar.menu.findItem(R.id.categoryToolbarClose).isVisible = focus
             toolbar.menu.findItem(R.id.categoryToolbarSearch).isVisible = !focus
 
-            categorySortingBtn.text = searchSettings.sortMethod.value.third
+            categorySortingBtn.text = searchSettings.sortMethod.getFromLocale(requireContext())
             currentSearchQuery.text = searchSettings.query.orEmpty()
         }
     }

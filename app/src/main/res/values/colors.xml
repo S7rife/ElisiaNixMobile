@@ -14,4 +14,6 @@
     <color name="black30">#4D000000</color>
     <color name="black10">#1A000000</color>
     <color name="transparent">#00000000</color>
+
+    <color name="graphite">#515562</color>
 </resources>

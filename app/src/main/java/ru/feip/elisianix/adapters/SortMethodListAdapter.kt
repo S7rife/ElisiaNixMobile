@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.feip.elisianix.R
 import ru.feip.elisianix.databinding.ItemSortMethodBinding
 import ru.feip.elisianix.remote.models.SortMethod
+import ru.feip.elisianix.remote.models.getFromLocale
 
 
 class SortMethodListAdapter(
@@ -48,7 +49,7 @@ class SortMethodListAdapter(
 
         fun bind(item: SortMethod) {
             binding.apply {
-                sortMethodName.text = item.value.third
+                sortMethodName.text = item.getFromLocale(itemView.context)
             }
         }
     }

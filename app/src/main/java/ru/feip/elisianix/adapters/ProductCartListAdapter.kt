@@ -71,7 +71,9 @@ class ProductCartListAdapter(
         fun bind(item: CartItemRemote) {
             binding.apply {
                 Glide.with(itemView).load(item.productImage.url)
-                    .error(R.drawable.ic_no_image)
+                    .timeout(60000)
+                    .placeholder(R.drawable.shape_placeholder)
+                    .error(R.drawable.shape_placeholder)
                     .into(cartProductImage)
                 cartProductName.text = item.name
                 cartProductBrand.text = item.brand.name

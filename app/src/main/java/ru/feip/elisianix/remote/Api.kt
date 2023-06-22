@@ -30,6 +30,9 @@ interface Api {
     @POST("api/basket/basketInfo")
     suspend fun getCartNoAuth(@Body items: RequestCartItems): Cart
 
+    @GET("api/basket")
+    suspend fun getCartFromRemote(): Cart
+
     @POST("api/basket")
     suspend fun addToRemoteCart(@Body item: RequestProductCart): RemoteCartItemInfo
 

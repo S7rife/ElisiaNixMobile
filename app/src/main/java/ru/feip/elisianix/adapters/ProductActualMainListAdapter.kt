@@ -89,16 +89,20 @@ class ProductActualMainListAdapter(
         fun bind(item: ProductMainPreview) {
             binding.apply {
                 Glide.with(itemView).load(item.images[0].url)
-                    .error(R.drawable.ic_no_image)
+                    .timeout(60000)
+                    .placeholder(R.drawable.shape_placeholder)
+                    .error(R.drawable.shape_placeholder)
                     .into(productImage)
 
                 productName.text = item.name
                 productActualTag.text = actualName
 
                 productNewPrice.inCurrency(item.price)
-                productOldPrice.inCurrency(item.price)
-                productOldPrice.addStrikethrough()
-                // TODO change old price with remote
+
+                if (!currentList.all { it.isNew }) {
+                    productOldPrice.inCurrency(item.price * 1.5)
+                    productOldPrice.addStrikethrough()
+                }
 
                 productCartBtn.setCartStatus(item.inCart, true)
                 productFavoriteBtn.setFavoriteStatus(item.inFavorites)

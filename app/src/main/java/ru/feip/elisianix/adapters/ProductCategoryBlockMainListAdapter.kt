@@ -86,7 +86,9 @@ class ProductCategoryBlockMainListAdapter(
         fun bind(item: ProductMainPreview) {
             binding.apply {
                 Glide.with(itemView).load(item.images[0].url)
-                    .error(R.drawable.ic_no_image)
+                    .timeout(60000)
+                    .placeholder(R.drawable.shape_placeholder)
+                    .error(R.drawable.shape_placeholder)
                     .into(productImage)
                 productName.text = item.name
                 productPrice.inCurrency(item.price)

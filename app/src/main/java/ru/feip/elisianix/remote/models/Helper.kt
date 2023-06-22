@@ -31,6 +31,17 @@ enum class SortMethod(val value: Triple<Int, String?, String>) {
     PRICE_DESC(Triple(2, "ByPriceDesc", "sorting by price descending")),
 }
 
+fun SortMethod.getFromLocale(context: Context): String {
+    val a = this.value.second
+    val resourceId: Int =
+        context.resources.getIdentifier(
+            this.value.second!!.lowercase(),
+            "string",
+            context.packageName
+        )
+    return context.resources.getString(resourceId)
+}
+
 val sortMethods: List<SortMethod> = listOf(
     SortMethod.NEWEST,
     SortMethod.PRICE_ASC,
