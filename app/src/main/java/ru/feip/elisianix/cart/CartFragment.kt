@@ -93,7 +93,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
 
             productLikedAdapter = ProductCategoryBlockMainListAdapter(
                 {
-                    toProductScreen(it.id)
+                    toProductScreen(it.id, it.category.id)
                 },
                 {
                     openAddToCartDialog(it)
@@ -228,7 +228,12 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
         }
     }
 
-    private fun toProductScreen(productId: Int, colorId: Int? = null, sizeId: Int? = null) {
+    private fun toProductScreen(
+        productId: Int,
+        categoryId: Int,
+        colorId: Int? = null,
+        sizeId: Int? = null
+    ) {
         val navController = findNavController(requireView())
         val graph = navController.graph
         val walletGraph = graph.findNode(R.id.nav_graph_catalog) as NavGraph
@@ -237,6 +242,7 @@ class CartFragment : BaseFragment<FragmentCartBinding>(R.layout.fragment_cart) {
             R.id.action_cartFragment_to_nav_graph_catalog,
             bundleOf(
                 "product_id" to productId,
+                "category_id" to categoryId,
                 "color_id" to colorId,
                 "size_id" to sizeId
             )
