@@ -11,6 +11,7 @@ import ru.feip.elisianix.common.App
 import ru.feip.elisianix.common.db.CartItem
 import ru.feip.elisianix.common.db.checkInCartByInfo
 import ru.feip.elisianix.common.db.deleteItemInCart
+import ru.feip.elisianix.common.db.editItemInCart
 import ru.feip.elisianix.remote.ApiService
 import ru.feip.elisianix.remote.Result
 import ru.feip.elisianix.remote.models.Address
@@ -177,7 +178,10 @@ class CartOrderingViewModel : ViewModel() {
                                 _productUpdatedInRemote.emit(true)
                             }
 
-                            is Result.Error -> {}
+                            is Result.Error -> {
+                                editItemInCart(item, false)
+                                _productUpdatedInRemote.emit(true)
+                            }
                         }
                     }
             }

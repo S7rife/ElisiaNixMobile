@@ -4,272 +4,274 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
+    <ScrollView
+        android:id="@+id/productAllContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipChildren="false"
+        android:overScrollMode="never"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/productCartBtnContainer"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ScrollView
-            android:id="@+id/productAllContainer"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:clipChildren="false"
-            android:overScrollMode="never"
-            android:visibility="gone">
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/productImageContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipChildren="false"
-                android:orientation="vertical">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/productImageContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    app:layout_constraintDimensionRatio="1:1.32"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerProductImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:overScrollMode="never" />
-
-                    <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
-                        android:id="@+id/recyclerProductImageIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        app:dotColor="@color/black30"
-                        app:dotCount="3"
-                        app:dotRadius="4dp"
-                        app:dotSeparation="10dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:selectedDotColor="@color/black60"
-                        app:selectedDotRadius="5dp" />
-
-                    <TextView
-                        android:id="@+id/productIsNew"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
-                        android:background="@drawable/shape_product_actual"
-                        android:text="@string/new_"
-                        android:textAllCaps="true"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/productContentContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="24dp"
-                    android:clipChildren="false"
-                    app:layout_constraintTop_toBottomOf="@id/productImageContainer">
-
-                    <LinearLayout
-                        android:id="@+id/productTagsContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/productTagCategoryContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:cardCornerRadius="70dp">
-
-                            <TextView
-                                android:id="@+id/productTagCategory"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="12dp"
-                                android:layout_marginVertical="6dp"
-                                android:textSize="14sp" />
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/productTagBrandContainer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="8dp"
-                            app:cardCornerRadius="70dp">
-
-                            <TextView
-                                android:id="@+id/productTagBrand"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="12dp"
-                                android:layout_marginVertical="6dp"
-                                android:textSize="14sp" />
-                        </com.google.android.material.card.MaterialCardView>
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/productName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:textSize="24sp"
-                        app:layout_constraintTop_toBottomOf="@id/productTagsContainer" />
-
-                    <RelativeLayout
-                        android:id="@+id/productPricesContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="horizontal"
-                        app:layout_constraintTop_toBottomOf="@id/productName">
-
-                        <TextView
-                            android:id="@+id/productPriceNew"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/productPriceOld"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginHorizontal="12dp"
-                            android:layout_toEndOf="@id/productPriceNew"
-                            android:textSize="16sp" />
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:id="@+id/productColorContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/productPricesContainer">
-
-                        <TextView
-                            android:id="@+id/productColor"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/color"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/productColorCurrent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="16dp"
-                            android:textSize="16sp" />
-                    </LinearLayout>
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerColorSelector"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginEnd="-16dp"
-                        android:overScrollMode="never"
-                        app:layout_constraintTop_toBottomOf="@id/productColorContainer" />
-
-                    <TextView
-                        android:id="@+id/productSize"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="32dp"
-                        android:text="@string/choose_size"
-                        android:textSize="16sp"
-                        app:layout_constraintTop_toBottomOf="@id/recyclerColorSelector" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerSizeSelector"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginEnd="-8dp"
-                        android:clipChildren="false"
-                        android:overScrollMode="never"
-                        app:layout_constraintTop_toBottomOf="@id/productSize" />
-
-                    <TextView
-                        android:id="@+id/tableOfSizesBtn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:drawablePadding="8dp"
-                        android:text="@string/table_of_sizes"
-                        android:textSize="16sp"
-                        app:drawableStartCompat="@drawable/ic_ruler"
-                        app:layout_constraintTop_toBottomOf="@id/recyclerSizeSelector" />
-
-                    <TextView
-                        android:id="@+id/productDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="32dp"
-                        android:lineSpacingMultiplier="1.6"
-                        android:textSize="16sp"
-                        app:layout_constraintTop_toBottomOf="@id/tableOfSizesBtn" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/productRecsBlock"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="32dp"
-                    android:clipChildren="false"
-                    android:visibility="gone"
-                    app:layout_constraintTop_toBottomOf="@id/productContentContainer">
-
-                    <TextView
-                        android:id="@+id/recsBlockName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/you_may_like"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
-                        android:id="@+id/recyclerProductRecsIndicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:dotColor="@color/black30"
-                        app:dotCount="3"
-                        app:dotRadius="4dp"
-                        app:dotSeparation="10dp"
-                        app:layout_constraintBottom_toBottomOf="@id/recsBlockName"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/recsBlockName"
-                        app:selectedDotColor="@color/black60"
-                        app:selectedDotRadius="5dp" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1.32"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerProductRecsBlock"
+                    android:id="@+id/recyclerProductImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never" />
+
+                <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
+                    android:id="@+id/recyclerProductImageIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:dotColor="@color/black30"
+                    app:dotCount="3"
+                    app:dotRadius="4dp"
+                    app:dotSeparation="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:selectedDotColor="@color/black60"
+                    app:selectedDotRadius="5dp" />
+
+                <TextView
+                    android:id="@+id/productIsNew"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/shape_product_actual"
+                    android:text="@string/new_"
+                    android:textAllCaps="true"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/productContentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:clipChildren="false"
+                app:layout_constraintTop_toBottomOf="@id/productImageContainer">
+
+                <LinearLayout
+                    android:id="@+id/productTagsContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/productTagCategoryContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="70dp">
+
+                        <TextView
+                            android:id="@+id/productTagCategory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="12dp"
+                            android:layout_marginVertical="6dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/productTagBrandContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        app:cardCornerRadius="70dp">
+
+                        <TextView
+                            android:id="@+id/productTagBrand"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="12dp"
+                            android:layout_marginVertical="6dp"
+                            android:textColor="@color/black"
+                            android:textSize="14sp" />
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/productName"
+                    style="@style/CormorantRegular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textSize="24sp"
+                    app:layout_constraintTop_toBottomOf="@id/productTagsContainer" />
+
+                <RelativeLayout
+                    android:id="@+id/productPricesContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="20dp"
-                    android:clipToPadding="false"
-                    android:overScrollMode="never"
-                    android:paddingHorizontal="12dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toBottomOf="@id/productName">
+
+                    <TextView
+                        android:id="@+id/productPriceNew"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/productPriceOld"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginHorizontal="12dp"
+                        android:layout_toEndOf="@id/productPriceNew"
+                        android:textSize="16sp" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/productColorContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/productRecsBlock" />
+                    app:layout_constraintTop_toBottomOf="@id/productPricesContainer">
+
+                    <TextView
+                        android:id="@+id/productColor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/color"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/productColorCurrent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerColorSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="-16dp"
+                    android:overScrollMode="never"
+                    app:layout_constraintTop_toBottomOf="@id/productColorContainer" />
+
+                <TextView
+                    android:id="@+id/productSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/choose_size"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toBottomOf="@id/recyclerColorSelector" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSizeSelector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="-8dp"
+                    android:clipChildren="false"
+                    android:overScrollMode="never"
+                    app:layout_constraintTop_toBottomOf="@id/productSize" />
+
+                <TextView
+                    android:id="@+id/tableOfSizesBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:drawablePadding="8dp"
+                    android:text="@string/table_of_sizes"
+                    android:textSize="16sp"
+                    app:drawableStartCompat="@drawable/ic_ruler"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/recyclerSizeSelector" />
+
+                <TextView
+                    android:id="@+id/productDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:lineSpacingMultiplier="1.6"
+                    android:textSize="16sp"
+                    app:layout_constraintTop_toBottomOf="@id/tableOfSizesBtn" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </ScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/productRecsBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:clipChildren="false"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/productContentContainer">
+
+                <TextView
+                    android:id="@+id/recsBlockName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/you_may_like"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator
+                    android:id="@+id/recyclerProductRecsIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:dotColor="@color/black30"
+                    app:dotCount="3"
+                    app:dotRadius="4dp"
+                    app:dotSeparation="10dp"
+                    app:layout_constraintBottom_toBottomOf="@id/recsBlockName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/recsBlockName"
+                    app:selectedDotColor="@color/black60"
+                    app:selectedDotRadius="5dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerProductRecsBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingHorizontal="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/productRecsBlock" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

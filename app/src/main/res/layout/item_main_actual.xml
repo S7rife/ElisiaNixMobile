@@ -6,13 +6,13 @@
     android:layout_marginBottom="40dp">
 
     <TextView
+        style="@style/CormorantSemiBold"
         android:id="@+id/actualSectionName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:textAllCaps="true"
         android:textSize="20sp"
-        android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.rbrooks.indefinitepagerindicator.IndefinitePagerIndicator

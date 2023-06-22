@@ -6,6 +6,7 @@
     android:layout_marginBottom="40dp">
 
     <TextView
+        style="@style/CormorantSemiBold"
         android:id="@+id/categoryBlockName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

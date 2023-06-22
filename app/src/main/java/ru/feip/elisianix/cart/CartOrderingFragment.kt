@@ -59,6 +59,10 @@ class CartOrderingFragment :
         updatePlaceUI()
     }
 
+    private val userDao = App.INSTANCE.db.UserInfoDao()
+    private val prefs = App.sharedPreferences
+    private var userInfo = userDao.getByToken(prefs.getString("token", "")!!)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.getCartNoAuth()
@@ -80,6 +84,9 @@ class CartOrderingFragment :
         cartDao.getAllLive().observe(viewLifecycleOwner) { updateAdaptersFromOther() }
 
         binding.apply {
+            nameInputEdit.setText(userInfo.firstName)
+            emailInputEdit.setText(userInfo.email)
+
             toolbarCart.setNavigationOnClickListener { findNavController().popBackStack() }
             radioGroup.setOnCheckedChangeListener { _, itemId ->
                 val isDelivery = itemId == R.id.radioDelivery
@@ -139,6 +146,8 @@ class CartOrderingFragment :
             val formatWatcher = MaskFormatWatcher(mask)
             formatWatcher.installOn(phoneInputEdit)
             formatWatcher.setCallback(PhoneNumberChangeListener())
+
+            phoneInputEdit.setText(prefs.getString("phone_number", ""))
 
             updateUi()
         }
@@ -279,6 +288,16 @@ class CartOrderingFragment :
     }
 
     private fun goToOrdered(orderNumber: Int) {
+        binding.apply {
+            userInfo.apply {
+                firstName = nameInputEdit.text.toString()
+                email = emailInputEdit.text.toString()
+            }
+            prefs.edit().putString("phone_number", phoneInputEdit.text.toString()).apply()
+            userDao.deleteByToken(prefs.getString("token", "")!!)
+            userDao.insert(userInfo)
+        }
+
         findNavController().navigate(
             R.id.action_cartOrderingFragment_to_cartOrderedDialog,
             bundleOf("order_number" to orderNumber)

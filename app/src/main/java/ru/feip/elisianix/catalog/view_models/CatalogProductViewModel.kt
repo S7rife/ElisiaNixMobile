@@ -92,7 +92,10 @@ class CatalogProductViewModel : ViewModel() {
                                     _productUpdatedInRemote.emit(true)
                                 }
 
-                                is Result.Error -> {}
+                                is Result.Error -> {
+                                    editItemInCart(item, false)
+                                    _productUpdatedInRemote.emit(true)
+                                }
                             }
                         }
                 }

@@ -109,6 +109,7 @@ class NoAuthSecondDialog :
         viewModel.userInfo
             .onEach {
                 App.sharedPreferences.edit().putString("token", it.token).apply()
+                App.sharedPreferences.edit().putString("phone_number", phoneNumber).apply()
                 App.INSTANCE.db.UserInfoDao().insert(it)
                 App.AUTH = true
                 back = false

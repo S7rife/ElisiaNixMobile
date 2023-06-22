@@ -32,13 +32,13 @@ data class UserInfo(
     @ColumnInfo(name = "username") val username: String,
 
     @SerializedName("firstName")
-    @ColumnInfo(name = "firstName") val firstName: String?,
+    @ColumnInfo(name = "firstName") var firstName: String?,
 
     @SerializedName("lastName")
     @ColumnInfo(name = "lastName") val lastName: String?,
 
     @SerializedName("email")
-    @ColumnInfo(name = "email") val email: String?,
+    @ColumnInfo(name = "email") var email: String?,
 
     @SerializedName("token")
     @ColumnInfo(name = "token") val token: String,
